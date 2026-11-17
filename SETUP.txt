@@ -1,0 +1,24 @@
+upwind sky history: one-time setup in Cloudflare (about 5 minutes)
+
+1. Create the database
+   Cloudflare dashboard > Storage & Databases > D1 > Create database.
+   Name it: upwind   (the free plan is fine)
+
+2. Connect it to the relay
+   Workers & Pages > upwind-relay > Settings > Bindings > Add > D1 database.
+   Variable name: DB   (exactly, in capitals)   Database: upwind   > Save.
+
+3. Turn on the 5-minute timer
+   Same worker > Settings > Trigger events (or Triggers) > Add > Cron trigger.
+   Enter: */5 * * * *   > Save.
+
+4. Update the code
+   Edit code > replace everything with relay-worker.js > Deploy.
+   The worker creates its own tables on the first run.
+
+5. Check
+   upwind-relay.maxpurwin.workers.dev/debug  should say  "history": "connected"
+   After ~10 minutes, /stats/today should show "ready": true.
+
+6. GitHub
+   Replace index.html in your upwind folder, commit, push.

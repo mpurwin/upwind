@@ -262,8 +262,9 @@ body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transp
 .tour-spot:after{content:"";position:absolute;inset:-4px;border-radius:16px;border:1.5px solid rgba(244,226,198,.55)}
 .tour-spot.none:after{display:none}
 .tour-card{position:fixed;z-index:62;width:264px;background:rgba(30,29,26,.42);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);border:1px solid rgba(236,231,222,.2);box-shadow:0 12px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06);border-radius:12px;padding:16px 16px 12px;overflow:hidden;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s,left .5s cubic-bezier(.4,0,.2,1),top .5s cubic-bezier(.4,0,.2,1)}
-.tour-card.on{opacity:1;transform:none}
-.tour-card .ln{position:absolute;left:0;top:0;height:3px;width:0;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s3))}
+.tour-card{pointer-events:none}
+.tour-card.on{opacity:1;transform:none;pointer-events:auto}
+.tour-card .ln{display:none}
 .tour-card.fly .ln{animation:tourLine .9s cubic-bezier(.3,.6,.3,1) forwards}
 @keyframes tourLine{to{width:100%}}
 .tour-card h3{font-family:var(--display);font-style:normal;font-weight:900;letter-spacing:-.03em;font-size:1.15rem;line-height:1.1}
@@ -388,7 +389,7 @@ body.lobby.lobby-awake{cursor:default}
 body.lobby.lobby-awake #lb-ctl{opacity:1;pointer-events:auto}
 #lb-ctl .lb-pan{display:none;flex-direction:column;gap:12px;padding:16px;border-radius:14px;background:rgba(13,13,12,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(236,231,222,.16);width:min(560px,90vw);position:relative}
 #lb-ctl .lb-pan.on{display:flex;animation:popIn .32s cubic-bezier(.2,.8,.2,1) both}
-#lb-ctl .lb-pan:before{content:"";position:absolute;left:14px;right:14px;top:0;height:2px;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s3))}
+
 #lb-ctl .row{display:flex;flex-direction:column;gap:6px}
 #lb-ctl .row>span{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
 #lb-ctl .toggles{display:flex;flex-wrap:wrap;gap:6px}
@@ -422,7 +423,7 @@ body.lobby.chart .vig{background:linear-gradient(to top,rgba(13,13,12,.94) 0,rgb
 .pop.on .row:nth-child(2){animation-delay:.04s}.pop.on .row:nth-child(3){animation-delay:.08s}.pop.on .row:nth-child(4){animation-delay:.12s}.pop.on .row:nth-child(5){animation-delay:.16s}.pop.on .row:nth-child(6){animation-delay:.2s}
 @keyframes popIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
 @keyframes rowIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.pop:before{content:"";position:absolute;left:14px;right:14px;top:0;height:2px;border-radius:0 0 2px 2px;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s3))}
+
 @media (prefers-reduced-motion:reduce){.pop.on,.pop.on .row{animation:none}}
 body.no-ticker .ticker{display:none}
 /* Menus and cards always fit between the top buttons and the bottom bar */
@@ -445,6 +446,39 @@ body.no-ticker .ticker{display:none}
 .busy .bsrc{font-size:.72rem;color:var(--dim);margin-top:6px}
 .panel .sub3{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);font-weight:600;margin-top:18px}
 .rstats em{font-style:normal;font-size:.72rem;margin-left:4px}.rstats em.up{color:#7fbf8a}.rstats em.dn{color:#e07a6a}
+.pop .ptabs{display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(236,231,222,.06);align-self:flex-start}
+.pop .ptabs button{background:none;border:0;color:var(--muted);font:500 .84rem var(--sans);padding:6px 16px;border-radius:999px;cursor:pointer;transition:color .2s,background .2s}
+.pop .ptabs button[aria-selected="true"]{background:var(--bone);color:var(--ink)}
+.pop .ptabs button:hover{color:var(--bone)}.pop .ptabs button[aria-selected="true"]:hover{color:var(--ink)}
+.pop .ppane{display:flex;flex-direction:column;gap:12px}.pop .ppane[hidden]{display:none}
+.pop .row .ckey{margin-top:4px}
+.wmrow{position:relative}
+.about{position:absolute;left:-8px;top:calc(100% + 8px);display:none;flex-direction:column;min-width:200px;padding:6px;border-radius:12px;background:rgba(13,13,12,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(236,231,222,.16);z-index:30}
+.about.on{display:flex;animation:popIn .28s cubic-bezier(.2,.8,.2,1) both}
+
+.about button,.about a{background:none;border:0;text-align:left;color:var(--bone);font:500 .88rem var(--sans);padding:9px 12px;border-radius:8px;cursor:pointer;text-decoration:none;position:relative;isolation:isolate}
+.about button:hover,.about a:hover{background:linear-gradient(100deg,rgba(232,105,44,.3),rgba(242,163,58,.16) 60%,rgba(244,226,198,.05))}
+.wm{cursor:pointer}
+/* One size for every control button */
+.home-pill,.open-panel .chip,#open-panel,.menu-btn,#scene-btn,#lb-gear,#look-btn{height:38px;padding:0 16px!important;font-size:.86rem!important;display:inline-flex;align-items:center;box-sizing:border-box;line-height:1}
+.modes{height:38px;padding:3px!important;box-sizing:border-box;align-items:stretch}
+.modes button{height:auto;padding:0 14px!important;font-size:.86rem!important;display:inline-flex;align-items:center}
+@media (max-width:760px){.home-pill,.open-panel .chip,#open-panel,.menu-btn,#scene-btn,#look-btn{height:34px;padding:0 12px!important;font-size:.8rem!important}.modes{height:34px}.modes button{padding:0 11px!important;font-size:.8rem!important}}
+#look-btn{gap:8px;color:var(--bone)}
+#look-btn .lk-off{display:none}
+#look-btn[aria-pressed="true"]{border-color:var(--s2);background:rgba(13,13,12,.7)}
+#look-btn[aria-pressed="true"] .lk-on{display:none}#look-btn[aria-pressed="true"] .lk-off{display:inline}
+#look-btn[aria-pressed="true"] svg{color:var(--s2)}
+.pop .rdesc{font-size:.76rem;line-height:1.4;color:var(--muted);margin:-2px 0 4px;text-transform:none;letter-spacing:0;max-width:340px}
+.pop .ptabs+.ppane{margin-top:2px}
+/* One accent for every pop-out: three solid stripes along the top */
+.about,.home-form,.credits,.tour-card{overflow:hidden}
+.pop:after,.about:after,#lb-ctl .lb-pan:after,.tour-card:after,.credits:after,.home-form:after{content:"";position:absolute;left:0;right:0;top:0;height:6px;pointer-events:none;background:linear-gradient(var(--s1) 0 2px,var(--s2) 2px 4px,var(--s3) 4px 6px)}
+.pop{padding-top:20px!important}.about{padding-top:12px!important}.home-form{padding-top:18px!important}.credits{padding-top:22px!important}.tour-card{padding-top:20px!important}
+.pop{overflow-y:auto}
+.heat-range{margin-top:14px;flex-wrap:wrap;gap:6px}
+.heat-key{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:.74rem;color:var(--muted)}
+.heat-key i{flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,rgba(232,105,44,.15),var(--s1),var(--s2),var(--s3))}
 </style>
 </head>
 <body>
@@ -455,7 +489,8 @@ body.no-ticker .ticker{display:none}
 <div class="topstripe" aria-hidden="true"><i></i><i></i><i></i></div>
 
 <div class="hud">
-  <div class="wmrow"><a class="wm" href="#" id="wm">upwind</a></div>
+  <div class="wmrow"><a class="wm" href="#" id="wm" aria-haspopup="true" aria-expanded="false">upwind</a>
+    <div class="about" id="about" role="menu"><button id="tour-again">Take the Tour</button><button id="credits-menu">Data &amp; Credits</button><a id="feedback-menu" hidden href="#">Send Feedback</a><button id="replay-intro">Replay the Intro</button></div></div>
   <h1 id="h-title">Over Michigan.</h1>
   <p class="sum" id="h-sum"></p>
   <div class="stats" id="h-stats"></div>
@@ -473,46 +508,42 @@ body.no-ticker .ticker{display:none}
     <span><i style="background:var(--s2)"></i>5,000 to 18,000</span>
     <span><i style="background:var(--s3)"></i>Above 18,000</span>
     <span class="fine">Connecting · Not for flight planning</span>
-    <button class="fine credits-btn" id="credits-btn">Data &amp; credits</button>
+    <button class="fine credits-btn" id="credits-btn">Data &amp; Credits</button>
   </div>
   <div class="ctrls">
-    <nav class="modes" aria-label="Mode"><button data-mode="sky" aria-pressed="true">Sky</button><button data-mode="look" aria-pressed="false">Look up</button></nav>
+    <button class="chip" id="look-btn" aria-pressed="false"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="7" cy="7" r="1.6" fill="currentColor"/></svg><span class="lk-on">What's Overhead</span><span class="lk-off">Back to the Map</span></button>
     <div class="scene">
-      <button class="chip menu-btn" id="scene-btn" aria-expanded="false" aria-haspopup="true"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 3h12M1 7h12M1 11h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="mlbl">Map options</span></button>
+      <button class="chip menu-btn" id="scene-btn" aria-expanded="false" aria-haspopup="true"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 3h12M1 7h12M1 11h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="mlbl">Map Settings</span></button>
       <div class="pop" id="pop" role="menu">
-        <div class="row"><span>Show</span><div class="toggles">
-          <button class="chip" id="chart-btn" aria-pressed="false">Sectional chart</button>
-          <button class="chip" data-layer="places" aria-pressed="true">Places</button>
-          <button class="chip" data-layer="wind" aria-pressed="true">Wind</button>
-          <button class="chip" data-layer="clouds" aria-pressed="true">Clouds</button>
-          <button class="chip" data-layer="precip" aria-pressed="true">Rain &amp; snow</button>
-          <button class="chip" data-layer="jets" aria-pressed="false">Airliners</button>
-          <button class="chip" data-layer="beacons" aria-pressed="true">Beacons</button>
-          <button class="chip" data-layer="tails" aria-pressed="true">Tail numbers</button>
-          <button class="chip" data-layer="ticker" aria-pressed="true">Worth knowing</button>
-          <button class="chip" data-layer="conds" aria-pressed="true">Conditions</button>
-          <button class="chip" id="snd" aria-pressed="false">Sound</button>
-        </div></div>
-        <div class="row cond-key"><span>Conditions</span><div class="ckey"><i style="background:#7fbf8a"></i>VFR<i style="background:#79a7e6"></i>MVFR<i style="background:#e0645a"></i>IFR<i style="background:#c975d9"></i>LIFR</div></div>
-        <div class="row"><span>Numbers <em class="hint">up to 3</em></span><div class="toggles" id="stat-pick"></div></div>
-        <div class="row"><span>Light</span><div class="group" role="group" aria-label="Light">
-          <button class="chip" data-mood="live" aria-pressed="true">Now</button>
-          <button class="chip" data-mood="dawn" aria-pressed="false">Dawn</button>
-          <button class="chip" data-mood="day" aria-pressed="false">Day</button>
-          <button class="chip" data-mood="dusk" aria-pressed="false">Dusk</button>
-          <button class="chip" data-mood="night" aria-pressed="false">Night</button>
-        </div></div>
-        <div class="row"><span>Map color</span><div class="group" role="group" aria-label="Map color">
-          <button class="chip" data-mtheme="season">Seasonal</button><button class="chip" data-mtheme="warm">Warm</button><button class="chip" data-mtheme="slate">Slate</button><button class="chip" data-mtheme="forest">Forest</button><button class="chip" data-mtheme="ink">Ink</button>
-        </div></div>
-        <div class="row" id="season-row"><span>Season</span><div class="group" role="group" aria-label="Season">
-          <button class="chip" data-season="live" aria-pressed="true">Now</button>
-          <button class="chip" data-season="spring" aria-pressed="false">Spring</button>
-          <button class="chip" data-season="summer" aria-pressed="false">Summer</button>
-          <button class="chip" data-season="fall" aria-pressed="false">Fall</button>
-          <button class="chip" data-season="winter" aria-pressed="false">Winter</button>
-        </div></div>
-        <div class="row"><span>Help</span><div class="toggles"><button class="chip" id="tour-again">Take the tour</button><button class="chip" id="credits-menu">Data &amp; credits</button><a class="chip" id="feedback-menu" hidden href="#">Send feedback</a></div></div>
+        <div class="ptabs" role="tablist"><button role="tab" data-ptab="map" aria-selected="true">Map Layers</button><button role="tab" data-ptab="view" aria-selected="false">Display</button></div>
+        <div class="ppane" data-pane="map">
+          <div class="row"><span>Base Map</span><div class="group seg" role="group" aria-label="Base map"><button class="chip" id="base-dark" aria-pressed="true">Dark</button><button class="chip" id="chart-btn" aria-pressed="false">Sectional</button></div></div>
+          <div class="row"><span>Weather</span><div class="toggles">
+            <button class="chip" data-layer="clouds" aria-pressed="true">Clouds</button>
+            <button class="chip" data-layer="precip" aria-pressed="true">Rain &amp; Snow</button>
+            <button class="chip" data-layer="wind" aria-pressed="true">Wind</button>
+            <button class="chip" data-layer="conds" aria-pressed="true">Conditions</button>
+          </div><div class="ckey"><i style="background:#7fbf8a"></i>VFR<i style="background:#79a7e6"></i>MVFR<i style="background:#e0645a"></i>IFR<i style="background:#c975d9"></i>LIFR</div></div>
+          <div class="row"><span>Traffic</span><div class="toggles">
+            <button class="chip" data-layer="jets" aria-pressed="false">Airliners</button>
+            <button class="chip" data-layer="tails" aria-pressed="true">Tail Numbers</button>
+          </div></div>
+          <div class="row"><span>Airports</span><div class="toggles">
+            <button class="chip" data-layer="airspace" aria-pressed="true">Airspace</button>
+            <button class="chip" data-layer="beacons" aria-pressed="true">Beacons</button>
+          </div></div>
+        </div>
+        <div class="ppane" data-pane="view" hidden>
+          <div class="row"><span>Headline Numbers <em class="hint">up to 3</em></span><div class="toggles" id="stat-pick"></div></div>
+          <div class="row"><span>On Screen</span><div class="toggles">
+            <button class="chip" data-layer="ticker" aria-pressed="true">Worth Knowing</button>
+            <button class="chip" id="snd" aria-pressed="false">Sound</button>
+          </div></div>
+          <div class="row"><span>Map Color</span><div class="group" role="group" aria-label="Map color">
+            <button class="chip" data-mtheme="season">Seasonal</button><button class="chip" data-mtheme="warm">Warm</button><button class="chip" data-mtheme="slate">Slate</button><button class="chip" data-mtheme="forest">Forest</button><button class="chip" data-mtheme="ink">Ink</button>
+          </div></div>
+        </div>
+        <div hidden><button data-mood="live" aria-pressed="true"></button><button data-season="live" aria-pressed="true"></button></div>
       </div>
     </div>
   </div>
@@ -525,14 +556,14 @@ body.no-ticker .ticker{display:none}
     <label for="home-in">Your home airport</label>
     <input id="home-in" list="home-list" placeholder="KARB or Ann Arbor" spellcheck="false">
     <datalist id="home-list"></datalist>
-    <div class="row"><button class="btn" type="submit">Set home</button><button class="btn ghost" type="button" id="home-clear">Clear</button></div>
+    <div class="row"><button class="btn" type="submit">Set Home</button><button class="btn ghost" type="button" id="home-clear">Clear</button></div>
     <p class="msg" id="home-msg"></p>
   </form>
 </div>
-<div class="open-panel"><button class="chip" id="open-panel"><span class="lg">Explore: </span><b>Places to Go</b></button></div>
+<div class="open-panel"><button class="chip" id="open-panel"><b>Explore</b></button></div>
 </div>
 <div class="panel" id="panel" role="dialog" aria-label="This weekend in Michigan's sky">
-  <div class="tabs" role="tablist"><button role="tab" data-tab="places" aria-selected="true">Places</button><button role="tab" data-tab="cross" aria-selected="false">Crossings</button><button role="tab" data-tab="week" aria-selected="false">This Week</button></div>
+  <div class="tabs" role="tablist"><button role="tab" data-tab="week" aria-selected="true">This Week</button><button role="tab" data-tab="places" aria-selected="false">Places to Go</button><button role="tab" data-tab="heat" aria-selected="false">Where We Fly</button></div>
   <button class="x" id="panel-x" aria-label="Close">×</button>
   <div class="pbody" id="pbody"></div>
 </div>
@@ -549,7 +580,7 @@ body.no-ticker .ticker{display:none}
   </ul>
   <p class="cnote">upwind is for fun and awareness only. It is not for navigation or flight planning; use current charts, NOTAMs and an official briefing.</p>
   <p class="cnote" id="privacy-note">No cookies or tracking. Your home airport and settings stay in your browser.</p>
-  <p class="cnote" id="feedback-line" hidden>Ideas or bugs? <a id="feedback-link" href="#">Send feedback</a>.</p>
+  <p class="cnote" id="feedback-line" hidden>Ideas or bugs? <a id="feedback-link" href="#">Send Feedback</a>.</p>
 </div>
 <div class="mcard" id="mcard" aria-live="polite"></div>
 <div class="follow" id="follow"><i></i><span id="follow-t"></span><button id="follow-stop">Stop</button></div>
@@ -566,9 +597,9 @@ body.no-ticker .ticker{display:none}
 </div>
 <div id="lb-ctl" aria-label="Display options">
   <div class="lb-pan" id="lb-pan">
-    <div class="row"><span>On screen</span><div class="toggles"><button class="chip" data-lbo="catTop">Field conditions</button><button class="chip" data-lbo="cond">Weather details</button><button class="chip" data-lbo="cap">Captions</button><button class="chip" data-lbo="chart">Sectional up close</button></div></div>
+    <div class="row"><span>On screen</span><div class="toggles"><button class="chip" data-lbo="catTop">Field Conditions</button><button class="chip" data-lbo="cond">Weather Details</button><button class="chip" data-lbo="cap">Captions</button><button class="chip" data-lbo="chart">Sectional Up Close</button></div></div>
     <div class="row"><span>Map color</span><div class="toggles"><button class="chip" data-lbt="season">Seasonal</button><button class="chip" data-lbt="warm">Warm</button><button class="chip" data-lbt="slate">Slate</button><button class="chip" data-lbt="forest">Forest</button><button class="chip" data-lbt="ink">Ink</button></div></div>
-    <div class="row"><span>Light</span><div class="toggles"><button class="chip" data-lbl="live">Real time</button><button class="chip" data-lbl="day">Day</button><button class="chip" data-lbl="dusk">Dusk</button><button class="chip" data-lbl="night">Night</button></div></div>
+    <div class="row"><span>Light</span><div class="toggles"><button class="chip" data-lbl="live">Real Time</button><button class="chip" data-lbl="day">Day</button><button class="chip" data-lbl="dusk">Dusk</button><button class="chip" data-lbl="night">Night</button></div></div>
   </div>
   <button class="chip" id="lb-gear"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 3h12M1 7h12M1 11h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> Display</button>
 </div>
@@ -660,7 +691,7 @@ var home=null; try{ var hs=localStorage.getItem("upwind-home"); if(hs&&A[hs]) ho
 function aptVisible(a){ var k=T.k; if(a===home||(sel&&sel.a===a)) return true; if(mobile) return (a.tier===1&&k>=1.3)||(a.tier===2&&k>=3.2)||k>=5; return a.tier===1||(a.tier===2&&k>=1.7)||k>=2.8; }
 function code(a){ return a.icao||a.id; }
 
-var layers={wind:false,clouds:true,jets:false,precip:true,places:false,beacons:true,conds:true,tails:true,ticker:true};
+var layers={wind:false,clouds:true,jets:false,precip:true,places:false,beacons:true,conds:true,tails:true,ticker:true,airspace:true};
 try{ var lp=JSON.parse(localStorage.getItem("upwind-layers")||"null"); if(lp) Object.keys(layers).forEach(function(k){ if(typeof lp[k]==="boolean") layers[k]=lp[k]; }); }catch(e){}
 function saveLayers(){ try{ localStorage.setItem("upwind-layers",JSON.stringify(layers)); }catch(e){} }
 var seasonPick="live";
@@ -776,7 +807,8 @@ function drawChart(){
   }
   gMap.fillStyle="rgba(8,10,14,"+(LOBBY?0.06+0.2*light.night:0.12+0.5*light.night)+")"; gMap.fillRect(0,0,W,H);
 }
-document.getElementById("chart-btn").addEventListener("click",function(){ chart=!chart; this.setAttribute("aria-pressed",chart); document.body.classList.toggle("chart",chart); mapDirty=true; clearWind(); if(chart) toast("FAA VFR sectional chart. Not for navigation; use current charts.",3600); });
+document.getElementById("base-dark").addEventListener("click",function(e){ if(chart) document.getElementById("chart-btn").click(); });
+document.getElementById("chart-btn").addEventListener("click",function(){ document.getElementById("base-dark").setAttribute("aria-pressed",chart); chart=!chart; this.setAttribute("aria-pressed",chart); document.body.classList.toggle("chart",chart); mapDirty=true; clearWind(); if(chart) toast("FAA VFR sectional chart. Not for navigation; use current charts.",3600); });
 
 /* ---------------- Map ---------------- */
 var mapDirty=true, lastLightKey="";
@@ -785,7 +817,7 @@ var RELIEF={ok:false,b:[-93.5,39.8,-76.0,49.5],img:new Image()};
 RELIEF.img.onload=function(){ RELIEF.ok=true; mapDirty=true; }; RELIEF.img.src="relief.webp";
 var LAKE_LABELS=[["LAKE SUPERIOR",-87.9,47.55,-6],["LAKE MICHIGAN",-87.05,43.6,-82],["LAKE HURON",-82.35,44.55,-68],["LAKE ERIE",-81.25,42.12,-22],["GEORGIAN BAY",-80.85,45.35,-50]];
 function drawLakeLabels(){
-  if(T.k>6) return; var fs=Math.round(Math.min(15,9+2.2*Math.sqrt(T.k))), a=Math.max(0,Math.min(1,(6-T.k)/2));
+  if(T.k>6||T.k<1.5) return; var fs=Math.round(Math.min(15,9+2.2*Math.sqrt(T.k))), a=Math.max(0,Math.min(1,(6-T.k)/2))*Math.max(0,Math.min(1,(T.k-1.5)/0.6));
   gMap.save(); gMap.font="500 "+fs+"px Hanken Grotesk, sans-serif"; gMap.textAlign="center"; gMap.textBaseline="middle";
   try{ gMap.letterSpacing=(fs*0.42).toFixed(1)+"px"; }catch(e){}
   gMap.fillStyle="rgba(150,172,190,"+(0.34*a*(0.75+0.25*light.day)).toFixed(3)+")";
@@ -903,6 +935,7 @@ function drawMap(){
   gMap.beginPath(); path(mi); gMap.lineWidth=1/T.k; gMap.strokeStyle=P.shore; gMap.stroke();
   // Weather from above: radar, then satellite clouds with their shadows
   drawRadarSat();
+  drawHeat();
   // Lake names, set like a printed map
   gMap.setTransform(DPR,0,0,DPR,0,0); drawLakeLabels();
   // Daylight by real sun angle, point by point: night falls across the state, with a warm band at the edge
@@ -1282,7 +1315,7 @@ function drawAirports(t){
     if(T.k>(a.twr?3.2:5)&&!(LOBBY&&!a.twr)){ var LS=lblSet(g,"apt",11), cw=g.measureText(code(a)).width; if(lblFree(p[0]+r+5,p[1]-6,cw+2,13)) lblDraw(g,LS,"apt",code(a),p[0]+r+6,p[1]+4); try{ g.letterSpacing="0px"; }catch(e){} }
   });
   // Airspace: the FAA's charted Class B, C and D boundaries, drawn like the sectional
-  if(!chart&&T.k>=1.6) drawAirspace(Math.min(1,(T.k-1.6)/1.2));
+  if(!chart&&layers.airspace&&T.k>=1.6) drawAirspace(Math.min(1,(T.k-1.6)/1.2));
   // Neighboring states and Ontario: weather stations only, drawn lighter
   if(!chart&&layers.conds&&T.k>=(LOBBY?3:2.2)) NBR().forEach(function(st){
     var p=scr(st.lon,st.lat); if(p[0]<-20||p[1]<-20||p[0]>W+20||p[1]>H+20) return;
@@ -1461,7 +1494,7 @@ function updPlaneCard(p){
     '<p class="line">'+esc(cap(w.txt))+', heading '+cardinal(p.trk)+'.'+(p.orb?' Circling '+esc(p.orb.sp.n)+'.':'')+'</p>'+lakeBit+
     '<dl><div><dt>Altitude</dt><dd>'+fmtAlt(p.alt)+'</dd></div><div><dt>Ground speed</dt><dd>'+Math.round(p.gs)+' kt</dd></div>'+
     '<div><dt>Heading</dt><dd>'+String(Math.round((p.trk%360+360)%360)).padStart(3,"0")+'°</dd></div><div><dt>Up there it feels</dt><dd>'+feel(p)+'</dd></div></dl>'+
-    '<div class="acts">'+(follow===p?'<button class="btn ghost" data-act="stop">Stop riding along</button>':'<button class="btn" data-act="ride">Ride along</button>')+(p.src&&p.src.h?'<button class="btn ghost" data-act="share" data-q="plane='+esc(p.src.h)+'">Copy link</button>':'')+'</div>';
+    '<div class="acts">'+(follow===p?'<button class="btn ghost" data-act="stop">Stop Riding Along</button>':'<button class="btn" data-act="ride">Ride Along</button>')+(p.src&&p.src.h?'<button class="btn ghost" data-act="share" data-q="plane='+esc(p.src.h)+'">Copy Link</button>':'')+'</div>';
 }
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function feel(p){ // rough outside air temperature from standard lapse rate and the nearest surface report
@@ -1485,7 +1518,7 @@ function openAirport(a){
     '<dl><div><dt>Wind</dt><dd>'+(w?windText(w):"No report")+'</dd></div><div><dt>Clouds</dt><dd>'+(s?(w.ceil?cap(w.ceil):"No ceiling"):"No report")+'</dd></div>'+
     '<div><dt>Visibility</dt><dd>'+(w&&w.vis?w.vis:"No report")+'</dd></div><div><dt>Longest runway</dt><dd>'+(longest[1]||0).toLocaleString()+' ft '+esc(surf(longest[3]))+'</dd></div></dl>'+
 
-    '<div class="acts">'+(a===home?'<button class="btn ghost" data-act="homeedit">Change home</button>':'<button class="btn ghost" data-act="sethome" data-id="'+a.id+'">Make this home</button>')+'<button class="btn ghost" data-act="share" data-q="apt='+esc(code(a))+'">Copy link</button>'+(a.twr?'<a class="btn ghost" href="https://www.liveatc.net/search/?icao='+esc(a.icao||("K"+a.id))+'" target="_blank" rel="noopener">Listen on LiveATC</a>':'')+(s?'<a class="btn ghost" href="https://aviationweather.gov/data/metar/?ids='+esc(a.icao||("K"+a.id))+'&hours=0&taf=1" target="_blank" rel="noopener">Official weather</a>':'')+'</div>';
+    '<div class="acts">'+(a===home?'<button class="btn ghost" data-act="homeedit">Change Home</button>':'<button class="btn ghost" data-act="sethome" data-id="'+a.id+'">Make This Home</button>')+'<button class="btn ghost" data-act="share" data-q="apt='+esc(code(a))+'">Copy Link</button>'+(a.twr?'<a class="btn ghost" href="https://www.liveatc.net/search/?icao='+esc(a.icao||("K"+a.id))+'" target="_blank" rel="noopener">Listen on LiveATC</a>':'')+(s?'<a class="btn ghost" href="https://aviationweather.gov/data/metar/?ids='+esc(a.icao||("K"+a.id))+'&hours=0&taf=1" target="_blank" rel="noopener">Official Weather</a>':'')+'</div>';
   card.classList.add("on"); aptStatsFor(a,function(st){ var sl=document.querySelector('#card .busy-slot[data-apt="'+a.id+'"]'); if(sl) sl.innerHTML=busyHTML(st); });
 }
 function openStation(st){
@@ -1621,17 +1654,17 @@ function summary(){
   return out.join(" ");
 }
 function list(a){ return a.length<2?a[0]:a.slice(0,-1).join(", ")+" and "+a[a.length-1]; }
-var STAT_DEFS=[["total","Over Michigan"],["ga","General aviation"],["air","Airliners"],["lakes","Over the lakes"],["home","Near home"],["heli","Helicopters"],["biz","Business jets"],["vfr","Fields VFR"]];
+var STAT_DEFS=[["total","Planes Over Michigan"],["ga","General Aviation"],["air","Airliners"],["lakes","Over the Lakes"],["home","Near Home"],["heli","Helicopters"],["biz","Business Jets"],["vfr","Fields VFR"]];
 var statPick=["total","ga","air"]; try{ var sp=JSON.parse(localStorage.getItem("upwind-stats")||"null"); if(Array.isArray(sp)) statPick=sp.filter(function(k){ return STAT_DEFS.some(function(d){return d[0]===k;}); }).slice(0,3); }catch(e){}
 function statVal(k,inMI){
-  if(k==="total") return [inMI.length,"over Michigan"];
-  if(k==="air"){ return [inMI.filter(function(p){return BIGKIND[p.kind];}).length,"airliners"]; }
-  if(k==="ga") return [inMI.filter(function(p){return !BIGKIND[p.kind];}).length,"general aviation"];
-  if(k==="lakes") return [inMI.filter(function(p){return SMALL[p.kind]&&!geoInMI([p.lon,p.lat]);}).length,"over the lakes"];
-  if(k==="heli") return [inMI.filter(function(p){return p.kind==="heli";}).length,"helicopters"];
-  if(k==="biz") return [inMI.filter(function(p){return p.kind==="bizjet";}).length,"business jets"];
-  if(k==="vfr"){ var L=STN.filter(function(s){return s.mi;}); return [L.filter(function(s){return s.cat==="VFR";}).length+"/"+L.length,"fields VFR"]; }
-  if(k==="home"){ if(!home) return ["—","near home"]; return [inMI.filter(function(p){return !BIGKIND[p.kind]&&d3.geoDistance([home.lon,home.lat],[p.lon,p.lat])*3440.065<20;}).length,"near "+code(home)]; }
+  if(k==="total") return [inMI.length,"Planes Over Michigan"];
+  if(k==="air"){ return [inMI.filter(function(p){return BIGKIND[p.kind];}).length,"Airliners"]; }
+  if(k==="ga") return [inMI.filter(function(p){return !BIGKIND[p.kind];}).length,"General Aviation"];
+  if(k==="lakes") return [inMI.filter(function(p){return SMALL[p.kind]&&!geoInMI([p.lon,p.lat]);}).length,"Over the Lakes"];
+  if(k==="heli") return [inMI.filter(function(p){return p.kind==="heli";}).length,"Helicopters"];
+  if(k==="biz") return [inMI.filter(function(p){return p.kind==="bizjet";}).length,"Business Jets"];
+  if(k==="vfr"){ var L=STN.filter(function(s){return s.mi;}); return [L.filter(function(s){return s.cat==="VFR";}).length+"/"+L.length,"Fields VFR"]; }
+  if(k==="home"){ if(!home) return ["—","Near Home"]; return [inMI.filter(function(p){return !BIGKIND[p.kind]&&d3.geoDistance([home.lon,home.lat],[p.lon,p.lat])*3440.065<20;}).length,"Near "+code(home)]; }
 }
 function stats(){
   var inMI=planes.filter(function(p){return p.fade>0.2&&nearMI(p);});
@@ -1719,7 +1752,7 @@ function busyHTML(st){
   return '<div class="busy"><div class="bh"><b>Busiest around '+hrLbl(pk)+'</b><span>'+wk+' visit'+(wk===1?'':'s')+' this week'+(st.days>=14&&d?' ('+(d>0?'▲ ':'▼ ')+Math.abs(d)+')':'')+'</span></div><div class="bars">'+bars+'</div><div class="bx"><span>6 AM</span><span>Noon</span><span>6 PM</span><span>10 PM</span></div>'+(st.days<14?'<p class="bsrc">Counting since '+niceDay(st.since)+'. Gets sharper every week.</p>':'')+'</div>';
 }
 function aptKind(a){ if(["SJX","MCD","DRM"].indexOf(a.id)>=0) return "Island"; var g=a.rw.some(function(r){return surf(r[3])==="turf";}), pv=a.rw.some(function(r){return surf(r[3])==="paved";}); if(g&&!pv) return "Grass strip"; var shore=BIG_LAKES.slice(0,3).some(function(n){ return lakesByName[n]&&d3.geoDistance([a.lon,a.lat],d3.geoCentroid(lakesByName[n]))<9; }); return a.t; }
-var panel=document.getElementById("panel"), pbody=document.getElementById("pbody"), tab="places";
+var panel=document.getElementById("panel"), pbody=document.getElementById("pbody"), tab="week";
 function renderPlaces(){
   var list=SPOTS.map(function(sp,i){ return {sp:sp,i:i,d:home?d3.geoDistance([home.lon,home.lat],[sp.lon,sp.lat])*3440.065:null}; });
   if(home) list.sort(function(a,b){return a.d-b.d;});
@@ -1744,6 +1777,52 @@ function flyToLL(lat,lon,k,cb,center,dur){
   d3.select(cTop).transition().duration(dur||1600).ease(d3.easeCubicInOut).call(zoom.transform,d3.zoomIdentity.translate(cx-b[0]*k,cy-b[1]*k).scale(k)).on("end",function(){ if(cb) cb(); });
   if(mobile) closePanel();
 }
+/* ---------------- Where We Fly: heat map of small-plane flight time ---------------- */
+var HEAT={days:30,data:{},img:null,key:""};
+function heatLoad(days,cb){
+  if(HEAT.data[days]){ cb(HEAT.data[days]); return; }
+  if(PREVIEW&&D.STATS&&D.STATS.heat){ HEAT.data[days]=D.STATS.heat; cb(D.STATS.heat); return; }
+  if(!RELAY){ cb(null); return; }
+  fetch(RELAY.replace(/\/$/,"")+"/stats/heat?days="+days).then(function(r){return r.ok?r.json():null;}).then(function(j){ if(j&&j.ready){ HEAT.data[days]=j; } cb(j&&j.ready?j:null); }).catch(function(){ cb(null); });
+}
+// Build the glow once, in map space: blurred, log-scaled, brand colors
+function heatImage(h){
+  var G=h.grid, k=h.days+":"+h.cells.length; if(HEAT.key===k&&HEAT.img) return HEAT.img;
+  var c=document.createElement("canvas"); c.width=G.nx; c.height=G.ny; var x=c.getContext("2d"), im=x.createImageData(G.nx,G.ny), v=new Float32Array(G.nx*G.ny), mx=0;
+  h.cells.forEach(function(r){ var i=(G.ny-1-r[1])*G.nx+r[0]; v[i]=Math.log(1+r[2]); });
+  // soften: a small box blur, twice
+  for(var pass=0;pass<2;pass++){ var o=new Float32Array(v.length); for(var yy=0;yy<G.ny;yy++) for(var xx=0;xx<G.nx;xx++){ var s2=0,n=0; for(var dy=-1;dy<=1;dy++) for(var dx=-1;dx<=1;dx++){ var X=xx+dx,Y=yy+dy; if(X<0||Y<0||X>=G.nx||Y>=G.ny) continue; s2+=v[Y*G.nx+X]*(dx||dy?1:2); n+=(dx||dy?1:2); } o[yy*G.nx+xx]=s2/n; } v=o; }
+  for(var i=0;i<v.length;i++) if(v[i]>mx) mx=v[i];
+  var ramp=[[232,105,44],[242,163,58],[244,226,198]];
+  for(var j=0;j<v.length;j++){ var t=mx?v[j]/mx:0; t=Math.pow(t,1.6); if(t<0.03) continue; var c0=t<0.6?ramp[0]:ramp[1], c1=t<0.6?ramp[1]:ramp[2], f=t<0.6?t/0.6:(t-0.6)/0.4;
+    im.data[j*4]=c0[0]+(c1[0]-c0[0])*f; im.data[j*4+1]=c0[1]+(c1[1]-c0[1])*f; im.data[j*4+2]=c0[2]+(c1[2]-c0[2])*f; im.data[j*4+3]=Math.round(Math.min(1,t*1.1)*170); }
+  x.putImageData(im,0,0);
+  // stretch into Mercator rows so it sits exactly on the map
+  var out=document.createElement("canvas"), OW=G.nx*4, OH=G.ny*4; out.width=OW; out.height=OH; var ox=out.getContext("2d"); ox.imageSmoothingEnabled=true; ox.imageSmoothingQuality="high";
+  var my=function(la){ return Math.log(Math.tan(Math.PI/4+la*Math.PI/360)); }, la0=G.la0, la1=G.la0+G.ny*G.d, y0=my(la1), y1=my(la0);
+  for(var r=0;r<OH;r++){ var la=360/Math.PI*Math.atan(Math.exp(y0+(y1-y0)*(r+0.5)/OH))-90, sy=(la1-la)/G.d; ox.drawImage(c,0,Math.max(0,Math.min(G.ny-1,sy)),G.nx,1/4,0,r,OW,1); }
+  HEAT.img={c:out,b:[G.lo0,la0,G.lo0+G.nx*G.d,la1]}; HEAT.key=k; return HEAT.img;
+}
+function drawHeat(){
+  if(!panel.classList.contains("on")||tab!=="heat") return; var h=HEAT.data[HEAT.days]; if(!h) return;
+  var I=heatImage(h), a=proj([I.b[0],I.b[3]]), b=proj([I.b[2],I.b[1]]);
+  gMap.save(); gMap.globalCompositeOperation="screen"; gMap.filter="blur("+Math.max(1.5,3/T.k).toFixed(1)+"px)"; gMap.globalAlpha=0.9;
+  gMap.drawImage(I.c,a[0],a[1],b[0]-a[0],b[1]-a[1]); gMap.restore();
+}
+function renderHeat(){
+  var d=HEAT.days;
+  pbody.innerHTML='<h2>Where We Fly.</h2><p class="when" id="heat-when">Small-plane flight time over Michigan</p>'+
+    '<div class="group seg heat-range" role="group" aria-label="Range">'+[[7,"Last 7 Days"],[30,"Last 30 Days"],[365,"Last Year"]].map(function(r){ return '<button class="chip" data-hd="'+r[0]+'" aria-pressed="'+(r[0]===d)+'">'+r[1]+'</button>'; }).join("")+'</div>'+
+    '<div class="heat-key"><span>Quiet</span><i></i><span>Busy</span></div>'+
+    '<p class="intro2" id="heat-note">Every five minutes, upwind notes where each small plane is. Over time that adds up to the shape of Michigan flying: training areas, the lakeshore, the run up to the islands.</p>';
+  pbody.querySelectorAll("[data-hd]").forEach(function(b){ b.addEventListener("click",function(){ HEAT.days=+b.dataset.hd; renderHeat(); }); });
+  if(!HEAT.framed){ HEAT.framed=1; flyToLL(44.7,-85.4,1.05); }
+  heatLoad(d,function(h){ if(tab!=="heat") return; var w=document.getElementById("heat-when"), n=document.getElementById("heat-note");
+    if(!h){ if(w) w.textContent=RELAY?"Counting has just started":"Live on the site"; if(n) n.textContent=RELAY?"The map fills in as upwind counts. Check back in a day or two to see the first shapes.":"The heat map is drawn from the live site's history."; return; }
+    if(w) w.textContent=(h.since&&h.since>h.from?"Since "+niceDay(h.since):niceDay(h.from)+" to "+niceDay(h.to))+", from live traffic";
+    mapDirty=true; });
+  mapDirty=true;
+}
 function renderWeek(){
   var R=STATS&&STATS.rep;
   if(!R){ pbody.innerHTML='<h2>This Week.</h2><p class="when">Michigan\'s sky, counted</p><p class="intro2">upwind keeps a quiet tally of the sky: which fields small planes actually visit, the first plane up each morning, the longest time over the lakes. '+(RELAY?'The first numbers show up here after a few hours of counting, and the full weekly picture after seven days.':'Live counting runs on the live site.')+'</p>'; return; }
@@ -1753,6 +1832,8 @@ function renderWeek(){
     '<div><b>'+R.visits.toLocaleString()+'</b><span>airport visits</span></div>'+
     (R.busiest?'<div><b>'+weekdayOf(R.busiest.day)+'</b><span>busiest day, '+R.busiest.n+' planes</span></div>':'')+
     (R.first?'<div><b>'+fmtMin(R.first.first_min)+'</b><span>earliest one up'+(R.first.first_apt&&A[R.first.first_apt]?', '+esc(A[R.first.first_apt].t||A[R.first.first_apt].n):'')+'</span></div>':'')+'</div>';
+  var lakeNow=planes.filter(function(p){ return SMALL[p.kind]&&p.fade>0.6&&BIG_LAKES.slice(0,3).some(function(n){return geoLake([p.lon,p.lat])===n;}); }).length;
+  if(lakeNow) h+='<p class="intro2"><b>Over the lakes right now:</b> '+lakeNow+' small plane'+(lakeNow>1?'s':'')+'.</p>';
   if(R.lake&&R.lake.min>=15) h+='<p class="intro2"><b>Longest over the water:</b> '+(R.lake.type&&TYPES[R.lake.type]?lc1(an(TYPES[R.lake.type][0])):"a small plane")+' spent about '+R.lake.min+' minutes over '+esc(R.lake.lake)+' on '+weekdayOf(R.lake.day)+'.</p>';
   if(top.length) h+='<h3 class="sub3">Where Michigan flew</h3><ol class="rank">'+top.map(function(r,i){ var a=A[r[0]], dd=r[1]-r[2];
       return '<li data-id="'+a.id+'"><span class="n">'+(i+1)+'</span><div><div class="nm">'+esc(a.t||a.n)+'</div><div class="sub">'+esc(code(a))+' · '+esc(aptKind(a)===a.t?a.n:aptKind(a))+'</div><div class="bar" style="width:'+Math.round(r[1]/mx*100)+'%"></div></div>'+
@@ -1761,9 +1842,9 @@ function renderWeek(){
   pbody.innerHTML=h;
   pbody.querySelectorAll("li[data-id]").forEach(function(li){ li.addEventListener("click",function(){ flyTo(A[li.dataset.id]); }); });
 }
-function renderPanel(){ if(tab!=="places"&&tab!=="cross"&&tab!=="week") tab="places"; document.querySelectorAll(".panel [data-tab]").forEach(function(b){ b.setAttribute("aria-selected",b.dataset.tab===tab); }); if(tab==="places") renderPlaces(); else if(tab==="cross") renderCross(); else renderWeek(); }
+function renderPanel(){ if(tab!=="places"&&tab!=="week"&&tab!=="heat") tab="week"; mapDirty=true; document.querySelectorAll(".panel [data-tab]").forEach(function(b){ b.setAttribute("aria-selected",b.dataset.tab===tab); }); if(tab==="heat") renderHeat(); else if(tab==="places") renderPlaces(); else if(tab==="cross") renderCross(); else renderWeek(); }
 function openPanel(){ renderPanel(); panel.classList.add("on"); document.body.classList.add("panel-open"); if(mobile) closeCard(); }
-function closePanel(){ panel.classList.remove("on"); document.body.classList.remove("panel-open"); }
+function closePanel(){ mapDirty=true; panel.classList.remove("on"); document.body.classList.remove("panel-open"); }
 document.getElementById("open-panel").addEventListener("click",openPanel);
 document.getElementById("panel-x").addEventListener("click",closePanel);
 document.querySelectorAll(".panel [data-tab]").forEach(function(b){ b.addEventListener("click",function(){ tab=b.dataset.tab; renderPanel(); }); });
@@ -1774,7 +1855,7 @@ function flyTo(a){
   if(mobile) closePanel();
 }
 function drawSpots(t){
-  if(!layers.places&&!(sel&&sel.spot)) return;
+  if(!(panel.classList.contains("on")&&tab==="places")&&!(sel&&sel.spot)) return;
   var sk=Math.min(2,Math.sqrt(T.k)), mx=SPOTS[0].c;
   SPOTS.forEach(function(sp,i){
     var q=scr(sp.lon,sp.lat); if(q[0]<-40||q[1]<-40||q[0]>W+40||q[1]>H+40) return;
@@ -1865,7 +1946,7 @@ var mode="sky", mcard=document.getElementById("mcard"), cruise=110, trip=null, l
 function setMode(m){
   if(m==="plan"&&!home){ toast("Set your home airport first, then plan from there."); openHomeForm(); return; }
   mode=m; document.body.classList.remove("mode-sky","mode-plan","mode-look"); document.body.classList.add("mode-"+m);
-  document.querySelectorAll("[data-mode]").forEach(function(b){ b.setAttribute("aria-pressed",b.dataset.mode===m); });
+  var lb=document.getElementById("look-btn"); if(lb) lb.setAttribute("aria-pressed",m==="look");
   closeCard(); closePanel(); if(follow) stopFollow();
   trip=null; SPEED=BASE_SPEED;
   if(m==="sky"){ mcard.classList.remove("on"); lookPos=null; return; }
@@ -1874,7 +1955,7 @@ function setMode(m){
     if(navigator.geolocation){ try{ navigator.geolocation.getCurrentPosition(function(pos){ var la=pos.coords.latitude, lo=pos.coords.longitude; if(la>41.5&&la<47.6&&lo>-90.6&&lo<-82.2&&mode==="look"&&!lookPos) setLook(la,lo); },function(){},{timeout:6000,maximumAge:600000}); }catch(e){} }
   }
 }
-document.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ setMode(b.dataset.mode); }); });
+var lookBtn=document.getElementById("look-btn"); lookBtn.addEventListener("click",function(e){ e.stopPropagation(); setMode(mode==="look"?"sky":"look"); });
 function reachZoom(){ var a=proj([home.lon,home.lat]), b=proj([home.lon,home.lat+cruise*1.5/60]); var px=Math.hypot(b[0]-a[0],b[1]-a[1]); return Math.max(0.8,Math.min(4,(Math.min(W,H)*0.42)/px)); }
 
 /* Plan: reach rings and trip sketches */
@@ -1919,7 +2000,7 @@ function renderTrip(){
     (notes.length?'<p class="note2">'+notes.join("<br>")+'</p>':'<p class="note2">No big lake crossings or towered airspace right on the line.</p>')+
     (t.along.length?'<p>Worth a look on the way: <b style="color:var(--bone);font-weight:500">'+esc(list(t.along.map(function(sp){return sp.n;})))+'</b>.</p>':'')+
     '<div class="spd">Cruise <button data-spd="100" aria-pressed="'+(cruise===100)+'">100 kt</button><button data-spd="110" aria-pressed="'+(cruise===110)+'">110</button><button data-spd="130" aria-pressed="'+(cruise===130)+'">130</button><button data-spd="160" aria-pressed="'+(cruise===160)+'">160</button></div>'+
-    '<div class="acts">'+(a?'<button class="btn ghost" data-act="openapt">Airport details</button>':'')+'<button class="btn ghost" data-act="cleartrip">Clear</button></div>'+
+    '<div class="acts">'+(a?'<button class="btn ghost" data-act="openapt">Airport Details</button>':'')+'<button class="btn ghost" data-act="cleartrip">Clear</button></div>'+
     '<p class="fine2">A straight-line sketch for ideas, not a flight plan. Check charts, NOTAMs and an official briefing.</p>';
   mcard.classList.add("on");
 }
@@ -1959,7 +2040,7 @@ function drawPlan(t){
 /* Look up: what's about to fly over you */
 var lookList=[];
 function renderLookAsk(){
-  mcard.innerHTML='<span class="k">Look up</span><h3>Where Are You?</h3><p>Tap your spot on the map, or allow location, and we\'ll tell you what\'s about to fly overhead.</p><p class="fine2">Running in real time here, not sped up.</p>';
+  mcard.innerHTML='<span class="k">What\'s Overhead</span><h3>Where Are You?</h3><p>Tap your spot on the map, or allow location, and we\'ll tell you what\'s about to fly overhead.</p><p class="fine2">Running in real time here, not sped up.</p>';
   mcard.classList.add("on");
 }
 function setLook(lat,lon){ lookPos={lat:lat,lon:lon}; flyToLL(lat,lon,7,null,true); renderLook(); }
@@ -1977,11 +2058,11 @@ function renderLook(){
   cand.sort(function(a,b){return a._pr.t-b._pr.t;}); lookList=cand.slice(0,4);
   var over=planes.filter(function(p){ return p._pr&&p._pr.now<1.5&&p.fade>0.5; })[0];
   function when(t){ return t<1?"&lt;1 min":Math.round(t)+" min"; }
-  mcard.innerHTML='<span class="k">Look up</span><h3>Above You.</h3>'+
+  mcard.innerHTML='<span class="k">What\'s Overhead</span><h3>Above You.</h3>'+
     (over?'<div class="now">Overhead now: '+esc(an(over.name))+' at '+fmtAlt(over.alt)+'. Look up!</div>':'')+
     (lookList.length?'<ul>'+lookList.map(function(p,i){ var pr=p._pr; return '<li data-pi="'+i+'"><span class="t">'+when(pr.t)+'</span><div><b>'+esc(p.name)+'</b><br><span>'+fmtAlt(p.alt)+', coming from the '+pr.from+(pr.dmin<0.8?", right overhead":", passing "+pr.dmin.toFixed(1)+" nm to your "+pr.side)+'</span></div></li>'; }).join("")+'</ul>'
       :'<p>Nothing headed right over you in the next 12 minutes.'+(nearest?' The closest is '+esc(an(nearest.name).replace(/^A/,'a'))+', '+nearest._pr.now.toFixed(0)+' nm '+cardinal((Math.atan2((nearest.lon-lookPos.lon)*Math.cos(lookPos.lat*Math.PI/180),nearest.lat-lookPos.lat)*180/Math.PI+360)%360)+' at '+fmtAlt(nearest.alt)+'.':'')+'</p>')+
-    '<div class="acts"><button class="btn ghost" data-act="look-here">Center on me</button></div>'+
+    '<div class="acts"><button class="btn ghost" data-act="look-here">Center on Me</button></div>'+
     '<p class="fine2">Real time, based on each plane\'s current track. Tap the map to move your spot.</p>';
 }
 function drawLook(t){
@@ -2076,14 +2157,14 @@ var tour=(function(){
   var blk=document.getElementById("tour-block"), spot=document.getElementById("tour-spot"), cardT=document.getElementById("tour-card"), i=0, on=false;
   var PLANE='<svg width="22" height="22" viewBox="-14 -14 28 28" aria-hidden="true"><path transform="rotate(90)" fill="#f4e2c6" d="M0,-13 C1.6,-13 2.3,-9 2.3,-5 L13,2 L13,5 L2.3,2 L1.6,9 L5.5,12 L5.5,14 L0,12.5 L-5.5,14 L-5.5,12 L-1.6,9 L-2.3,2 L-13,5 L-13,2 L-2.3,-5 C-2.3,-9 -1.6,-13 0,-13 Z"/></svg>';
   var STEPS=[
-    {t:null,h:"Welcome to upwind.",p:"Michigan's sky, live, focused on general aviation: small planes, local airports and the weather that decides whether you go.",cta:"Take the tour",intro:true},
+    {t:null,h:"Welcome to upwind.",p:"Michigan's sky, live, focused on general aviation: small planes, local airports and the weather that decides whether you go.",cta:"Take the Tour",intro:true},
     {t:".legend",h:"Colors Show Altitude.",key:true},
     {t:"map",h:"Tap Anything.",p:"Planes show what they are and where they're headed. Airports show conditions, runways and frequencies."},
     {t:"#home-pill",h:"Set Your Home Airport.",p:"It stays on the map, and distances are measured from it.",home:true},
-    {t:".modes",h:"Look Up.",p:"Tap where you are to see what's about to fly overhead."},
-    {t:"#scene-btn",h:"Map Options.",p:"Sectional chart, places, weather, beacons, light and season."},
+    {t:"#look-btn",h:"What's Overhead.",p:"Tap where you are to see what's about to fly over you. Tap again to go back to the map."},
+    {t:"#scene-btn",h:"Map Settings.",p:"Map layers: sectional, weather, traffic, airspace. Display: your numbers, Worth knowing and map color."},
     {t:"#hud-toggle",h:"More Map.",p:"Tap − to tuck the headline away. The numbers stay."},
-    {t:null,h:"Enjoy the Sky.",p:"Take the tour again from Map options.",last:true}
+    {t:null,h:"Enjoy the Sky.",p:"Tap the upwind logo anytime for this tour, credits and more.",last:true}
   ];
   function rectOf(sel){
     if(sel==="map"){ var cx=mobile?W/2:W*0.62, cy=mobile?H*0.55:H*0.5, r=mobile?Math.min(W*0.42,150):Math.min(W*0.2,220); return {left:cx-r,top:cy-r,width:r*2,height:r*2,round:true}; }
@@ -2376,7 +2457,12 @@ function playSplash(){
   function settle(){ var any=false; letters.forEach(function(sp,j){ lift[j]*=0.93; if(lift[j]>0.01) any=true; else lift[j]=0; sp.style.translate="0 "+(-8*lift[j]).toFixed(2)+"px"; sp.style.rotate=(-1.5*lift[j]).toFixed(2)+"deg"; }); if(any) requestAnimationFrame(settle); }
 }
 splash.addEventListener("click",endSplash);
-document.getElementById("wm").addEventListener("click",function(e){ e.preventDefault(); if(follow) stopFollow(); closeCard(); playSplash(); });
+document.querySelectorAll("[data-ptab]").forEach(function(b){ b.addEventListener("click",function(e){ e.stopPropagation(); document.querySelectorAll("[data-ptab]").forEach(function(x){ x.setAttribute("aria-selected",x===b); }); document.querySelectorAll(".ppane").forEach(function(p){ p.hidden=p.dataset.pane!==b.dataset.ptab; }); }); });
+var aboutEl=document.getElementById("about"), wmEl=document.getElementById("wm");
+wmEl.addEventListener("click",function(e){ e.preventDefault(); e.stopPropagation(); var on=!aboutEl.classList.contains("on"); aboutEl.classList.toggle("on",on); wmEl.setAttribute("aria-expanded",on); });
+document.addEventListener("click",function(e){ if(!e.target.closest("#about")){ aboutEl.classList.remove("on"); wmEl.setAttribute("aria-expanded",false); } });
+aboutEl.addEventListener("click",function(e){ if(e.target.closest("button,a")) aboutEl.classList.remove("on"); },true);
+document.getElementById("replay-intro").addEventListener("click",function(){ if(follow) stopFollow(); closeCard(); playSplash(); });
 if(document.visibilityState==="visible") playSplash();
 else document.addEventListener("visibilitychange",function once(){ if(document.visibilityState==="visible"){ document.removeEventListener("visibilitychange",once); playSplash(); } });
 })();

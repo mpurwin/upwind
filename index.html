@@ -29,7 +29,7 @@ button{font-family:inherit;color:inherit}
 /* Top left: wordmark + headline */
 .hud{position:fixed;left:32px;top:34px;max-width:min(520px,calc(100vw - 64px));pointer-events:none;z-index:5}
 .wm{font-family:"Calogen Exp",var(--display);font-weight:700;font-style:italic;font-size:1.05rem;letter-spacing:.01em;color:var(--bone);pointer-events:auto;text-decoration:none}
-.hud h1{font-family:var(--display);font-weight:700;font-style:italic;font-size:clamp(2.1rem,4.6vw,3.9rem);line-height:.98;letter-spacing:-.005em;margin-top:22px;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+.hud h1{font-family:var(--display);font-weight:700;font-style:italic;font-size:clamp(1.7rem,2.9vw,2.6rem);line-height:1;letter-spacing:-.005em;margin-top:22px;text-shadow:0 2px 30px rgba(0,0,0,.6)}
 .hud .sum{margin-top:16px;font-size:1.04rem;line-height:1.5;color:#d8d2c7;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 18px rgba(0,0,0,.8);max-width:44ch}
 .hud .stats{display:flex;gap:22px;margin-top:20px;flex-wrap:wrap}
 .hud .stat b{display:block;font-weight:600;font-size:1.5rem;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
@@ -143,7 +143,7 @@ body.panel-open .open-panel{opacity:0;pointer-events:none}
   .open-panel .lg{display:none}
   .panel{left:10px;right:10px;width:auto;top:auto;bottom:10px;height:72vh}
   body.panel-open .card{right:12px}
-  .pop{right:auto;left:0;min-width:0;width:calc(100vw - 40px)}
+  .pop{right:0;left:auto;min-width:0;width:calc(100vw - 40px);max-height:70vh;overflow-y:auto}
 }
 
 .toast{position:fixed;left:50%;bottom:84px;transform:translate(-50%,8px);background:rgba(13,13,12,.88);border:1px solid rgba(236,231,222,.18);border-radius:999px;padding:9px 16px;font-size:.86rem;z-index:9;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;max-width:calc(100vw - 40px);text-align:center}
@@ -219,6 +219,50 @@ body.mcard-hide .mcard{opacity:0;pointer-events:none}
   .ticker{bottom:70px}
 }
 
+/* Collapsible headline */
+.wmrow{display:flex;align-items:center;gap:12px;pointer-events:auto}
+.hud .hud-toggle{margin-top:12px;pointer-events:auto}
+.hud-toggle{background:rgba(13,13,12,.5);border:1px solid rgba(236,231,222,.2);border-radius:999px;color:var(--muted);font:500 .72rem var(--sans);letter-spacing:.04em;padding:3px 10px;cursor:pointer}
+.hud-toggle:hover{color:var(--bone);border-color:rgba(236,231,222,.45)}
+body.hud-min .hud h1,body.hud-min .hud .sum{display:none}
+body.hud-min .hud .stats{margin-top:14px}
+body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transparent 26%),linear-gradient(to top,rgba(13,13,12,.85),transparent 22%)}
+@media (max-width:760px){body.hud-min .vig{background:linear-gradient(to bottom,rgba(13,13,12,.9) 0,transparent 22%),linear-gradient(to top,rgba(13,13,12,.94) 10%,transparent 32%)}}
+
+/* Walkthrough */
+.tour-block{position:fixed;inset:0;z-index:60;display:none}
+.tour-block.on{display:block}
+.tour-spot{position:fixed;z-index:61;border-radius:14px;box-shadow:0 0 0 9999px rgba(8,8,7,.66);pointer-events:none;transition:all .5s cubic-bezier(.4,0,.2,1);opacity:0}
+.tour-spot.on{opacity:1}
+.tour-spot:after{content:"";position:absolute;inset:-4px;border-radius:16px;border:1.5px solid rgba(244,226,198,.55)}
+.tour-spot.none:after{display:none}
+.tour-card{position:fixed;z-index:62;width:264px;background:rgba(30,29,26,.42);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);border:1px solid rgba(236,231,222,.2);box-shadow:0 12px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06);border-radius:12px;padding:16px 16px 12px;overflow:hidden;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s,left .5s cubic-bezier(.4,0,.2,1),top .5s cubic-bezier(.4,0,.2,1)}
+.tour-card.on{opacity:1;transform:none}
+.tour-card .ln{position:absolute;left:0;top:0;height:3px;width:0;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s3))}
+.tour-card.fly .ln{animation:tourLine .9s cubic-bezier(.3,.6,.3,1) forwards}
+@keyframes tourLine{to{width:100%}}
+.tour-card h3{font-family:var(--display);font-style:italic;font-weight:700;font-size:1.15rem;line-height:1.1}
+.tour-card p{color:#e2dccf;font-size:.85rem;line-height:1.45;margin-top:6px}
+.tour-card .row{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px}
+.tour-card .count{font-size:.74rem;color:var(--dim);font-variant-numeric:tabular-nums}
+.tour-card .acts2{display:flex;align-items:center;gap:4px}
+.tour-card .skip{background:none;border:0;color:var(--muted);font:500 .8rem var(--sans);cursor:pointer;padding:6px 8px}
+.tour-card .skip:hover{color:var(--bone)}
+.tour-card .nx{background:none;border:0;color:var(--s2);font:600 .84rem var(--sans);cursor:pointer;padding:6px 2px 6px 8px}
+.tour-card .nx:hover{color:var(--bone)}
+.tour-card .go{background:var(--bone);color:var(--ink);border:0;border-radius:999px;font:600 .82rem var(--sans);padding:7px 14px;cursor:pointer}
+.tour-card .go:hover{background:var(--s2)}
+.tkey{display:grid;gap:6px;margin-top:10px}
+.tkey div{display:flex;align-items:center;gap:8px;font-size:.82rem;color:#cfc9be}
+.tkey i{width:16px;height:3px;border-radius:2px;flex:none}
+.tour-card .hin{display:flex;gap:6px;margin-top:10px}
+.tour-card .hin input{flex:1;min-width:0;font:500 .9rem var(--sans);padding:7px 10px;border-radius:8px;border:1px solid rgba(236,231,222,.25);background:rgba(236,231,222,.06);color:var(--bone);text-transform:uppercase}
+.tour-card .hin input:focus{outline:none;border-color:var(--s2)}
+.tour-card .hin button{background:var(--bone);color:var(--ink);border:0;border-radius:8px;font:600 .8rem var(--sans);padding:0 12px;cursor:pointer}
+.tour-card .hmsg{font-size:.76rem;color:var(--muted);margin-top:6px;min-height:1em}
+@media (max-width:760px){.tour-card{width:auto;left:16px!important;right:16px}}
+@media (prefers-reduced-motion:reduce){.tour-card.fly .ln{animation:none;width:100%}}
+
 /* Brand stripe */
 .topstripe{position:fixed;left:0;right:0;top:0;z-index:8;display:flex;flex-direction:column;pointer-events:none}
 .topstripe i,.stripe i{display:block;height:3px}
@@ -247,7 +291,7 @@ body.mcard-hide .mcard{opacity:0;pointer-events:none}
 
 @media (max-width:760px){
   .hud{left:20px;top:20px}
-  .hud h1{margin-top:16px;font-size:2.1rem}
+  .hud h1{margin-top:14px;font-size:1.65rem}
   .hud .sum{font-size:.92rem;margin-top:10px;line-height:1.4}
   .hud .stats{gap:16px;margin-top:12px}
   .hud .stat b{font-size:1.2rem}
@@ -271,11 +315,11 @@ body.mcard-hide .mcard{opacity:0;pointer-events:none}
 <div class="topstripe" aria-hidden="true"><i></i><i></i><i></i></div>
 
 <div class="hud">
-  <a class="wm" href="#" id="wm">upwind</a>
-  <div class="stripe" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="wmrow"><a class="wm" href="#" id="wm">upwind</a></div>
   <h1 id="h-title">Over Michigan.</h1>
   <p class="sum" id="h-sum"></p>
   <div class="stats" id="h-stats"></div>
+  <button class="hud-toggle" id="hud-toggle" aria-expanded="true" title="Hide the headline">Hide headline</button>
 </div>
 
 <div class="ticker" aria-live="polite">
@@ -321,6 +365,7 @@ body.mcard-hide .mcard{opacity:0;pointer-events:none}
           <button class="chip" data-season="fall" aria-pressed="false">Fall</button>
           <button class="chip" data-season="winter" aria-pressed="false">Winter</button>
         </div></div>
+        <div class="row"><span>Help</span><div class="toggles"><button class="chip" id="tour-again">Take the tour</button></div></div>
       </div>
     </div>
   </div>
@@ -349,6 +394,9 @@ body.mcard-hide .mcard{opacity:0;pointer-events:none}
 <div class="mcard" id="mcard" aria-live="polite"></div>
 <div class="follow" id="follow"><i></i><span id="follow-t"></span><button id="follow-stop">Stop</button></div>
 
+<div class="tour-block" id="tour-block"></div>
+<div class="tour-spot" id="tour-spot"></div>
+<div class="tour-card" id="tour-card" role="dialog" aria-live="polite"></div>
 <div class="splash" id="splash" role="img" aria-label="upwind">
   <div class="bg"><div class="wm2" aria-hidden="true"><span style="--i:0">u</span><span style="--i:1">p</span><span style="--i:2">w</span><span style="--i:3">i</span><span style="--i:4">n</span><span style="--i:5">d</span></div></div>
   <svg id="splash-svg" aria-hidden="true"></svg>
@@ -418,17 +466,20 @@ var A={}; APTS.forEach(function(a){A[a.id]=a;});
 APTS.forEach(function(a){ var longest=a.rw.reduce(function(m,r){return Math.max(m,surf(r[3])==="paved"?r[1]:0);},0);
   a.tier=a.twr?1:(longest>=5000||(METAR[a.id]&&longest>=4000))?2:3; });
 var home=null; try{ var hs=localStorage.getItem("upwind-home"); if(hs&&A[hs]) home=A[hs]; }catch(e){}
-function aptVisible(a){ var k=T.k; if(a===home||(sel&&sel.a===a)) return true; return a.tier===1||(a.tier===2&&k>=1.7)||k>=2.8; }
+function aptVisible(a){ var k=T.k; if(a===home||(sel&&sel.a===a)) return true; if(mobile) return (a.tier===1&&k>=1.3)||(a.tier===2&&k>=3.2)||k>=5; return a.tier===1||(a.tier===2&&k>=1.7)||k>=2.8; }
 function code(a){ return a.icao||a.id; }
 
-var layers={wind:true,clouds:true,jets:false,precip:true,places:true,beacons:true,conds:true};
+var layers={wind:false,clouds:true,jets:false,precip:true,places:false,beacons:true,conds:true};
+try{ var lp=JSON.parse(localStorage.getItem("upwind-layers")||"null"); if(lp) Object.keys(layers).forEach(function(k){ if(typeof lp[k]==="boolean") layers[k]=lp[k]; }); }catch(e){}
+function saveLayers(){ try{ localStorage.setItem("upwind-layers",JSON.stringify(layers)); }catch(e){} }
 var seasonPick="live";
 var mood="live";
 
 function size(){
   W=innerWidth; H=innerHeight; DPR=Math.min(2,devicePixelRatio||1); mobile=W<760;
   [cMap,cWind,cTop].forEach(function(c){ c.width=W*DPR; c.height=H*DPR; });
-  var padT=mobile?H*0.40:40, padB=mobile?150:70, padL=mobile?14:Math.max(40,W*0.30), padR=mobile?14:40;
+  var hmin=document.body.classList.contains("hud-min");
+  var padT=mobile?(hmin?H*0.16:H*0.40):40, padB=mobile?150:70, padL=mobile?14:Math.max(40,W*(hmin?0.12:0.30)), padR=mobile?14:40;
   proj.fitExtent([[padL,padT],[W-padR,H-padB]], mi);
   if(mobile) proj.fitExtent([[padL,padT],[W-padR,H-padB]], mi);
   buildWindField(); buildClouds(); buildPrecip();
@@ -874,8 +925,8 @@ function drawAirports(t){
   APTS.forEach(function(a){
     if(!aptVisible(a)||a===home) return;
     var p=scr(a.lon,a.lat); if(p[0]<-20||p[1]<-20||p[0]>W+20||p[1]>H+20) return;
-    var s=stnFor(a), r=(a.twr?2.6:1.8)*Math.min(2.2,sk);
-    if(!chart){ g.fillStyle="rgba(236,231,222,"+(0.35+0.25*light.night)+")"; g.beginPath(); g.arc(p[0],p[1],r,0,7); g.fill(); }
+    var s=stnFor(a), r=(a.twr?2.6:1.8)*Math.min(2.2,sk)*(mobile?0.75:1);
+    if(!chart){ g.fillStyle="rgba(236,231,222,"+((mobile?0.24:0.35)+0.2*light.night)+")"; g.beginPath(); g.arc(p[0],p[1],r,0,7); g.fill(); }
     if(a.twr&&T.k>1.8){ var ac=aspClass(a); g.font="600 10px Hanken Grotesk, sans-serif"; g.fillStyle=ac.col; g.fillText(ac.c,p[0]-r-12,p[1]+4); }
     if(chart) return;
     if(s&&layers.conds){ g.strokeStyle=CATC[s.cat]||CATC.VFR; g.globalAlpha=0.85; g.lineWidth=1.2; g.beginPath(); g.arc(p[0],p[1],r+2.6*Math.min(2,sk),0,7); g.stroke(); g.globalAlpha=1; }
@@ -1288,7 +1339,7 @@ function drawActivity(t){
 }
 
 /* ---------------- Controls ---------------- */
-document.querySelectorAll("[data-layer]").forEach(function(b){ b.addEventListener("click",function(){ var k=b.dataset.layer; layers[k]=!layers[k]; b.setAttribute("aria-pressed",layers[k]); if(k==="wind") clearWind(); }); });
+document.querySelectorAll("[data-layer]").forEach(function(b){ b.setAttribute("aria-pressed",!!layers[b.dataset.layer]); b.addEventListener("click",function(){ var k=b.dataset.layer; layers[k]=!layers[k]; b.setAttribute("aria-pressed",layers[k]); if(k==="wind") clearWind(); saveLayers(); }); });
 document.querySelectorAll("[data-mood]").forEach(function(b){ b.addEventListener("click",function(){ mood=b.dataset.mood; document.querySelectorAll("[data-mood]").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); updLight(); mapDirty=true; headline(); sceneLbl(); }); });
 document.querySelectorAll("[data-season]").forEach(function(b){ b.addEventListener("click",function(){ seasonPick=b.dataset.season; document.querySelectorAll("[data-season]").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); mapDirty=true; sceneLbl(); }); });
 var pop=document.getElementById("pop"), sb=document.getElementById("scene-btn");
@@ -1521,8 +1572,88 @@ function pollWeather(){
     .then(function(){ setTimeout(pollWeather,5*60000); });
 }
 
+/* ---------------- Headline toggle ---------------- */
+var hudBtn=document.getElementById("hud-toggle");
+function setHudMin(on,keepView){
+  document.body.classList.toggle("hud-min",on); hudBtn.textContent=on?"Show headline":"Hide headline"; hudBtn.setAttribute("aria-expanded",!on); hudBtn.title=on?"Show the headline":"Hide the headline";
+  try{ localStorage.setItem("upwind-hud",on?"min":"full"); }catch(e){}
+  if(!keepView){ size(); seedParticles(); }
+}
+hudBtn.addEventListener("click",function(e){ e.preventDefault(); setHudMin(!document.body.classList.contains("hud-min")); });
+try{ if(localStorage.getItem("upwind-hud")==="min") setHudMin(true,true); }catch(e){}
+
+/* ---------------- Walkthrough ---------------- */
+var tour=(function(){
+  var blk=document.getElementById("tour-block"), spot=document.getElementById("tour-spot"), cardT=document.getElementById("tour-card"), i=0, on=false;
+  var PLANE='<svg width="22" height="22" viewBox="-14 -14 28 28" aria-hidden="true"><path transform="rotate(90)" fill="#f4e2c6" d="M0,-13 C1.6,-13 2.3,-9 2.3,-5 L13,2 L13,5 L2.3,2 L1.6,9 L5.5,12 L5.5,14 L0,12.5 L-5.5,14 L-5.5,12 L-1.6,9 L-2.3,2 L-13,5 L-13,2 L-2.3,-5 C-2.3,-9 -1.6,-13 0,-13 Z"/></svg>';
+  var STEPS=[
+    {t:null,h:"Welcome to upwind.",p:"Michigan's sky, live, focused on general aviation: small planes, local airports and the weather that decides whether you go.",cta:"Take the tour",intro:true},
+    {t:".legend",h:"Colors show altitude.",key:true},
+    {t:"map",h:"Tap anything.",p:"Planes show what they are and where they're headed. Airports show conditions, runways and frequencies."},
+    {t:"#home-pill",h:"Set your home airport.",p:"It stays on the map, and distances are measured from it.",home:true},
+    {t:".modes",h:"Look up.",p:"Tap where you are to see what's about to fly overhead."},
+    {t:"#scene-btn",h:"Map options.",p:"Sectional chart, places, weather, beacons, light and season."},
+    {t:"#hud-toggle",h:"More map.",p:"Hide the headline anytime. The numbers stay."},
+    {t:null,h:"Enjoy the sky.",p:"Take the tour again from Map options.",last:true}
+  ];
+  function rectOf(sel){
+    if(sel==="map"){ var cx=mobile?W/2:W*0.62, cy=mobile?H*0.55:H*0.5, r=mobile?Math.min(W*0.42,150):Math.min(W*0.2,220); return {left:cx-r,top:cy-r,width:r*2,height:r*2,round:true}; }
+    var el=document.querySelector(sel); if(!el) return null; var r=el.getBoundingClientRect(); if(!r.width) return null; return {left:r.left-8,top:r.top-8,width:r.width+16,height:r.height+16};
+  }
+  function place(){
+    var st=STEPS[i], r=st.t?rectOf(st.t):null;
+    if(r){ spot.classList.remove("none"); spot.style.left=r.left+"px"; spot.style.top=r.top+"px"; spot.style.width=r.width+"px"; spot.style.height=r.height+"px"; spot.style.borderRadius=r.round?"50%":"14px"; }
+    else { spot.classList.add("none"); spot.style.left=W/2+"px"; spot.style.top=H/2+"px"; spot.style.width="0px"; spot.style.height="0px"; }
+    var cw=mobile?W-24:290, ch=cardT.offsetHeight||200, gap=18, m=12, x, y;
+    if(!r){ x=(W-cw)/2; y=(H-ch)/2; }
+    else {
+      // Try below, above, right, left of the highlighted thing, and keep the first spot that doesn't cover it
+      var cx=r.left+r.width/2, cy=r.top+r.height/2, C=[
+        [cx-cw/2, r.top+r.height+gap],
+        [cx-cw/2, r.top-ch-gap],
+        [r.left+r.width+gap, cy-ch/2],
+        [r.left-cw-gap, cy-ch/2]
+      ];
+      if(mobile) C=C.slice(0,2).map(function(c){ return [12,c[1]]; });
+      function fits(c){ return c[0]>=m&&c[1]>=m&&c[0]+cw<=W-m&&c[1]+ch<=H-m; }
+      function clamp(c){ return [Math.min(W-cw-m,Math.max(m,c[0])),Math.min(H-ch-m,Math.max(m,c[1]))]; }
+      function hits(c){ return !(c[0]+cw<r.left-6||c[0]>r.left+r.width+6||c[1]+ch<r.top-6||c[1]>r.top+r.height+6); }
+      var pick=null;
+      for(var k=0;k<C.length&&!pick;k++){ if(fits(C[k])) pick=C[k]; }
+      for(var k2=0;k2<C.length&&!pick;k2++){ var cc=clamp(C[k2]); if(!hits(cc)) pick=cc; }
+      if(!pick){ pick=clamp([cy>H/2?m:W-cw-m, cy>H/2?m:H-ch-m]); }
+      x=pick[0]; y=pick[1];
+    }
+    cardT.style.left=x+"px"; cardT.style.top=y+"px";
+  }
+  function render(){
+    var st=STEPS[i];
+    var n=STEPS.length-1;
+    cardT.innerHTML='<div class="ln"></div><h3>'+st.h+'</h3>'+(st.p?'<p>'+st.p+'</p>':'')+
+      (st.key?'<div class="tkey"><div><i style="background:var(--s1)"></i>Under 5,000 ft</div><div><i style="background:var(--s2)"></i>5,000 to 18,000 ft</div><div><i style="background:var(--s3)"></i>Above 18,000 ft</div></div>':'')+
+      (st.home?'<form class="hin" id="tour-home" autocomplete="off"><input id="tour-home-in" list="home-list" placeholder="KARB" spellcheck="false" value="'+(home?esc(code(home)):"")+'"><button type="submit">Set</button></form><p class="hmsg" id="tour-hmsg">'+(home?"Home is "+esc(code(home))+".":"Optional.")+'</p>':'')+
+      '<div class="row"><span class="count">'+(st.intro||st.last?"":i+" of "+(n-1))+'</span><div class="acts2">'+
+      (st.intro?'<button class="skip" data-t="skip">Skip</button><button class="go" data-t="next">'+st.cta+'</button>':
+       st.last?'<button class="go" data-t="next">Done</button>':'<button class="skip" data-t="skip">Skip</button><button class="nx" data-t="next">Next →</button>')+
+      '</div></div>';
+    cardT.classList.remove("fly"); void cardT.offsetWidth; cardT.classList.add("fly");
+    place();
+    var f=document.getElementById("tour-home");
+    if(f) f.addEventListener("submit",function(e){ e.preventDefault(); var a=findApt(document.getElementById("tour-home-in").value); var m=document.getElementById("tour-hmsg"); if(!a){ m.textContent="Couldn't find that one. Try a code like KARB."; return; } setHome(a); m.textContent="Home set to "+code(a)+"."; setTimeout(next,700); });
+  }
+  function next(){ if(i>=STEPS.length-1){ end(); return; } i++; render(); }
+  function start(){ if(on) return; on=true; i=0; closeCard(); closePanel(); pop.classList.remove("on"); blk.classList.add("on"); spot.classList.add("on"); cardT.classList.add("on"); render(); }
+  function end(){ on=false; blk.classList.remove("on"); spot.classList.remove("on"); cardT.classList.remove("on"); try{ localStorage.setItem("upwind-tour","done"); }catch(e){} }
+  cardT.addEventListener("click",function(e){ var b=e.target.closest("[data-t]"); if(!b) return; if(b.dataset.t==="next") next(); else end(); });
+  addEventListener("keydown",function(e){ if(!on) return; if(e.key==="Escape") end(); if(e.key==="ArrowRight"||e.key==="Enter"&&e.target.tagName!=="INPUT") next(); });
+  addEventListener("resize",function(){ if(on) place(); });
+  function seen(){ try{ return localStorage.getItem("upwind-tour")==="done"; }catch(e){ return true; } }
+  return {start:start,end:end,seen:seen};
+})();
+document.getElementById("tour-again").addEventListener("click",function(e){ e.stopPropagation(); pop.classList.remove("on"); tour.start(); });
+
 /* ---------------- Boot ---------------- */
-window.upwindSky={shapes:function(c){ var cv=document.createElement('canvas'); cv.width=900; cv.height=200; var x=cv.getContext('2d'); x.fillStyle='#0d0d0c'; x.fillRect(0,0,900,200); ['single','twin','bizjet','airliner','widebody'].forEach(function(k,i){ x.fillStyle=['#e8692c','#e8692c','#f2a33a','#f4e2c6','#f4e2c6'][i]; shapeGlyph(x,90+i*170,100,0,SHAPE_SIZE[k]*12,k); }); x.strokeStyle='#e8692c'; x.fillStyle='#e8692c'; return cv.toDataURL(); },mode:setMode,look:function(la,lo){setLook(la,lo);},trip:function(id){ trip={dest:{lat:A[id].lat,lon:A[id].lon,name:code(A[id])+' '+A[id].t,apt:A[id]}}; renderTrip(); },setHome:function(id){setHome(A[id]);},openLake:function(){ var p=planes.filter(function(p){return SMALL[p.kind]&&!p.orb&&where(p).lake;})[0]; if(p) openPlane(p); return p&&p.name; },openSpot:function(i){openSpot(SPOTS[i]);},openCrossing:function(i){openCrossing(XING[i]);},openAirport:function(id){openAirport(A[id]);},openPanel:openPanel,tab:function(t){tab=t;renderPanel();}};
+window.upwindSky={tour:function(){tour.start();},shapes:function(c){ var cv=document.createElement('canvas'); cv.width=900; cv.height=200; var x=cv.getContext('2d'); x.fillStyle='#0d0d0c'; x.fillRect(0,0,900,200); ['single','twin','bizjet','airliner','widebody'].forEach(function(k,i){ x.fillStyle=['#e8692c','#e8692c','#f2a33a','#f4e2c6','#f4e2c6'][i]; shapeGlyph(x,90+i*170,100,0,SHAPE_SIZE[k]*12,k); }); x.strokeStyle='#e8692c'; x.fillStyle='#e8692c'; return cv.toDataURL(); },mode:setMode,look:function(la,lo){setLook(la,lo);},trip:function(id){ trip={dest:{lat:A[id].lat,lon:A[id].lon,name:code(A[id])+' '+A[id].t,apt:A[id]}}; renderTrip(); },setHome:function(id){setHome(A[id]);},openLake:function(){ var p=planes.filter(function(p){return SMALL[p.kind]&&!p.orb&&where(p).lake;})[0]; if(p) openPlane(p); return p&&p.name; },openSpot:function(i){openSpot(SPOTS[i]);},openCrossing:function(i){openCrossing(XING[i]);},openAirport:function(id){openAirport(A[id]);},openPanel:openPanel,tab:function(t){tab=t;renderPanel();}};
 updLight(); size(); seedParticles(); headline(); stats();
 addEventListener("resize",function(){ size(); seedParticles(); });
 // warm up trails
@@ -1533,7 +1664,7 @@ nextMoment(); setInterval(nextMoment,7000);
 liveNote(); pollTraffic(); pollWeather();
 // Load-in
 var splash=document.getElementById("splash"), spT, spRaf;
-function endSplash(){ clearTimeout(spT); cancelAnimationFrame(spRaf); splash.classList.add("gone"); splash.classList.remove("on","split"); splash.querySelectorAll(".half").forEach(function(h){h.remove();}); }
+function endSplash(){ clearTimeout(spT); cancelAnimationFrame(spRaf); if(!splash.classList.contains("gone")&&!tour.seen()) setTimeout(tour.start,900); splash.classList.add("gone"); splash.classList.remove("on","split"); splash.querySelectorAll(".half").forEach(function(h){h.remove();}); }
 function playSplash(){
   clearTimeout(spT); cancelAnimationFrame(spRaf);
   var still=matchMedia("(prefers-reduced-motion:reduce)").matches;
@@ -1545,8 +1676,11 @@ function playSplash(){
   var cols=["#e8692c","#f2a33a","#f4e2c6"], x0=-90, x1=Wd+90, L=x1-x0;
   var lines=cols.map(function(c){ return gEl.append("polyline").attr("stroke",c).attr("stroke-width",band+0.6); });
   var plane=gEl.append("path").attr("class","pl").attr("d","M0,-13 C1.6,-13 2.3,-9 2.3,-5 L13,2 L13,5 L2.3,2 L1.6,9 L5.5,12 L5.5,14 L0,12.5 L-5.5,14 L-5.5,12 L-1.6,9 L-2.3,2 L-13,5 L-13,2 L-2.3,-5 C-2.3,-9 -1.6,-13 0,-13 Z");
+  var letters=[].slice.call(splash.querySelectorAll(".wm2 span")), lift=letters.map(function(){return 0;}), lc=letters.map(function(sp){ var r=sp.getBoundingClientRect(); return r.left+r.width/2; });
   function draw(p){
     var x=x0+L*p;
+    // Letters lift a little as the plane passes underneath, like a wake
+    letters.forEach(function(sp,j){ var d=(x-lc[j])/70, bump=Math.exp(-d*d); lift[j]+=(bump-lift[j])*0.1; sp.style.translate="0 "+(-8*lift[j]).toFixed(2)+"px"; sp.style.rotate=(-1.5*lift[j]).toFixed(2)+"deg"; });
     lines.forEach(function(ln,k){ var y=yU+(k-1)*band; ln.attr("points",x0+","+y+" "+x.toFixed(1)+","+y); });
     plane.attr("transform","translate("+x.toFixed(1)+","+yU+") rotate(90)");
   }
@@ -1569,9 +1703,10 @@ function playSplash(){
     },320);
   }
   if(still){ draw(1); spT=setTimeout(finish,1000); return; }
-  var dur=2100, t0=performance.now()+450;
-  (function step(now){ var t=Math.max(0,Math.min(1,(now-t0)/dur)), p=1-Math.pow(1-Math.pow(t,1.5),2.2); draw(p);
-    if(t<1) spRaf=requestAnimationFrame(step); else { draw(1); finish(); } })(performance.now());
+  var dur=2700, t0=performance.now()+450;
+  (function step(now){ var t=Math.max(0,Math.min(1,(now-t0)/dur)), p=0.5-0.5*Math.cos(Math.PI*t); draw(p);
+    if(t<1) spRaf=requestAnimationFrame(step); else { draw(1); settle(); finish(); } })(performance.now());
+  function settle(){ var any=false; letters.forEach(function(sp,j){ lift[j]*=0.93; if(lift[j]>0.01) any=true; else lift[j]=0; sp.style.translate="0 "+(-8*lift[j]).toFixed(2)+"px"; sp.style.rotate=(-1.5*lift[j]).toFixed(2)+"deg"; }); if(any) requestAnimationFrame(settle); }
 }
 splash.addEventListener("click",endSplash);
 document.getElementById("wm").addEventListener("click",function(e){ e.preventDefault(); if(follow) stopFollow(); closeCard(); playSplash(); });

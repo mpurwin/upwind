@@ -1303,7 +1303,20 @@ var LBLS={
   D:{font:function(r,z){return "700 "+(z-1.5)+"px Hanken Grotesk, sans-serif";},ls:1.8,apt:"rgba(244,226,198,.82)",tail:"rgba(242,163,58,.95)",stroke:false,blur:7}
 };
 function lblSet(c,role,z){ var L=LBLS[LBLV]||LBLS.A; c.font=L.font(role,z); try{ c.letterSpacing=L.ls+"px"; }catch(e){} return L; }
+// Haloed labels are rendered once and reused; a canvas text shadow on every label every frame is slow
+var LBLC={}, LBLN=0;
 function lblDraw(c,L,role,text,x,y){
+  if(L.blur&&!(chart&&role==="tail")){
+    var key=role+"|"+text+"|"+c.font+"|"+L.ls+"|"+DPR+"|"+LBLV, sp=LBLC[key];
+    if(!sp){ if(++LBLN>800){ LBLC={}; LBLN=0; }
+      var fs=parseFloat((c.font.match(/([\d.]+)px/)||[0,11])[1]), pad=Math.ceil(L.blur*1.6+2), w=Math.ceil(c.measureText(text).width+pad*2+2), h=Math.ceil(fs*1.5+pad*2);
+      var cv=document.createElement("canvas"); cv.width=w*DPR; cv.height=h*DPR; var x2=cv.getContext("2d"); x2.setTransform(DPR,0,0,DPR,0,0);
+      x2.font=c.font; try{ x2.letterSpacing=L.ls+"px"; }catch(e){}
+      x2.shadowColor="rgba(8,8,7,.95)"; x2.shadowBlur=L.blur*DPR; x2.fillStyle=role==="tail"?L.tail:L.apt; x2.fillText(text,pad,pad+fs*1.05);
+      x2.shadowBlur=0; x2.fillText(text,pad,pad+fs*1.05);
+      sp=LBLC[key]={cv:cv,w:w,h:h,ox:pad,oy:pad+fs*1.05}; }
+    c.drawImage(sp.cv,x-sp.ox,y-sp.oy,sp.w,sp.h); return;
+  }
   c.save(); if(L.blur){ c.shadowColor="rgba(8,8,7,.95)"; c.shadowBlur=L.blur; }
   if(L.stroke&&role==="tail"){ c.lineJoin="round"; c.lineWidth=3; c.strokeStyle="rgba(13,13,12,.8)"; c.strokeText(text,x,y); }
   if(chart&&role==="tail"){ c.shadowBlur=0; c.lineJoin="round"; c.lineWidth=3.5; c.strokeStyle="rgba(18,16,13,.9)"; c.strokeText(text,x,y); }
@@ -1344,6 +1357,19 @@ function drawAirports(t){
 
 /* ---------------- Render ---------------- */
 var follow=null, sel=null, hoverP=null, selTrailA=0;
+// Soft blurred silhouettes, rendered once per shape and size and then stamped (canvas blur per plane per frame is slow)
+var SOFT={};
+// One sprite per shape, color and blur-to-size ratio, drawn at a fixed reference size and scaled when stamped, so zooming never creates new ones
+function softSprite(shp,s,blur,rgb){
+  var R=16, ratio=Math.round(blur/s*10)/10, key=shp+"|"+ratio+"|"+rgb+"|"+DPR, c=SOFT[key];
+  if(!c){ var bl=ratio*R, pad=Math.ceil(R*1.4+bl*2+4), cv=document.createElement("canvas"); cv.width=cv.height=Math.ceil(pad*2*DPR);
+    var x=cv.getContext("2d"), X=100000; x.setTransform(DPR,0,0,DPR,0,0);
+    x.fillStyle="#000"; x.strokeStyle="#000"; x.shadowColor="rgb("+rgb+")"; x.shadowBlur=bl*DPR; x.shadowOffsetX=X*DPR;
+    if(shp==="heli"){ x.beginPath(); x.arc(pad-X,pad,R*0.5,0,7); x.fill(); } else shapeGlyph(x,pad-X,pad,0,R,shp);
+    c=SOFT[key]={cv:cv,h:pad}; }
+  return {cv:c.cv,h:c.h*s/R};
+}
+function stampSoft(c,x,y,rot,a){ if(a<=0.01) return; g.save(); g.globalAlpha=Math.min(1,a); g.translate(x,y); g.rotate(rot); g.drawImage(c.cv,-c.h,-c.h,c.h*2,c.h*2); g.restore(); }
 function drawPlanes(set,t){
   var sk=Math.min(2.4,Math.max(0.85,Math.sqrt(T.k)));
   var sh=light.alt>0?1:0, sa=light.az*Math.PI/180, shAlpha=0.18+0.25*light.day;
@@ -1379,17 +1405,15 @@ function drawPlanes(set,t){
     var jet=isJet(p), shp=p._shp||(p._shp=shapeOf(p)), s=SHAPE_SIZE[shp]*sk*(LOBBY&&chart?1.7:1), rot=p.trk*Math.PI/180;
     // Shadow on the ground, longer the higher it flies
     // Soft edge: the glyph is drawn far off-canvas and only its blurred shadow lands on the map (works in every browser)
-    if(sh){ var off=Math.min(26,4+p.alt/1600)*sk*0.7, SHX=100000;
+    if(sh){ var off=Math.min(26,4+p.alt/1600)*sk*0.7;
       var sx=q[0]-Math.sin(sa)*off, sy=q[1]+Math.cos(sa)*off;
-      g.save(); g.fillStyle="#000"; g.strokeStyle="#000"; g.shadowColor="rgba(0,0,0,"+(shAlpha*p.fade*1.15)+")";
-      g.shadowBlur=(1.6+Math.min(3,p.alt/9000))*sk*DPR; g.shadowOffsetX=SHX*DPR;
-      if(shp==="heli") { g.beginPath(); g.arc(sx-SHX,sy,s*0.5,0,7); g.fill(); } else shapeGlyph(g,sx-SHX,sy,rot,s*0.92,shp);
-      g.restore(); }
+      stampSoft(softSprite(shp,s*0.92,(1.6+Math.min(3,Math.round(p.alt/9000)))*sk,"0,0,0"),sx,sy,rot,shAlpha*p.fade*1.15); }
     var isSel=(sel&&sel.p===p)||follow===p, isHov=hoverP===p;
     if(isSel||isHov){ g.strokeStyle="rgba(236,231,222,"+(isSel?0.9:0.5)+")"; g.lineWidth=1.2; g.beginPath(); g.arc(q[0],q[1],s*2.1+Math.sin(t*3)*1.5,0,7); g.stroke(); }
     // On the sectional the chart is light and busy, so each plane gets a dark outline and soft halo, and stays fully opaque
     if(chart){ var ha=p.fade*(p.mi||isSel?1:0.7);
-      g.save(); g.fillStyle="rgba(18,16,13,"+(0.92*ha)+")"; g.strokeStyle=g.fillStyle; g.shadowColor="rgba(18,16,13,"+(0.6*ha)+")"; g.shadowBlur=9*DPR;
+      stampSoft(softSprite(shp,s*1.25,9,"18,16,13"),q[0],q[1],rot,0.6*ha);
+      g.save(); g.fillStyle="rgba(18,16,13,"+(0.92*ha)+")"; g.strokeStyle=g.fillStyle;
       if(shp==="heli"){ g.beginPath(); g.arc(q[0],q[1],s*1.2,0,7); g.fill(); } else { g.lineWidth=Math.max(3.2,s*0.34); g.lineJoin="round"; shapeGlyph(g,q[0],q[1],rot,s,shp,true); }
       g.restore(); }
     g.fillStyle="rgba("+BC[band(p.alt)]+","+(chart?p.fade*(p.mi||isSel?1:0.7):p.fade*(jet&&!isSel?0.55:1)*(p.mi||isSel?1:0.35))+")"; g.strokeStyle=g.fillStyle;

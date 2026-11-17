@@ -1374,9 +1374,13 @@ function drawPlanes(set,t){
     var q=scr(p.lon,p.lat); if(q[0]<-30||q[1]<-30||q[0]>W+30||q[1]>H+30) return;
     var jet=isJet(p), shp=p._shp||(p._shp=shapeOf(p)), s=SHAPE_SIZE[shp]*sk*(LOBBY&&chart?1.7:1), rot=p.trk*Math.PI/180;
     // Shadow on the ground, longer the higher it flies
-    if(sh){ var off=Math.min(26,4+p.alt/1600)*sk*0.7; g.fillStyle="rgba(0,0,0,"+(shAlpha*p.fade)+")";
+    // Soft edge: the glyph is drawn far off-canvas and only its blurred shadow lands on the map (works in every browser)
+    if(sh){ var off=Math.min(26,4+p.alt/1600)*sk*0.7, SHX=100000;
       var sx=q[0]-Math.sin(sa)*off, sy=q[1]+Math.cos(sa)*off;
-      if(shp==="heli") { g.beginPath(); g.arc(sx,sy,s*0.5,0,7); g.fill(); } else shapeGlyph(g,sx,sy,rot,s*0.92,shp); }
+      g.save(); g.fillStyle="#000"; g.strokeStyle="#000"; g.shadowColor="rgba(0,0,0,"+(shAlpha*p.fade*1.15)+")";
+      g.shadowBlur=(1.6+Math.min(3,p.alt/9000))*sk*DPR; g.shadowOffsetX=SHX*DPR;
+      if(shp==="heli") { g.beginPath(); g.arc(sx-SHX,sy,s*0.5,0,7); g.fill(); } else shapeGlyph(g,sx-SHX,sy,rot,s*0.92,shp);
+      g.restore(); }
     var isSel=(sel&&sel.p===p)||follow===p, isHov=hoverP===p;
     if(isSel||isHov){ g.strokeStyle="rgba(236,231,222,"+(isSel?0.9:0.5)+")"; g.lineWidth=1.2; g.beginPath(); g.arc(q[0],q[1],s*2.1+Math.sin(t*3)*1.5,0,7); g.stroke(); }
     g.fillStyle="rgba("+BC[band(p.alt)]+","+(p.fade*(jet&&!isSel?0.55:1)*(p.mi||isSel?1:0.35))+")"; g.strokeStyle=g.fillStyle;

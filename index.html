@@ -330,6 +330,10 @@ body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transp
 .splash .wm2 span{display:inline-block;opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i)*60ms + 120ms)}
 .splash.on .wm2 span{opacity:1;transform:none}
 .splash.on .wm2{animation:wmDrift 3.4s ease-out both}
+/* Lobby: the featured airport's identifier hangs under the stripes and drops in, the mirror of the wordmark rising */
+.splash .apt2{position:absolute;left:0;right:0;display:flex;justify-content:center;font:700 1.05rem "Hanken Grotesk",sans-serif;letter-spacing:.32em;text-indent:.32em;color:var(--s3)}
+.splash .apt2 span{display:inline-block;opacity:0;transform:translateY(-12px);transition:opacity .5s ease,transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i)*70ms + 900ms)}
+.splash.on .apt2 span{opacity:1;transform:none}
 @keyframes wmDrift{from{transform:scale(.95);letter-spacing:.06em}to{transform:scale(1.04);letter-spacing:.01em}}
 .splash svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .splash polyline{fill:none;stroke-linejoin:round;stroke-linecap:butt}
@@ -352,7 +356,7 @@ body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transp
   .card.on{transform:none}
   .follow{top:64px;bottom:auto;max-width:calc(100vw - 32px)}
 }
-@media (prefers-reduced-motion:reduce){.splash .wm2 span{transition:none}.splash.on .wm2{animation:none}}
+@media (prefers-reduced-motion:reduce){.splash .wm2 span,.splash .apt2 span{transition:none}.splash.on .wm2{animation:none}}
 
 /* ---------- Lobby mode (?lobby=KARB): a hands-off wall display ---------- */
 body.lobby{cursor:none}
@@ -875,22 +879,32 @@ function pollSat(){
 }
 function tileLon(x){ return x/Math.pow(2,SAT.z)*360-180; }
 function tileLat(y){ var n=Math.PI-2*Math.PI*y/Math.pow(2,SAT.z); return 180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))); }
+// Blurred and tinted copies of the satellite and radar images are made once per image, not on every redraw:
+// a canvas filter on these big images each frame is what made camera moves stutter. Blur is set in map units,
+// so it scales with zoom the way the live filter did.
+var BAKE=typeof WeakMap!=="undefined"?new WeakMap():null;
+function baked(img,key,basePx,extra){
+  if(!img) return null; var m=BAKE&&BAKE.get(img); if(!m){ m={}; if(BAKE) BAKE.set(img,m); } if(m[key]) return m[key];
+  var a=proj([tileLon(SAT.x0),tileLat(SAT.y0)]), b=proj([tileLon(SAT.x1+1),tileLat(SAT.y1+1)]), sc=img.width/Math.max(1,b[0]-a[0]);
+  var pad=Math.ceil(basePx*sc*3), cv=document.createElement("canvas"); cv.width=img.width; cv.height=img.height;
+  var x=cv.getContext("2d"); x.filter=(extra||"")+" blur("+(basePx*sc).toFixed(2)+"px)"; x.drawImage(img,0,0); x.filter="none";
+  return (m[key]=cv);
+}
 function drawRadarSat(over){ over=over||1;
   if(!SAT.cur&&!SAT.radar) return;
   var a=proj([tileLon(SAT.x0),tileLat(SAT.y0)]), b=proj([tileLon(SAT.x1+1),tileLat(SAT.y1+1)]), w=b[0]-a[0], h=b[1]-a[1];
-  if(SAT.radar&&layers.precip){ gMap.globalAlpha=0.85*over; gMap.filter="blur("+Math.max(2,Math.min(10,T.k*1.6)).toFixed(1)+"px)"; gMap.drawImage(SAT.radar,a[0],a[1],w,h); gMap.filter="none"; gMap.globalAlpha=1; }
+  if(SAT.radar&&layers.precip){ gMap.globalAlpha=0.85*over; gMap.drawImage(baked(SAT.radar,"r",1.6),a[0],a[1],w,h); gMap.globalAlpha=1; }
   if(!layers.clouds||!SAT.cur) return;
   if(SAT.fadeT<1){ SAT.fadeT=Math.min(1,SAT.fadeT+0.02); mapDirty=true; }
   var day=light.day, op=(0.26+0.34*day)*(LOBBY?0.9:1)*(over<1?0.55:1);
   // Shadow cast away from the sun
   if(day>0.2){ var az=light.az*Math.PI/180, off=6/T.k; gMap.globalCompositeOperation="multiply";
-    gMap.globalAlpha=0.22*day*SAT.fadeT; gMap.filter="brightness(0) blur(3px)";
-    gMap.drawImage(SAT.cur,a[0]-Math.sin(az)*off,a[1]+Math.cos(az)*off,w,h); gMap.filter="none"; gMap.globalCompositeOperation="source-over"; }
-  var soft="blur("+Math.max(SAT.ir?3:1.2,Math.min(8,T.k*(SAT.ir?1.6:0.9))).toFixed(1)+"px)", tint=(day>0.4?"":"brightness(0.78) sepia(0.15) ")+soft;
-  gMap.filter=tint;
-  if(SAT.prev&&SAT.fadeT<1){ gMap.globalAlpha=op*(1-SAT.fadeT); gMap.drawImage(SAT.prev,a[0],a[1],w,h); }
-  gMap.globalAlpha=op*SAT.fadeT; gMap.drawImage(SAT.cur,a[0],a[1],w,h);
-  gMap.globalAlpha=1; gMap.filter="none";
+    gMap.globalAlpha=0.22*day*SAT.fadeT;
+    gMap.drawImage(baked(SAT.cur,"sh",2.4,"brightness(0)"),a[0]-Math.sin(az)*off,a[1]+Math.cos(az)*off,w,h); gMap.globalCompositeOperation="source-over"; }
+  var night=day<=0.4, ck=(night?"cn":"cd")+(SAT.ir?"i":""), cb=SAT.ir?1.6:1.0, tint=night?"brightness(0.78) sepia(0.15)":"";
+  if(SAT.prev&&SAT.fadeT<1){ gMap.globalAlpha=op*(1-SAT.fadeT); gMap.drawImage(baked(SAT.prev,ck,cb,tint),a[0],a[1],w,h); }
+  gMap.globalAlpha=op*SAT.fadeT; gMap.drawImage(baked(SAT.cur,ck,cb,tint),a[0],a[1],w,h);
+  gMap.globalAlpha=1;
 }
 var termC=document.createElement("canvas"); termC.width=48; termC.height=28;
 function sunAltAt(lat,lon,d){ var doy=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5), dec=23.44*Math.sin((360/365*(doy-81))*Math.PI/180)*Math.PI/180;
@@ -911,6 +925,14 @@ function drawTerminator(){
   if(!any) return; c.putImageData(im,0,0);
   gMap.save(); gMap.imageSmoothingEnabled=true; gMap.imageSmoothingQuality="high"; gMap.drawImage(termC,0,0,W,H); gMap.restore();
 }
+// The projection only changes on resize, so the coastlines are turned into ready-made shapes once
+// instead of being re-projected point by point on every redraw
+var P2=null;
+function shapes2(){
+  var key=proj.scale()+"|"+proj.translate().join(","); if(P2&&P2.key===key) return P2;
+  var sp=d3.geoPath(proj), mk=function(fs){ return new Path2D(fs.map(function(f){ return sp(f)||""; }).join("")); };
+  return (P2={key:key,land:mk(GEO.land.features),mi:mk([mi]),lakes:mk(GEO.lakes.features),borders:mk(GEO.borders.features)});
+}
 function drawMap(){
   var P=pal();
   gMap.setTransform(DPR,0,0,DPR,0,0);
@@ -919,23 +941,23 @@ function drawMap(){
   var path=d3.geoPath(proj,gMap);
   if(chart){ drawChart(); if(LOBBY){ gMap.setTransform(DPR*T.k,0,0,DPR*T.k,DPR*T.x,DPR*T.y); drawRadarSat(0.6); } mapDirty=false; return; }
   // Neighboring land
-  gMap.beginPath(); GEO.land.features.forEach(function(f){path(f);}); gMap.fillStyle=P.other; gMap.fill();
+  var S2=shapes2();
+  gMap.fillStyle=P.other; gMap.fill(S2.land);
   // Michigan land, slightly lifted
-  gMap.beginPath(); path(mi); gMap.fillStyle=P.land; gMap.fill();
+  gMap.fillStyle=P.land; gMap.fill(S2.mi);
   // Lakes
-  gMap.beginPath(); GEO.lakes.features.forEach(function(f){path(f);}); gMap.fillStyle=P.lake; gMap.fill();
+  gMap.fillStyle=P.lake; gMap.fill(S2.lakes);
   // Terrain and lake depth from NOAA elevation data, laid over the flat colors
   if(RELIEF.ok){ var r0=proj([RELIEF.b[0],RELIEF.b[3]]), r1=proj([RELIEF.b[2],RELIEF.b[1]]);
     gMap.globalCompositeOperation="soft-light"; gMap.globalAlpha=Math.max(0.55,Math.min(1,(6-T.k)/3)); gMap.drawImage(RELIEF.img,r0[0],r0[1],r1[0]-r0[0],r1[1]-r0[1]);
     var rs=Math.max(0,Math.min(1,(4.5-T.k)/2.5)); if(rs>0){ gMap.globalAlpha=0.55*rs; gMap.drawImage(RELIEF.img,r0[0],r0[1],r1[0]-r0[0],r1[1]-r0[1]); }
     gMap.globalCompositeOperation="source-over"; gMap.globalAlpha=1; }
-  gMap.beginPath(); GEO.lakes.features.forEach(function(f){path(f);});
-  gMap.lineWidth=0.8/T.k; gMap.strokeStyle=P.lakeEdge; gMap.stroke();
+  gMap.lineWidth=0.8/T.k; gMap.strokeStyle=P.lakeEdge; gMap.stroke(S2.lakes);
 
   // State borders
-  gMap.beginPath(); GEO.borders.features.forEach(function(f){path(f);}); gMap.lineWidth=0.8/T.k; gMap.strokeStyle=P.border; gMap.setLineDash([3/T.k,4/T.k]); gMap.stroke(); gMap.setLineDash([]);
+  gMap.lineWidth=0.8/T.k; gMap.strokeStyle=P.border; gMap.setLineDash([3/T.k,4/T.k]); gMap.stroke(S2.borders); gMap.setLineDash([]);
   // Michigan shoreline
-  gMap.beginPath(); path(mi); gMap.lineWidth=1/T.k; gMap.strokeStyle=P.shore; gMap.stroke();
+  gMap.lineWidth=1/T.k; gMap.strokeStyle=P.shore; gMap.stroke(S2.mi);
   // Weather from above: radar, then satellite clouds with their shadows
   drawRadarSat();
   drawHeat();
@@ -1444,7 +1466,7 @@ function drawClouds(dt,low){
 var last=performance.now(), clock=0, lightTimer=0;
 var lobbyLast=0;
 function frame(now){
-  if(LOBBY||(!follow&&now-zoomAt>600)){ if(now-lobbyLast<31){ requestAnimationFrame(frame); return; } }
+  if(!follow&&now-zoomAt>600){ if(now-lobbyLast<31){ requestAnimationFrame(frame); return; } }
   lobbyLast=now;
   var dt=Math.min(0.05,(now-last)/1000); last=now; clock+=dt;
   lightTimer+=dt; if(lightTimer>30&&mood==="live"){ lightTimer=0; var k0=light.day.toFixed(2); updLight(); if(light.day.toFixed(2)!==k0) mapDirty=true; }
@@ -2465,15 +2487,25 @@ function playSplash(){
   splash.classList.remove("gone","on","split"); void splash.offsetWidth; splash.classList.add("on");
   var Wd=innerWidth, Hd=innerHeight, band=3;
   var wmR=splash.querySelector(".wm2").getBoundingClientRect(), yU=Math.round(wmR.bottom+22)+0.5;
+  // Lobby: the airport identifier sits under the stripes, inside .bg so it travels with the lower half on the split
+  var a2=splash.querySelector(".apt2"); if(a2) a2.remove(); a2=null;
+  var la=LOBBY?findApt(LOBBY):null;
+  if(la){ a2=document.createElement("div"); a2.className="apt2"; a2.setAttribute("aria-hidden","true");
+    a2.innerHTML=code(la).split("").map(function(ch,i){ return '<span style="--i:'+i+'">'+esc(ch)+'</span>'; }).join("");
+    a2.style.top=(yU+band+16)+"px"; splash.querySelector(".bg").appendChild(a2);
+    splash.setAttribute("aria-label","upwind, "+code(la)); }
   var svgRoot=d3.select("#splash-svg"); svgRoot.selectAll("*").remove(); var gEl=svgRoot.append("g");
   var cols=["#e8692c","#f2a33a","#f4e2c6"], x0=-90, x1=Wd+90, L=x1-x0;
   var lines=cols.map(function(c){ return gEl.append("polyline").attr("stroke",c).attr("stroke-width",band+0.6); });
   var plane=gEl.append("path").attr("class","pl").attr("d","M0,-13 C1.6,-13 2.3,-9 2.3,-5 L13,2 L13,5 L2.3,2 L1.6,9 L5.5,12 L5.5,14 L0,12.5 L-5.5,14 L-5.5,12 L-1.6,9 L-2.3,2 L-13,5 L-13,2 L-2.3,-5 C-2.3,-9 -1.6,-13 0,-13 Z");
   var letters=[].slice.call(splash.querySelectorAll(".wm2 span")), lift=letters.map(function(){return 0;}), lc=letters.map(function(sp){ var r=sp.getBoundingClientRect(); return r.left+r.width/2; });
+  // The identifier's letters dip as the plane passes over them, the opposite of the wordmark's lift
+  var dl=a2?[].slice.call(a2.querySelectorAll("span")):[], dip=dl.map(function(){return 0;}), dc=dl.map(function(sp){ var r=sp.getBoundingClientRect(); return r.left+r.width/2; });
   function draw(p){
     var x=x0+L*p;
     // Letters lift a little as the plane passes underneath, like a wake
     letters.forEach(function(sp,j){ var d=(x-lc[j])/70, bump=Math.exp(-d*d); lift[j]+=(bump-lift[j])*0.1; sp.style.translate="0 "+(-8*lift[j]).toFixed(2)+"px"; sp.style.rotate=(-1.5*lift[j]).toFixed(2)+"deg"; });
+    dl.forEach(function(sp,j){ var d=(x-dc[j])/70, bump=Math.exp(-d*d); dip[j]+=(bump-dip[j])*0.1; sp.style.translate="0 "+(6*dip[j]).toFixed(2)+"px"; });
     lines.forEach(function(ln,k){ var y=yU+(k-1)*band; ln.attr("points",x0+","+y+" "+x.toFixed(1)+","+y); });
     plane.attr("transform","translate("+x.toFixed(1)+","+yU+") rotate(90)");
   }
@@ -2499,7 +2531,7 @@ function playSplash(){
   var dur=2700, t0=performance.now()+450;
   (function step(now){ var t=Math.max(0,Math.min(1,(now-t0)/dur)), p=0.5-0.5*Math.cos(Math.PI*t); draw(p);
     if(t<1) spRaf=requestAnimationFrame(step); else { draw(1); settle(); finish(); } })(performance.now());
-  function settle(){ var any=false; letters.forEach(function(sp,j){ lift[j]*=0.93; if(lift[j]>0.01) any=true; else lift[j]=0; sp.style.translate="0 "+(-8*lift[j]).toFixed(2)+"px"; sp.style.rotate=(-1.5*lift[j]).toFixed(2)+"deg"; }); if(any) requestAnimationFrame(settle); }
+  function settle(){ var any=false; dl.forEach(function(sp,j){ dip[j]*=0.93; if(dip[j]>0.01) any=true; else dip[j]=0; sp.style.translate="0 "+(6*dip[j]).toFixed(2)+"px"; }); letters.forEach(function(sp,j){ lift[j]*=0.93; if(lift[j]>0.01) any=true; else lift[j]=0; sp.style.translate="0 "+(-8*lift[j]).toFixed(2)+"px"; sp.style.rotate=(-1.5*lift[j]).toFixed(2)+"deg"; }); if(any) requestAnimationFrame(settle); }
 }
 splash.addEventListener("click",endSplash);
 document.querySelectorAll("[data-ptab]").forEach(function(b){ b.addEventListener("click",function(e){ e.stopPropagation(); document.querySelectorAll("[data-ptab]").forEach(function(x){ x.setAttribute("aria-selected",x===b); }); document.querySelectorAll(".ppane").forEach(function(p){ p.hidden=p.dataset.pane!==b.dataset.ptab; }); }); });

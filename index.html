@@ -23,11 +23,10 @@
 <link rel="canonical" href="https://maxpurwin.com/upwind/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;900&display=swap" rel="stylesheet">
 <style>
-@font-face{font-family:"Calogen Italic";src:url("fonts/calogen-bold-italic.woff2") format("woff2");font-weight:700;font-style:italic;font-display:swap}
 @font-face{font-family:"Calogen Exp";src:url("fonts/calogen-exp-italic.woff2") format("woff2");font-weight:700;font-style:italic;font-display:swap}
-:root{--ink:#0d0d0c;--bone:#ece7de;--muted:#a39d92;--dim:#6a665e;--s1:#e8692c;--s2:#f2a33a;--s3:#f4e2c6;--sans:"Hanken Grotesk",system-ui,sans-serif;--display:"Calogen Italic","Hanken Grotesk",sans-serif}
+:root{--ink:#0d0d0c;--bone:#ece7de;--muted:#a39d92;--dim:#6a665e;--s1:#e8692c;--s2:#f2a33a;--s3:#f4e2c6;--sans:"Hanken Grotesk",system-ui,sans-serif;--display:"Hanken Grotesk",system-ui,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--ink);color:var(--bone);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
 canvas{position:fixed;inset:0;width:100vw;height:100vh;display:block}
@@ -42,8 +41,8 @@ button{font-family:inherit;color:inherit}
 
 /* Top left: wordmark + headline */
 .hud{position:fixed;left:32px;top:34px;max-width:min(520px,calc(100vw - 64px));pointer-events:none;z-index:5}
-.wm{font-family:"Calogen Exp",var(--display);font-weight:700;font-style:italic;font-size:1.05rem;letter-spacing:.01em;color:var(--bone);pointer-events:auto;text-decoration:none}
-.hud h1{font-family:var(--display);font-weight:700;font-style:italic;font-size:clamp(1.7rem,2.9vw,2.6rem);line-height:1;letter-spacing:-.005em;margin-top:22px;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+.wm{font-family:"Calogen Exp","Hanken Grotesk",sans-serif;font-weight:700;font-style:italic;font-size:1.05rem;letter-spacing:.01em;color:var(--bone);pointer-events:auto;text-decoration:none}
+.hud h1{font-family:var(--display);font-weight:900;font-style:normal;font-size:clamp(1.8rem,3vw,2.75rem);line-height:1;letter-spacing:-.035em;margin-top:22px;text-shadow:0 2px 30px rgba(0,0,0,.6)}
 .hud .sum{margin-top:16px;font-size:1.04rem;line-height:1.5;color:#d8d2c7;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 18px rgba(0,0,0,.8);max-width:44ch}
 .hud .stats{display:flex;gap:22px;margin-top:20px;flex-wrap:wrap}
 .hud .stat b{display:block;font-weight:600;font-size:1.5rem;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
@@ -81,7 +80,7 @@ body.menu-open .card,body.menu-open .mcard{opacity:0!important;pointer-events:no
 .card .x{position:absolute;right:12px;top:10px;background:none;border:0;font-size:1.4rem;line-height:1;color:var(--muted);cursor:pointer;padding:6px}
 .card .x:hover{color:var(--bone)}
 .card .k{font-size:.78rem;color:var(--muted);letter-spacing:.02em}
-.card h2{font-family:var(--display);font-style:italic;font-weight:700;font-size:1.75rem;line-height:1.02;margin-top:8px;padding-right:20px}
+.card h2{font-family:var(--display);font-style:normal;font-weight:900;letter-spacing:-.03em;font-size:1.75rem;line-height:1.02;margin-top:8px;padding-right:20px}
 .card .line{color:#cfc9be;margin-top:10px;font-size:.96rem;line-height:1.45}
 .card dl{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;margin-top:18px;padding-top:16px;border-top:1px solid rgba(236,231,222,.12)}
 .card dt{font-size:.74rem;color:var(--dim)}
@@ -129,7 +128,7 @@ body.following .hud h1,body.following .hud .sum,body.following .hud .stats,body.
 .panel .tabs button[aria-selected="true"]{background:var(--bone);color:var(--ink)}
 .panel .x{position:absolute;right:12px;top:14px;background:none;border:0;font-size:1.4rem;color:var(--muted);cursor:pointer;padding:6px}
 .panel .pbody{overflow-y:auto;padding:18px 22px 22px;flex:1}
-.panel h2{font-family:var(--display);font-style:italic;font-weight:700;font-size:1.9rem;line-height:1}
+.panel h2{font-family:var(--display);font-style:normal;font-weight:900;letter-spacing:-.03em;font-size:1.9rem;line-height:1}
 .panel .when{font-size:.8rem;color:var(--muted);margin-top:8px}
 .panel .intro2{color:#cfc9be;margin-top:12px;font-size:.95rem;line-height:1.5}
 .rank{list-style:none;margin-top:16px;border-top:1px solid rgba(236,231,222,.12)}
@@ -204,7 +203,7 @@ body.mcard-hide .mcard{opacity:0;pointer-events:none}
 .mcard{position:fixed;right:32px;top:76px;width:380px;max-height:calc(100vh - 170px);overflow-y:auto;z-index:6;background:rgba(13,13,12,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(236,231,222,.14);border-radius:16px;padding:20px 20px 18px;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .35s,transform .35s;overflow:hidden}
 .mcard.on{opacity:1;transform:none;pointer-events:auto}
 .mcard:before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(var(--s1) 0 2px,var(--s2) 2px 4px,var(--s3) 4px 6px)}
-.mcard h3{font-family:var(--display);font-style:italic;font-weight:700;font-size:1.5rem;line-height:1.05}
+.mcard h3{font-family:var(--display);font-style:normal;font-weight:900;letter-spacing:-.03em;font-size:1.5rem;line-height:1.05}
 .mcard .k{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--s2)}
 .mcard p{color:#cfc9be;font-size:.93rem;line-height:1.5;margin-top:8px}
 .mcard .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(236,231,222,.12)}
@@ -256,7 +255,7 @@ body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transp
 .tour-card .ln{position:absolute;left:0;top:0;height:3px;width:0;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s3))}
 .tour-card.fly .ln{animation:tourLine .9s cubic-bezier(.3,.6,.3,1) forwards}
 @keyframes tourLine{to{width:100%}}
-.tour-card h3{font-family:var(--display);font-style:italic;font-weight:700;font-size:1.15rem;line-height:1.1}
+.tour-card h3{font-family:var(--display);font-style:normal;font-weight:900;letter-spacing:-.03em;font-size:1.15rem;line-height:1.1}
 .tour-card p{color:#e2dccf;font-size:.85rem;line-height:1.45;margin-top:6px}
 .tour-card .row{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px}
 .tour-card .count{font-size:.74rem;color:var(--dim);font-variant-numeric:tabular-nums}
@@ -288,7 +287,7 @@ body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transp
 .credits{position:fixed;left:32px;bottom:64px;width:360px;max-width:calc(100vw - 32px);z-index:9;border-radius:14px;padding:18px 18px 14px;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .3s,transform .3s}
 .credits.on{opacity:1;transform:none;pointer-events:auto}
 .credits .x{position:absolute;right:8px;top:6px;background:none;border:0;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:6px}
-.credits h3{font-family:var(--display);font-style:italic;font-weight:700;font-size:1.2rem}
+.credits h3{font-family:var(--display);font-style:normal;font-weight:900;letter-spacing:-.03em;font-size:1.2rem}
 .credits ul{list-style:none;margin-top:10px;display:grid;gap:8px}
 .credits li{font-size:.84rem;line-height:1.45;color:#e2dccf}
 .credits li b{font-weight:600;color:var(--bone)}
@@ -312,7 +311,7 @@ body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transp
 .splash{position:fixed;inset:0;z-index:100;cursor:pointer}
 .splash.gone{display:none}
 .splash .bg{position:absolute;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center}
-.splash .wm2{font-family:"Calogen Exp",var(--display);font-style:italic;font-weight:700;font-size:1.7rem;letter-spacing:.01em;color:var(--bone);display:flex}
+.splash .wm2{font-family:"Calogen Exp","Hanken Grotesk",sans-serif;font-style:italic;font-weight:700;font-size:1.7rem;letter-spacing:.01em;color:var(--bone);display:flex}
 .splash .wm2 span{display:inline-block;opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i)*60ms + 120ms)}
 .splash.on .wm2 span{opacity:1;transform:none}
 .splash.on .wm2{animation:wmDrift 3.4s ease-out both}
@@ -417,7 +416,7 @@ body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transp
     <p class="msg" id="home-msg"></p>
   </form>
 </div>
-<div class="open-panel"><button class="chip" id="open-panel"><span class="lg">Explore: </span><b>places to go</b></button></div>
+<div class="open-panel"><button class="chip" id="open-panel"><span class="lg">Explore: </span><b>Places to Go</b></button></div>
 </div>
 <div class="panel" id="panel" role="dialog" aria-label="This weekend in Michigan's sky">
   <div class="tabs" role="tablist"><button role="tab" data-tab="places" aria-selected="true">Places</button><button role="tab" data-tab="cross" aria-selected="false">Crossings</button></div>
@@ -851,7 +850,7 @@ var LINES={
 };
 var CARD=["north","north-northeast","northeast","east-northeast","east","east-southeast","southeast","south-southeast","south","south-southwest","southwest","west-southwest","west","west-northwest","northwest","north-northwest"];
 function cardinal(h){ return CARD[Math.round(((h%360)+360)%360/22.5)%16]; }
-function typeInfo(p){ var t=TYPES[p.t]; if(t) return {n:t[0],k:t[1]}; var k=p.cat==="A7"?"heli":(p.cat==="A3"||p.cat==="A4")?"airliner":p.cat==="A5"?"widebody":p.cat==="A2"?((p.a||0)>=18000?"bizjet":"twin"):p.cat==="A1"?"single":((p.a||0)>=18000?"airliner":"other"); return {n:p.t?p.t:"An aircraft",k:k}; }
+function typeInfo(p){ var t=TYPES[p.t]; if(t) return {n:t[0],k:t[1]}; var k=p.cat==="A7"?"heli":(p.cat==="A3"||p.cat==="A4")?"airliner":p.cat==="A5"?"widebody":p.cat==="A2"?((p.a||0)>=18000?"bizjet":"twin"):p.cat==="A1"?"single":((p.a||0)>=18000?"airliner":"other"); return {n:p.t?p.t:"An Aircraft",k:k}; }
 var B={la0:41.0,la1:48.6,lo0:-92.5,lo1:-81.0};
 function inBox(p){ return p.la>B.la0&&p.la<B.la1&&p.lo>B.lo0&&p.lo<B.lo1&&typeof p.a==="number"; }
 var planes=SNAP.filter(inBox).map(makePlane);
@@ -1533,7 +1532,7 @@ function drawPlan(t){
 /* Look up: what's about to fly over you */
 var lookList=[];
 function renderLookAsk(){
-  mcard.innerHTML='<span class="k">Look up</span><h3>Where are you?</h3><p>Tap your spot on the map, or allow location, and we\'ll tell you what\'s about to fly overhead.</p><p class="fine2">Running in real time here, not sped up.</p>';
+  mcard.innerHTML='<span class="k">Look up</span><h3>Where Are You?</h3><p>Tap your spot on the map, or allow location, and we\'ll tell you what\'s about to fly overhead.</p><p class="fine2">Running in real time here, not sped up.</p>';
   mcard.classList.add("on");
 }
 function setLook(lat,lon){ lookPos={lat:lat,lon:lon}; flyToLL(lat,lon,7,null,true); renderLook(); }
@@ -1551,7 +1550,7 @@ function renderLook(){
   cand.sort(function(a,b){return a._pr.t-b._pr.t;}); lookList=cand.slice(0,4);
   var over=planes.filter(function(p){ return p._pr&&p._pr.now<1.5&&p.fade>0.5; })[0];
   function when(t){ return t<1?"&lt;1 min":Math.round(t)+" min"; }
-  mcard.innerHTML='<span class="k">Look up</span><h3>Above you.</h3>'+
+  mcard.innerHTML='<span class="k">Look up</span><h3>Above You.</h3>'+
     (over?'<div class="now">Overhead now: '+esc(an(over.name))+' at '+fmtAlt(over.alt)+'. Look up!</div>':'')+
     (lookList.length?'<ul>'+lookList.map(function(p,i){ var pr=p._pr; return '<li data-pi="'+i+'"><span class="t">'+when(pr.t)+'</span><div><b>'+esc(p.name)+'</b><br><span>'+fmtAlt(p.alt)+', coming from the '+pr.from+(pr.dmin<0.8?", right overhead":", passing "+pr.dmin.toFixed(1)+" nm to your "+pr.side)+'</span></div></li>'; }).join("")+'</ul>'
       :'<p>Nothing headed right over you in the next 12 minutes.'+(nearest?' The closest is '+esc(an(nearest.name).replace(/^A/,'a'))+', '+nearest._pr.now.toFixed(0)+' nm '+cardinal((Math.atan2((nearest.lon-lookPos.lon)*Math.cos(lookPos.lat*Math.PI/180),nearest.lat-lookPos.lat)*180/Math.PI+360)%360)+' at '+fmtAlt(nearest.alt)+'.':'')+'</p>')+
@@ -1574,7 +1573,7 @@ function drawLook(t){
 var hp=document.getElementById("home-pill"), hf=document.getElementById("home-form"), hin=document.getElementById("home-in"), hmsg=document.getElementById("home-msg");
 document.getElementById("home-list").innerHTML=APTS.map(function(a){ return '<option value="'+esc(code(a))+'">'+esc(a.n+", "+a.t)+'</option>'; }).join("");
 function renderHome(){
-  if(!home){ hp.innerHTML='<span>Set home airport</span>'; hp.title="Set your home airport"; return; }
+  if(!home){ hp.innerHTML='<span>Set Home Airport</span>'; hp.title="Set your home airport"; return; }
   var st=stnFor(home), w=st?st.w:null;
   hp.title="Fly to "+home.n;
   hp.innerHTML=(st?'<span class="dot" style="background:'+CATC[st.cat]+'"></span>':'')+'<b>'+esc(code(home))+'</b>'+(w?'<span class="hw">'+(w.calm?"Calm":(w.vrb?"VRB":String(w.dir).padStart(3,"0"))+"/"+w.spd+(w.gust?"G"+w.gust:""))+'</span>':'');
@@ -1648,13 +1647,13 @@ var tour=(function(){
   var PLANE='<svg width="22" height="22" viewBox="-14 -14 28 28" aria-hidden="true"><path transform="rotate(90)" fill="#f4e2c6" d="M0,-13 C1.6,-13 2.3,-9 2.3,-5 L13,2 L13,5 L2.3,2 L1.6,9 L5.5,12 L5.5,14 L0,12.5 L-5.5,14 L-5.5,12 L-1.6,9 L-2.3,2 L-13,5 L-13,2 L-2.3,-5 C-2.3,-9 -1.6,-13 0,-13 Z"/></svg>';
   var STEPS=[
     {t:null,h:"Welcome to upwind.",p:"Michigan's sky, live, focused on general aviation: small planes, local airports and the weather that decides whether you go.",cta:"Take the tour",intro:true},
-    {t:".legend",h:"Colors show altitude.",key:true},
-    {t:"map",h:"Tap anything.",p:"Planes show what they are and where they're headed. Airports show conditions, runways and frequencies."},
-    {t:"#home-pill",h:"Set your home airport.",p:"It stays on the map, and distances are measured from it.",home:true},
-    {t:".modes",h:"Look up.",p:"Tap where you are to see what's about to fly overhead."},
-    {t:"#scene-btn",h:"Map options.",p:"Sectional chart, places, weather, beacons, light and season."},
-    {t:"#hud-toggle",h:"More map.",p:"Hide the headline anytime. The numbers stay."},
-    {t:null,h:"Enjoy the sky.",p:"Take the tour again from Map options.",last:true}
+    {t:".legend",h:"Colors Show Altitude.",key:true},
+    {t:"map",h:"Tap Anything.",p:"Planes show what they are and where they're headed. Airports show conditions, runways and frequencies."},
+    {t:"#home-pill",h:"Set Your Home Airport.",p:"It stays on the map, and distances are measured from it.",home:true},
+    {t:".modes",h:"Look Up.",p:"Tap where you are to see what's about to fly overhead."},
+    {t:"#scene-btn",h:"Map Options.",p:"Sectional chart, places, weather, beacons, light and season."},
+    {t:"#hud-toggle",h:"More Map.",p:"Hide the headline anytime. The numbers stay."},
+    {t:null,h:"Enjoy the Sky.",p:"Take the tour again from Map options.",last:true}
   ];
   function rectOf(sel){
     if(sel==="map"){ var cx=mobile?W/2:W*0.62, cy=mobile?H*0.55:H*0.5, r=mobile?Math.min(W*0.42,150):Math.min(W*0.2,220); return {left:cx-r,top:cy-r,width:r*2,height:r*2,round:true}; }

@@ -917,6 +917,8 @@ function movePlanes(dt){
     p.lat+=d*Math.cos(r)/60; p.lon+=d*Math.sin(r)/(60*Math.cos(p.lat*Math.PI/180));
     p.tt=(p.tt||0)+dt;
     if(p.tt>0.12){ p.tt=0; p.trail.push([p.lon,p.lat]); var max=isJet(p)?46:30; if(p.trail.length>max) p.trail.shift(); }
+    // Longer history for the selected-plane trail: a point every 4 s, about 20 minutes
+    p.ht=(p.ht||0)+dt; if(!p.hist) p.hist=[[p.lon,p.lat]]; if(p.ht>4){ p.ht=0; p.hist.push([p.lon,p.lat]); if(p.hist.length>300) p.hist.shift(); }
     if(p.fade<1&&!p.gone) p.fade=Math.min(1,p.fade+dt*0.6);
     p.mt=(p.mt||Math.random())-dt; if(p.mt<=0){ p.mt=1; p.mi=nearMI(p); }
     if(!LIVE&&(p.lat<B.la0||p.lat>B.la1||p.lon<B.lo0||p.lon>B.lo1)){ p.lat=p.src.la; p.lon=p.src.lo; p.trk=p.src.k||0; p.trail=[]; p.fade=0; }
@@ -994,10 +996,25 @@ function drawAirports(t){
 }
 
 /* ---------------- Render ---------------- */
-var follow=null, sel=null, hoverP=null;
+var follow=null, sel=null, hoverP=null, selTrailA=0;
 function drawPlanes(set,t){
   var sk=Math.min(2.4,Math.max(0.85,Math.sqrt(T.k)));
   var sh=light.alt>0?1:0, sa=light.az*Math.PI/180, shAlpha=0.18+0.25*light.day;
+  // Selected plane: a long, fading trail of where it has been
+  var sp=(sel&&sel.p)||follow;
+  if(sp&&set.indexOf(sp)>=0&&sp.hist&&sp.hist.length>1){
+    selTrailA=Math.min(1,selTrailA+0.04);
+    var pts=sp.hist.concat([[sp.lon,sp.lat]]).map(function(c){return scr(c[0],c[1]);}), n=pts.length, col=BC[band(sp.alt)];
+    g.lineCap="round"; g.lineJoin="round";
+    for(var pass=0;pass<2;pass++){
+      for(var i=1;i<n;i++){
+        var f=i/(n-1), al=Math.pow(f,1.6)*selTrailA*sp.fade;
+        g.strokeStyle="rgba("+col+","+((pass?0.85:0.12)*al).toFixed(3)+")";
+        g.lineWidth=pass?(0.8+1.4*f)*Math.min(1.5,sk):(3+4*f)*Math.min(1.5,sk);
+        g.beginPath(); g.moveTo(pts[i-1][0],pts[i-1][1]); g.lineTo(pts[i][0],pts[i][1]); g.stroke();
+      }
+    }
+  } else selTrailA=0;
   // Trails
   set.forEach(function(p){
     if(p.trail.length<2) return;

@@ -178,6 +178,8 @@ body.chart .vig{background:linear-gradient(to right,rgba(13,13,12,.92) 0,rgba(13
 .home-pill .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
 .home-pill .hw{color:#cfc9be;font-variant-numeric:tabular-nums}
 .home-form{display:none;position:absolute;right:0;top:calc(100% + 8px);background:rgba(13,13,12,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(236,231,222,.18);border-radius:14px;padding:12px;gap:8px;width:260px;flex-direction:column}
+.rank .fby{font-size:.74rem;color:var(--s2);margin-top:3px;letter-spacing:.01em}
+.fby2{font-size:.82rem;color:var(--s2)!important;margin-top:10px!important}
 .home-form.on{display:flex;z-index:30}
 .topright:has(.home-form.on){z-index:40}
 .home-form label{font-size:.76rem;color:var(--muted)}
@@ -963,6 +965,8 @@ function drawMap(){
     });
     gMap.globalCompositeOperation="source-over";
   }
+  // Airspace is static for a given view, so it lives in the base map and isn't redrawn every frame
+  if(!chart&&layers.airspace&&T.k>=1.6) drawAirspace(Math.min(1,(T.k-1.6)/1.2),gMap);
   mapDirty=false;
 }
 var TOWNS=APTS.filter(function(a){ return a.twr || a.rw.some(function(r){return r[1]>=6000;}); }).map(function(a){ var big=a.rw.reduce(function(m,r){return Math.max(m,r[1]);},0); return {lat:a.lat,lon:a.lon,r:big>=8000?60:big>=6500?40:28}; });
@@ -1275,10 +1279,10 @@ function buildAirspace(){
     return {c:f.c,path:path,b:[x0,y0,x1,y1],home:home&&f.id===home.id};
   });
 }
-function drawAirspace(fa){
+function drawAirspace(fa,g){
   if(!ASP.length) return; if(!aspPaths||aspW!==W||aspH!==H) buildAirspace();
   var vx0=-T.x/T.k, vy0=-T.y/T.k, vx1=(W-T.x)/T.k, vy1=(H-T.y)/T.k;
-  g.save(); g.translate(T.x,T.y); g.scale(T.k,T.k);
+  g.save(); g.setTransform(DPR,0,0,DPR,0,0); g.translate(T.x,T.y); g.scale(T.k,T.k);
   ["D","C","B"].forEach(function(cl){
     var col=cl==="C"?"201,117,217":"91,143,217", a=(cl==="B"?0.55:cl==="C"?0.5:0.42)*fa;
     g.lineJoin="round"; g.lineCap="round"; g.strokeStyle="rgba("+col+","+a.toFixed(3)+")"; g.lineWidth=(cl==="D"?1.1:1.4)/T.k; g.setLineDash(cl==="D"?[5/T.k,4/T.k]:[]);
@@ -1317,7 +1321,6 @@ function drawAirports(t){
     if(T.k>(a.twr?3.2:5)&&!(LOBBY&&!a.twr)){ var LS=lblSet(g,"apt",11), cw=g.measureText(code(a)).width; if(lblFree(p[0]+r+5,p[1]-6,cw+2,13)) lblDraw(g,LS,"apt",code(a),p[0]+r+6,p[1]+4); try{ g.letterSpacing="0px"; }catch(e){} }
   });
   // Airspace: the FAA's charted Class B, C and D boundaries, drawn like the sectional
-  if(!chart&&layers.airspace&&T.k>=1.6) drawAirspace(Math.min(1,(T.k-1.6)/1.2));
   // Neighboring states and Ontario: weather stations only, drawn lighter
   if(!chart&&layers.conds&&T.k>=(LOBBY?3:2.2)) NBR().forEach(function(st){
     var p=scr(st.lon,st.lat); if(p[0]<-20||p[1]<-20||p[0]>W+20||p[1]>H+20) return;
@@ -1417,7 +1420,8 @@ function drawClouds(dt,low){
 var last=performance.now(), clock=0, lightTimer=0;
 var lobbyLast=0;
 function frame(now){
-  if(LOBBY){ if(now-lobbyLast<31){ requestAnimationFrame(frame); return; } lobbyLast=now; }
+  if(LOBBY||(!follow&&now-zoomAt>600)){ if(now-lobbyLast<31){ requestAnimationFrame(frame); return; } }
+  lobbyLast=now;
   var dt=Math.min(0.05,(now-last)/1000); last=now; clock+=dt;
   lightTimer+=dt; if(lightTimer>30&&mood==="live"){ lightTimer=0; var k0=light.day.toFixed(2); updLight(); if(light.day.toFixed(2)!==k0) mapDirty=true; }
   movePlanes(dt);
@@ -1445,7 +1449,8 @@ function frame(now){
 }
 
 /* ---------------- Zoom and interaction ---------------- */
-var zoom=d3.zoom().scaleExtent([0.8,14]).on("zoom",function(e){ T=e.transform; mapDirty=true; clearWind(); if(e.sourceEvent&&follow) stopFollow(); }).on("start",function(e){ if(e.sourceEvent&&e.sourceEvent.type==="mousedown") cTop.classList.add("drag"); }).on("end",function(){ cTop.classList.remove("drag"); });
+var zoomAt=0;
+var zoom=d3.zoom().scaleExtent([0.8,14]).on("zoom",function(e){ T=e.transform; zoomAt=performance.now(); mapDirty=true; clearWind(); if(e.sourceEvent&&follow) stopFollow(); }).on("start",function(e){ if(e.sourceEvent&&e.sourceEvent.type==="mousedown") cTop.classList.add("drag"); }).on("end",function(){ cTop.classList.remove("drag"); });
 var sel_=d3.select(cTop).call(zoom).on("dblclick.zoom",null);
 var homeEdge=null;
 function drawHome(t){
@@ -1591,7 +1596,7 @@ function openSpot(sp){
   var fh=fromHome(sp.lat,sp.lon);
   body.innerHTML='<span class="spot-k">'+esc(sp.k)+'</span><h2>'+esc(sp.n)+'</h2>'+(fh?'<p class="line" style="color:var(--s2);font-size:.88rem">'+esc(fh)+'</p>':'')+'<p class="line">'+esc(sp.txt)+'</p>'+
     (sp.park?'<p class="note2">Part of a National Lakeshore. The FAA asks pilots to stay at least 2,000 ft above the ground over national park land.</p>':'')+
-    '<dl><div><dt>Small planes nearby now</dt><dd>'+(circ||"None")+'</dd></div><div></div></dl>'+
+    '<dl><div><dt>Small planes nearby now</dt><dd>'+(circ||"None")+'</dd></div><div></div></dl>'+(flybyLine(sp)?'<p class="line fby2">'+esc(flybyLine(sp))+'.</p>':'')+
     '<p class="line" style="margin-top:14px;font-size:.85rem;color:var(--muted)">Closest airports</p>'+
     near.map(function(x){ return '<p class="line" style="margin-top:4px"><b style="color:var(--bone);font-weight:500">'+esc(code(x.a))+'</b> '+esc(x.a.t)+' · '+Math.round(x.nm)+' nm</p>'; }).join("")+
     '';
@@ -1740,8 +1745,9 @@ function pollStats(){
   if(!RELAY){ return; }
   var base=RELAY.replace(/\/$/,"");
   Promise.all([fetch(base+"/stats/today").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
-               fetch(base+"/stats/report").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})])
-    .then(function(x){ if(x[0]||x[1]){ STATS={today:x[0]&&x[0].ready?x[0]:null,rep:x[1]&&x[1].ready?x[1]:null}; if(panel.classList.contains("on")&&tab==="week") renderPanel(); } })
+               fetch(base+"/stats/report").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+               fetch(base+"/stats/spots").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})])
+    .then(function(x){ if(x[0]||x[1]||x[2]){ STATS={today:x[0]&&x[0].ready?x[0]:null,rep:x[1]&&x[1].ready?x[1]:null,spots:x[2]&&x[2].ready?x[2]:null}; if(panel.classList.contains("on")&&(tab==="week"||tab==="places")) renderPanel(); } })
     .then(function(){ later(pollStats,15*60000); });
 }
 function aptStatsFor(a,cb){
@@ -1764,13 +1770,20 @@ function busyHTML(st){
 }
 function aptKind(a){ if(["SJX","MCD","DRM"].indexOf(a.id)>=0) return "Island"; var g=a.rw.some(function(r){return surf(r[3])==="turf";}), pv=a.rw.some(function(r){return surf(r[3])==="paved";}); if(g&&!pv) return "Grass strip"; var shore=BIG_LAKES.slice(0,3).some(function(n){ return lakesByName[n]&&d3.geoDistance([a.lon,a.lat],d3.geoCentroid(lakesByName[n]))<9; }); return a.t; }
 var panel=document.getElementById("panel"), pbody=document.getElementById("pbody"), tab="week";
+// Fly-bys from the history database: small planes within 4 nm and under 6,000 ft, each counted once a day
+function flybyLine(sp){
+  var S=STATS&&STATS.spots; if(!S||!S.counts) return "";
+  var n=S.counts[sp.n]||0, d=Math.round((Date.now()-Date.parse(S.since+"T12:00:00"))/864e5)+1;
+  var span=d>=30?"in the last 30 days":d<=1?"today":"in the last "+d+" days";
+  return n?n+" plane"+(n>1?"s":"")+" flew by "+span:(d>=30?"No fly-bys in the last 30 days":"No fly-bys yet");
+}
 function renderPlaces(){
   var list=SPOTS.map(function(sp,i){ return {sp:sp,i:i,d:home?d3.geoDistance([home.lon,home.lat],[sp.lon,sp.lat])*3440.065:null}; });
   if(home) list.sort(function(a,b){return a.d-b.d;});
   pbody.innerHTML='<h2>Places to Go.</h2><p class="when">'+(home?"Nearest to "+esc(code(home))+" first":"Worth seeing from the air")+'</p>'+
     '<p class="intro2">Michigan sights that are best from the air. Tap one to see it on the map, with the closest airports.</p>'+
     '<ol class="rank">'+list.map(function(x,n){ var sp=x.sp, na=nearestApts(sp.lat,sp.lon,1)[0];
-      return '<li data-spot="'+x.i+'"><span class="n">'+(n+1)+'</span><div><div class="nm">'+esc(sp.n)+'</div><div class="sub">'+esc(sp.k)+' · '+Math.round(na.nm)+' nm from '+esc(code(na.a))+'</div></div><div class="ct">'+(x.d!=null?'<b>'+Math.round(x.d)+'</b><span>nm away</span>':'')+'</div></li>'; }).join("")+'</ol>';
+      return '<li data-spot="'+x.i+'"><span class="n">'+(n+1)+'</span><div><div class="nm">'+esc(sp.n)+'</div><div class="sub">'+esc(sp.k)+' · '+Math.round(na.nm)+' nm from '+esc(code(na.a))+'</div>'+(flybyLine(sp)?'<div class="fby">'+esc(flybyLine(sp))+'</div>':'')+'</div><div class="ct">'+(x.d!=null?'<b>'+Math.round(x.d)+'</b><span>nm away</span>':'')+'</div></li>'; }).join("")+'</ol>';
   pbody.querySelectorAll("li").forEach(function(li){ li.addEventListener("click",function(){ var sp=SPOTS[+li.dataset.spot]; flyToLL(sp.lat,sp.lon,3.4,function(){ openSpot(sp); }); }); });
 }
 function renderCross(){
@@ -1911,7 +1924,7 @@ function drawActivity(t){
 }
 
 /* ---------------- Controls ---------------- */
-document.querySelectorAll("[data-layer]").forEach(function(b){ b.setAttribute("aria-pressed",!!layers[b.dataset.layer]); b.addEventListener("click",function(){ var k=b.dataset.layer; layers[k]=!layers[k]; b.setAttribute("aria-pressed",layers[k]); if(k==="wind") clearWind(); if(k==="ticker") document.body.classList.toggle("no-ticker",!layers.ticker); saveLayers(); }); });
+document.querySelectorAll("[data-layer]").forEach(function(b){ b.setAttribute("aria-pressed",!!layers[b.dataset.layer]); b.addEventListener("click",function(){ var k=b.dataset.layer; layers[k]=!layers[k]; b.setAttribute("aria-pressed",layers[k]); mapDirty=true; if(k==="wind") clearWind(); if(k==="ticker") document.body.classList.toggle("no-ticker",!layers.ticker); saveLayers(); }); });
 document.body.classList.toggle("no-ticker",!layers.ticker);
 document.querySelectorAll("[data-mood]").forEach(function(b){ b.addEventListener("click",function(){ mood=b.dataset.mood; document.querySelectorAll("[data-mood]").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); updLight(); mapDirty=true; headline(); sceneLbl(); }); });
 document.querySelectorAll("[data-season]").forEach(function(b){ b.addEventListener("click",function(){ seasonPick=b.dataset.season; document.querySelectorAll("[data-season]").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); mapDirty=true; sceneLbl(); }); });

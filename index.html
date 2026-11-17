@@ -1722,7 +1722,7 @@ function moments(){
   CHANGES.slice(0,2).forEach(function(c){ var a=A[c.id], up=CAT_RANK[c.to]<CAT_RANK[c.from]; M.unshift([{apt:a},(a.t||a.n)+(up?" just improved to ":" just dropped to ")+c.to+"."]); });
   var oa=home||null, ol=oa?outlook(oa):null; if(ol&&/drop|improve/.test(ol.txt)) M.push([{apt:oa},(oa.t||oa.n)+": "+ol.txt.charAt(0).toLowerCase()+ol.txt.slice(1)]);
   var TD=STATS&&STATS.today;
-  if(TD){ if(TD.first&&TD.first.apt&&A[TD.first.apt]) M.push([{apt:A[TD.first.apt]},"First one up today: "+(TD.first.type&&TYPES[TD.first.type]?lc1(an(TYPES[TD.first.type][0]))+" ":"a small plane ")+"near "+(A[TD.first.apt].t||A[TD.first.apt].n)+" at "+fmtMin(TD.first.min)+"."]);
+  if(TD){
     if(TD.memory) M.push([null,"Yesterday was the busiest "+TD.memory.weekday+(TD.memory.since?" since "+niceDay(TD.memory.since):" upwind has counted")+", with "+TD.memory.planes+" small planes up."]);
     (TD.streaks||[]).slice(0,1).forEach(function(st){ var a=A[st[0]]; if(a) M.push([{apt:a},(a.t||a.n)+" has been VFR "+st[1]+" days running."]); }); }
   if(P.length) M.push([null,P.length+" small plane"+(P.length>1?"s are":" is")+" up over Michigan right now."]);
@@ -1849,13 +1849,13 @@ function renderHeat(){
 }
 function renderWeek(){
   var R=STATS&&STATS.rep;
-  if(!R){ pbody.innerHTML='<h2>This Week.</h2><p class="when">Michigan\'s sky, counted</p><p class="intro2">upwind keeps a quiet tally of the sky: which fields small planes actually visit, and the first plane up each morning. '+(RELAY?'The first numbers show up here after a few hours of counting, and the full weekly picture after seven days.':'Live counting runs on the live site.')+'</p>'; return; }
+  if(!R){ pbody.innerHTML='<h2>This Week.</h2><p class="when">Michigan\'s sky, counted</p><p class="intro2">upwind keeps a quiet tally of the sky: which fields small planes actually visit, and when they fly. '+(RELAY?'The first numbers show up here after a few hours of counting, and the full weekly picture after seven days.':'Live counting runs on the live site.')+'</p>'; return; }
   var d=R.planes-R.prevPlanes, days=Math.round((new Date(R.to)-new Date(R.since))/864e5)+1, full=days>=7, top=R.top.filter(function(r){return A[r[0]];}), mx=top.length?top[0][1]:1;
   var h='<h2>This Week.</h2><p class="when">'+(full?niceDay(R.from)+" to "+niceDay(R.to):"Counting since "+niceDay(R.since))+'</p>'+
     '<div class="rstats"><div><b>'+R.planes.toLocaleString()+'</b><span>small planes flew'+(full&&R.prevPlanes?' <em class="'+(d>=0?'up':'dn')+'">'+(d>=0?'▲ ':'▼ ')+Math.abs(d)+'</em>':'')+'</span></div>'+
     '<div><b>'+R.visits.toLocaleString()+'</b><span>airport visits</span></div>'+
     (R.busiest?'<div><b>'+weekdayOf(R.busiest.day)+'</b><span>busiest day, '+R.busiest.n+' planes</span></div>':'')+
-    (R.first?'<div><b>'+fmtMin(R.first.first_min)+'</b><span>earliest one up'+(R.first.first_apt&&A[R.first.first_apt]?', '+esc(A[R.first.first_apt].t||A[R.first.first_apt].n):'')+'</span></div>':'')+'</div>';
+    (R.peakHour&&R.peakHour.n?'<div><b>'+fmtMin(R.peakHour.hour*60).replace(":00","")+'</b><span>busiest hour at the airports</span></div>':'')+'</div>';
   if(top.length) h+='<h3 class="sub3">Where Michigan flew</h3><ol class="rank">'+top.map(function(r,i){ var a=A[r[0]], dd=r[1]-r[2];
       return '<li data-id="'+a.id+'"><span class="n">'+(i+1)+'</span><div><div class="nm">'+esc(a.t||a.n)+'</div><div class="sub">'+esc(code(a))+' · '+esc(aptKind(a)===a.t?a.n:aptKind(a))+'</div><div class="bar" style="width:'+Math.round(r[1]/mx*100)+'%"></div></div>'+
         '<div class="ct"><b>'+r[1]+'</b>'+(full&&R.prevVisits?'<span class="'+(dd>0?"up":dd<0?"dn":"")+'">'+(dd>0?"▲ "+dd:dd<0?"▼ "+(-dd):"same")+'</span>':'<span>visits</span>')+'</div></li>'; }).join("")+'</ol>';

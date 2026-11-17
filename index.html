@@ -1241,14 +1241,14 @@ function shapeOf(p){
   return "single";
 }
 var SHAPE_SIZE={pc12:5.4,kingair:5.6,citation:5.5,gulf:6.0,q400:6.2,twinwide:7.6,c172:5.0,pa28:4.8,sr22:5.0,be36:4.9,b738:6.4,a320:6.3,e175:5.7,crj:6.0,single:4.9,twin:5.5,bizjet:5.6,airliner:6.2,widebody:7.4,heli:4.6};
-function shapeGlyph(c,x,y,rot,s,key){
+function shapeGlyph(c,x,y,rot,s,key,outline){
   var sh=SHAPES[key]||SHAPES.single, o=sh.o;
   c.save(); c.translate(x,y); c.rotate(rot); c.beginPath();
   c.moveTo(o[0][0]*s,o[0][1]*s);
   for(var i=1;i<o.length;i++) c.lineTo(o[i][0]*s,o[i][1]*s);
   for(var j=o.length-2;j>0;j--) c.lineTo(-o[j][0]*s,o[j][1]*s);
-  c.closePath(); c.fill();
-  sh.e.forEach(function(e){ var w=e[3]*s, h=(e[2]-e[1])*s; c.fillRect(e[0]*s-w/2,e[1]*s,w,h); c.fillRect(-e[0]*s-w/2,e[1]*s,w,h); });
+  c.closePath(); if(outline) c.stroke(); c.fill();
+  sh.e.forEach(function(e){ var w=e[3]*s, h=(e[2]-e[1])*s; if(outline){ c.strokeRect(e[0]*s-w/2,e[1]*s,w,h); c.strokeRect(-e[0]*s-w/2,e[1]*s,w,h); } c.fillRect(e[0]*s-w/2,e[1]*s,w,h); c.fillRect(-e[0]*s-w/2,e[1]*s,w,h); });
   c.restore();
 }
 function glyph(c,x,y,rot,s){
@@ -1302,6 +1302,7 @@ function lblSet(c,role,z){ var L=LBLS[LBLV]||LBLS.A; c.font=L.font(role,z); try{
 function lblDraw(c,L,role,text,x,y){
   c.save(); if(L.blur){ c.shadowColor="rgba(8,8,7,.95)"; c.shadowBlur=L.blur; }
   if(L.stroke&&role==="tail"){ c.lineJoin="round"; c.lineWidth=3; c.strokeStyle="rgba(13,13,12,.8)"; c.strokeText(text,x,y); }
+  if(chart&&role==="tail"){ c.shadowBlur=0; c.lineJoin="round"; c.lineWidth=3.5; c.strokeStyle="rgba(18,16,13,.9)"; c.strokeText(text,x,y); }
   c.fillStyle=role==="tail"?L.tail:L.apt; c.fillText(text,x,y); if(L.blur){ c.shadowBlur=0; c.fillText(text,x,y); } c.restore(); }
 function drawAirports(t){
   LBL=[];
@@ -1383,7 +1384,12 @@ function drawPlanes(set,t){
       g.restore(); }
     var isSel=(sel&&sel.p===p)||follow===p, isHov=hoverP===p;
     if(isSel||isHov){ g.strokeStyle="rgba(236,231,222,"+(isSel?0.9:0.5)+")"; g.lineWidth=1.2; g.beginPath(); g.arc(q[0],q[1],s*2.1+Math.sin(t*3)*1.5,0,7); g.stroke(); }
-    g.fillStyle="rgba("+BC[band(p.alt)]+","+(p.fade*(jet&&!isSel?0.55:1)*(p.mi||isSel?1:0.35))+")"; g.strokeStyle=g.fillStyle;
+    // On the sectional the chart is light and busy, so each plane gets a dark outline and soft halo, and stays fully opaque
+    if(chart){ var ha=p.fade*(p.mi||isSel?1:0.7);
+      g.save(); g.fillStyle="rgba(18,16,13,"+(0.92*ha)+")"; g.strokeStyle=g.fillStyle; g.shadowColor="rgba(18,16,13,"+(0.6*ha)+")"; g.shadowBlur=9*DPR;
+      if(shp==="heli"){ g.beginPath(); g.arc(q[0],q[1],s*1.2,0,7); g.fill(); } else { g.lineWidth=Math.max(3.2,s*0.34); g.lineJoin="round"; shapeGlyph(g,q[0],q[1],rot,s,shp,true); }
+      g.restore(); }
+    g.fillStyle="rgba("+BC[band(p.alt)]+","+(chart?p.fade*(p.mi||isSel?1:0.7):p.fade*(jet&&!isSel?0.55:1)*(p.mi||isSel?1:0.35))+")"; g.strokeStyle=g.fillStyle;
     if(shp==="heli") heliGlyph(g,q[0],q[1],rot,s,t); else shapeGlyph(g,q[0],q[1],rot,s,shp);
     // Tail number tag once zoomed in
     var tag=p.reg||p.cs; if(tag&&layers.tails&&(T.k>=4||isSel)&&(!jet||isSel||T.k>=7)&&(p.mi||isSel)){
@@ -1830,16 +1836,13 @@ function renderHeat(){
 }
 function renderWeek(){
   var R=STATS&&STATS.rep;
-  if(!R){ pbody.innerHTML='<h2>This Week.</h2><p class="when">Michigan\'s sky, counted</p><p class="intro2">upwind keeps a quiet tally of the sky: which fields small planes actually visit, the first plane up each morning, the longest time over the lakes. '+(RELAY?'The first numbers show up here after a few hours of counting, and the full weekly picture after seven days.':'Live counting runs on the live site.')+'</p>'; return; }
+  if(!R){ pbody.innerHTML='<h2>This Week.</h2><p class="when">Michigan\'s sky, counted</p><p class="intro2">upwind keeps a quiet tally of the sky: which fields small planes actually visit, and the first plane up each morning. '+(RELAY?'The first numbers show up here after a few hours of counting, and the full weekly picture after seven days.':'Live counting runs on the live site.')+'</p>'; return; }
   var d=R.planes-R.prevPlanes, days=Math.round((new Date(R.to)-new Date(R.since))/864e5)+1, full=days>=7, top=R.top.filter(function(r){return A[r[0]];}), mx=top.length?top[0][1]:1;
   var h='<h2>This Week.</h2><p class="when">'+(full?niceDay(R.from)+" to "+niceDay(R.to):"Counting since "+niceDay(R.since))+'</p>'+
     '<div class="rstats"><div><b>'+R.planes.toLocaleString()+'</b><span>small planes flew'+(full&&R.prevPlanes?' <em class="'+(d>=0?'up':'dn')+'">'+(d>=0?'▲ ':'▼ ')+Math.abs(d)+'</em>':'')+'</span></div>'+
     '<div><b>'+R.visits.toLocaleString()+'</b><span>airport visits</span></div>'+
     (R.busiest?'<div><b>'+weekdayOf(R.busiest.day)+'</b><span>busiest day, '+R.busiest.n+' planes</span></div>':'')+
     (R.first?'<div><b>'+fmtMin(R.first.first_min)+'</b><span>earliest one up'+(R.first.first_apt&&A[R.first.first_apt]?', '+esc(A[R.first.first_apt].t||A[R.first.first_apt].n):'')+'</span></div>':'')+'</div>';
-  var lakeNow=planes.filter(function(p){ return SMALL[p.kind]&&p.fade>0.6&&BIG_LAKES.slice(0,3).some(function(n){return geoLake([p.lon,p.lat])===n;}); }).length;
-  if(lakeNow) h+='<p class="intro2"><b>Over the lakes right now:</b> '+lakeNow+' small plane'+(lakeNow>1?'s':'')+'.</p>';
-  if(R.lake&&R.lake.min>=15) h+='<p class="intro2"><b>Longest over the water:</b> '+(R.lake.type&&TYPES[R.lake.type]?lc1(an(TYPES[R.lake.type][0])):"a small plane")+' spent about '+R.lake.min+' minutes over '+esc(R.lake.lake)+' on '+weekdayOf(R.lake.day)+'.</p>';
   if(top.length) h+='<h3 class="sub3">Where Michigan flew</h3><ol class="rank">'+top.map(function(r,i){ var a=A[r[0]], dd=r[1]-r[2];
       return '<li data-id="'+a.id+'"><span class="n">'+(i+1)+'</span><div><div class="nm">'+esc(a.t||a.n)+'</div><div class="sub">'+esc(code(a))+' · '+esc(aptKind(a)===a.t?a.n:aptKind(a))+'</div><div class="bar" style="width:'+Math.round(r[1]/mx*100)+'%"></div></div>'+
         '<div class="ct"><b>'+r[1]+'</b>'+(full&&R.prevVisits?'<span class="'+(dd>0?"up":dd<0?"dn":"")+'">'+(dd>0?"▲ "+dd:dd<0?"▼ "+(-dd):"same")+'</span>':'<span>visits</span>')+'</div></li>'; }).join("")+'</ol>';

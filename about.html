@@ -32,8 +32,8 @@ html{background:var(--ink);color:var(--bone);-webkit-text-size-adjust:100%;overf
 html.xfer body:before{content:"";position:fixed;inset:0;background:var(--ink);z-index:299}
 body{font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;
   background:radial-gradient(90% 60% at 80% 0%,rgba(232,105,44,.09),transparent 60%),radial-gradient(70% 50% at 0% 30%,rgba(242,163,58,.05),transparent 60%),var(--ink)}
-a{color:var(--s2);text-decoration:underline;text-decoration-color:rgba(242,163,58,.35);text-underline-offset:3px}
-a:hover{text-decoration-color:var(--s2)}
+a{color:var(--bone);text-decoration:underline;text-decoration-color:rgba(236,231,222,.35);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--bone)}
 .topstripe{position:fixed;left:0;right:0;top:0;z-index:10;display:flex;flex-direction:column}
 .topstripe i{display:block;height:3px}.topstripe i:nth-child(1){background:var(--s1)}.topstripe i:nth-child(2){background:var(--s2)}.topstripe i:nth-child(3){background:var(--s3)}
 header{position:sticky;top:0;z-index:9;display:flex;align-items:center;justify-content:space-between;padding:26px 32px 40px;margin-bottom:-24px;background:linear-gradient(var(--ink) 0,rgba(13,13,12,.88) 45%,rgba(13,13,12,0) 100%)}
@@ -41,9 +41,6 @@ header{position:sticky;top:0;z-index:9;display:flex;align-items:center;justify-c
 .pill{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 18px;border-radius:999px;border:1px solid rgba(236,231,222,.22);background:rgba(20,19,17,.6);color:var(--bone);font:500 .9rem var(--sans);text-decoration:none;cursor:pointer;transition:border-color .25s,color .25s}
 .pill:hover{border-color:var(--s2);color:var(--s2)}
 main{max-width:720px;margin:0 auto;padding:40px 32px 40px}
-.hero{padding:9vh 0 7vh}
-.hero h1{font-weight:900;font-size:clamp(2.6rem,7vw,4.6rem);line-height:1;letter-spacing:-.035em}
-.hero p{margin-top:22px;font-size:1.2rem;color:#cfc9be;max-width:34ch}
 /* Full-bleed stripes across the page, like a horizon under the headline */
 .band{display:flex;flex-direction:column;width:100vw;margin:0 calc(50% - 50vw) 0}.band i{display:block;height:4px}
 .band i:nth-child(1){background:var(--s1)}.band i:nth-child(2){background:var(--s2)}.band i:nth-child(3){background:var(--s3)}
@@ -67,12 +64,29 @@ footer{max-width:720px;margin:0 auto;padding:30px 32px 70px;display:flex;align-i
   body{font-size:16px}
   header{padding:24px 22px 36px}
   main{padding:20px 22px 30px}
-  .hero{padding:6vh 0 5vh}
   .grid{grid-template-columns:1fr;gap:16px}
   h2{font-size:1.6rem}
   footer{padding:26px 22px 60px;flex-direction:column;align-items:flex-start}
 }
 @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+/* Hero: fills the first screen, stripes along its bottom edge; the title rises in through the three stripe colors */
+.hero{min-height:calc(100svh - 132px);display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 11vh;position:relative}
+.hero h1{font-weight:900;font-size:clamp(3.1rem,9.5vw,6.4rem);line-height:.98;letter-spacing:-.04em}
+.hero h1 .ln{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+.hero h1 .ln>span{display:inline-block;animation:heroUp 1.15s cubic-bezier(.22,1,.36,1) .5s both,heroTint 1.5s linear .5s both}
+.hero h1 .ln:nth-child(2)>span{animation-delay:.64s,.64s}
+.hero p{margin-top:26px;font-size:1.25rem;color:#cfc9be;max-width:36ch;animation:heroFade .9s ease 1.25s both}
+.hero .cue{position:absolute;left:0;bottom:3.2vh;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:10px;animation:heroFade .9s ease 1.8s both}
+.hero .cue i{display:block;width:1px;height:22px;background:linear-gradient(var(--s2),transparent);animation:cueBob 2.2s ease-in-out 2.4s infinite}
+.band i{transform-origin:left center;animation:bandIn .9s cubic-bezier(.7,0,.25,1) both}
+.band i:nth-child(1){animation-delay:.9s}.band i:nth-child(2){animation-delay:1s}.band i:nth-child(3){animation-delay:1.1s}
+@keyframes heroUp{from{transform:translateY(105%)}to{transform:none}}
+@keyframes heroTint{0%{color:var(--s1);text-shadow:0 .05em 0 var(--s2),0 .1em 0 var(--s3)}35%{color:var(--s2);text-shadow:0 .03em 0 var(--s3),0 .06em 0 var(--s3)}70%{color:var(--s3);text-shadow:0 0 0 rgba(244,226,198,0),0 0 0 rgba(244,226,198,0)}100%{color:var(--bone);text-shadow:0 0 0 rgba(244,226,198,0),0 0 0 rgba(244,226,198,0)}}
+@keyframes heroFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes bandIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes cueBob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+@media (max-width:760px){.hero{min-height:calc(100svh - 106px);padding-bottom:12vh}.hero p{font-size:1.1rem}}
+@media (prefers-reduced-motion:reduce){.hero h1 .ln>span,.hero p,.hero .cue,.hero .cue i,.band i{animation:none}}
 </style>
 </head>
 <body>
@@ -84,8 +98,9 @@ footer{max-width:720px;margin:0 auto;padding:30px 32px 70px;display:flex;align-i
 
 <main>
   <div class="hero">
-    <h1>Michigan's Sky,<br>Live.</h1>
-    <p>Every small plane over the state right now, the weather at each airport, and a running tally of where Michigan pilots fly.</p>
+    <h1><span class="ln"><span>Michigan's Sky,</span></span><span class="ln"><span>Live.</span></span></h1>
+    <p>Every plane in the air, every airport on the ground, all of it happening now. For the people who fly them and anyone who wants to watch.</p>
+    <span class="cue" aria-hidden="true"><i></i>Scroll</span>
   </div>
   <div class="band" aria-hidden="true"><i></i><i></i><i></i></div>
 
@@ -102,10 +117,9 @@ footer{max-width:720px;margin:0 auto;padding:30px 32px 70px;display:flex;align-i
 
   <section class="reveal">
     <div class="k">Why</div>
-    <h2>Made in Michigan.</h2>
-    <!-- DRAFT: replace with Max's own words -->
-    <p>I'm a private pilot and designer in Michigan. I wanted one place that shows the state's sky the way it feels from the ramp: who's flying, what the weather's doing, and where everyone's headed.</p>
-    <p>upwind is that place. It's a personal project, built for pilots and for anyone who looks up when they hear an engine.</p>
+    <h2>General Aviation Matters.</h2>
+    <p>Michigan's general aviation runs on small fields, flight schools, mechanics and people who simply love to fly. It moves medical flights, trains future airline pilots and connects towns that a highway never reaches. When nobody sees that activity, it's easy to overlook, and fields that get overlooked can close.</p>
+    <p>upwind exists to show how much flying really happens here. Every plane on the map makes the case for the airports that keep it going, and might be the thing that gets someone new to visit a field, take a discovery flight or start lessons.</p>
   </section>
 
   <section class="reveal">

@@ -96,7 +96,8 @@ body.menu-open .card,body.menu-open .mcard{opacity:0!important;pointer-events:no
 /* About, as a layer over the live map: the planes keep moving faintly behind the text */
 #aboutL{position:fixed;inset:0;z-index:50;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:rgba(13,13,12,.78);display:none;font-size:17px;line-height:1.6;color:var(--bone)}
 #aboutL.on{display:block}
-#aboutL a{color:var(--s2);text-decoration:underline;text-decoration-color:rgba(242,163,58,.35);text-underline-offset:3px}
+#aboutL a{color:var(--bone);text-decoration:underline;text-decoration-color:rgba(236,231,222,.35);text-underline-offset:3px}
+#aboutL a:hover{text-decoration-color:var(--bone)}
 #aboutL .ahead{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:26px 32px 40px;margin-bottom:-24px;background:linear-gradient(rgba(13,13,12,.92) 0,rgba(13,13,12,.8) 45%,rgba(13,13,12,0) 100%)}
 #aboutL .ahead .wm{font-size:1.15rem;color:var(--bone)!important;text-decoration:none!important}
 #aboutL .pill{text-decoration:none!important;color:var(--bone)!important}
@@ -111,9 +112,6 @@ body.about-open .hud,body.about-open .ticker,body.about-open .foot,body.about-op
 #aboutL .pill{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 18px;border-radius:999px;border:1px solid rgba(236,231,222,.22);background:rgba(20,19,17,.6);color:var(--bone);font:500 .9rem var(--sans);text-decoration:none;cursor:pointer;transition:border-color .25s,color .25s}
 #aboutL .pill:hover{border-color:var(--s2);color:var(--s2)}
 #aboutL main{max-width:720px;margin:0 auto;padding:40px 32px 40px}
-#aboutL .hero{padding:9vh 0 7vh}
-#aboutL .hero h1{font-weight:900;font-size:clamp(2.6rem,7vw,4.6rem);line-height:1;letter-spacing:-.035em}
-#aboutL .hero p{margin-top:22px;font-size:1.2rem;color:#cfc9be;max-width:34ch}
 #aboutL /* Full-bleed stripes across the page,#aboutL like a horizon under the headline */
 .band{display:flex;flex-direction:column;width:100vw;margin:0 calc(50% - 50vw) 0}
 #aboutL .band i{display:block;height:4px}
@@ -137,9 +135,27 @@ body.about-open .hud,body.about-open .ticker,body.about-open .foot,body.about-op
 #aboutL ul.src li b{color:var(--bone);font-weight:600}
 #aboutL .note{margin-top:22px;padding:16px 18px;border-radius:12px;background:rgba(232,105,44,.08);border:1px solid rgba(232,105,44,.28);color:var(--bone)}
 #aboutL footer{max-width:720px;margin:0 auto;padding:30px 32px 70px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid rgba(236,231,222,.1);color:var(--dim);font-size:.85rem}
+/* Hero: fills the first screen, stripes along its bottom edge; the title rises in through the three stripe colors */
+#aboutL .hero{min-height:calc(100svh - 132px);display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 11vh;position:relative}
+#aboutL .hero h1{font-weight:900;font-size:clamp(3.1rem,9.5vw,6.4rem);line-height:.98;letter-spacing:-.04em}
+#aboutL .hero h1 .ln{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+#aboutL .hero h1 .ln>span{display:inline-block;animation:heroUp 1.15s cubic-bezier(.22,1,.36,1) .5s both,heroTint 1.5s linear .5s both}
+#aboutL .hero h1 .ln:nth-child(2)>span{animation-delay:.64s,.64s}
+#aboutL .hero p{margin-top:26px;font-size:1.25rem;color:#cfc9be;max-width:36ch;animation:heroFade .9s ease 1.25s both}
+#aboutL .hero .cue{position:absolute;left:0;bottom:3.2vh;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:10px;animation:heroFade .9s ease 1.8s both}
+#aboutL .hero .cue i{display:block;width:1px;height:22px;background:linear-gradient(var(--s2),transparent);animation:cueBob 2.2s ease-in-out 2.4s infinite}
+#aboutL .band i{transform-origin:left center;animation:bandIn .9s cubic-bezier(.7,0,.25,1) both}
+#aboutL .band i:nth-child(1){animation-delay:.9s}#aboutL .band i:nth-child(2){animation-delay:1s}#aboutL .band i:nth-child(3){animation-delay:1.1s}
+@keyframes heroUp{from{transform:translateY(105%)}to{transform:none}}
+@keyframes heroTint{0%{color:var(--s1);text-shadow:0 .05em 0 var(--s2),0 .1em 0 var(--s3)}35%{color:var(--s2);text-shadow:0 .03em 0 var(--s3),0 .06em 0 var(--s3)}70%{color:var(--s3);text-shadow:0 0 0 rgba(244,226,198,0),0 0 0 rgba(244,226,198,0)}100%{color:var(--bone);text-shadow:0 0 0 rgba(244,226,198,0),0 0 0 rgba(244,226,198,0)}}
+@keyframes heroFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes bandIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes cueBob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+@media (max-width:760px){#aboutL .hero{min-height:calc(100svh - 106px);padding-bottom:12vh}#aboutL .hero p{font-size:1.1rem}}
+@media (prefers-reduced-motion:reduce){#aboutL .hero h1 .ln>span,#aboutL .hero p,#aboutL .hero .cue,#aboutL .hero .cue i,#aboutL .band i{animation:none}}
 #aboutL .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
 #aboutL .reveal.in{opacity:1;transform:none}
-@media (max-width:760px){#aboutL main{padding:20px 22px 30px}#aboutL .hero{padding:6vh 0 5vh}#aboutL .grid{grid-template-columns:1fr;gap:16px}#aboutL h2{font-size:1.6rem}#aboutL footer{padding:26px 22px 60px;flex-direction:column;align-items:flex-start}}
+@media (max-width:760px){#aboutL main{padding:20px 22px 30px}#aboutL .grid{grid-template-columns:1fr;gap:16px}#aboutL h2{font-size:1.6rem}#aboutL footer{padding:26px 22px 60px;flex-direction:column;align-items:flex-start}}
 @media (prefers-reduced-motion:reduce){#aboutL .reveal{opacity:1;transform:none;transition:none}}
 /* Shown when live traffic stops arriving, so an empty sky isn't mistaken for a quiet one */
 /* One-time "add to home screen" hint on phones */
@@ -168,6 +184,8 @@ body.a2hs-on .ticker{opacity:0;pointer-events:none}
 /* Quiet text actions instead of pill buttons */
 .card.float .btn{background:none!important;border:0!important;padding:2px 0;font-size:.78rem;font-weight:500;color:var(--muted);letter-spacing:.01em;box-shadow:none!important}
 .card.float .btn:hover{color:var(--bone)}
+.card.float .btn:after{display:none}
+.card.float .btn:active{transform:none;opacity:.7}
 .card.float .btn[data-act="ride"],.card.float .btn[data-act="stop"]{color:var(--bone)}
 .card.float .more{margin-top:9px;font-size:.82rem;color:#cfc9be;line-height:1.45}
 .card.float .more p+p{margin-top:4px}
@@ -623,7 +641,7 @@ body.no-ticker .ticker{display:none}
 
 <div class="hud">
   <div class="wmrow"><a class="wm" href="#" id="wm" aria-haspopup="true" aria-expanded="false">upwind</a>
-    <div class="about" id="about" role="menu"><button id="about-page">About upwind</button><button id="tour-again">Take the Tour</button><button id="credits-menu">Data &amp; Credits</button><a id="feedback-menu" hidden href="#">Send Feedback</a><button id="replay-intro">Replay the Intro</button></div></div>
+    <div class="about" id="about" role="menu"><button id="about-page">About upwind</button><button id="tour-again">Take the Tour</button><button id="credits-menu">Data &amp; Credits</button><a id="feedback-menu" hidden href="#">Send Feedback</a></div></div>
   <h1 id="h-title">Over Michigan.</h1>
   <p class="sum" id="h-sum"></p>
   <div class="stats" id="h-stats"></div>
@@ -704,8 +722,9 @@ body.no-ticker .ticker{display:none}
 <div class="a2hs" id="a2hs" role="dialog" aria-label="Add upwind to your home screen"><div><b>Add upwind to your home screen</b><span id="a2hs-how"></span></div><button class="btn" id="a2hs-go" hidden>Install</button><button class="a2x" id="a2hs-x" aria-label="Dismiss">×</button></div>
 <div id="aboutL" role="dialog" aria-label="About upwind" aria-hidden="true"><div class="ahead"><a class="wm" href="./" data-aclose>upwind</a><a class="pill" href="./" data-aclose>Back to the Map</a></div><main>
   <div class="hero">
-    <h1>Michigan's Sky,<br>Live.</h1>
-    <p>Every small plane over the state right now, the weather at each airport, and a running tally of where Michigan pilots fly.</p>
+    <h1><span class="ln"><span>Michigan's Sky,</span></span><span class="ln"><span>Live.</span></span></h1>
+    <p>Every plane in the air, every airport on the ground, all of it happening now. For the people who fly them and anyone who wants to watch.</p>
+    <span class="cue" aria-hidden="true"><i></i>Scroll</span>
   </div>
   <div class="band" aria-hidden="true"><i></i><i></i><i></i></div>
 
@@ -722,10 +741,9 @@ body.no-ticker .ticker{display:none}
 
   <section class="reveal">
     <div class="k">Why</div>
-    <h2>Made in Michigan.</h2>
-    <!-- DRAFT: replace with Max's own words -->
-    <p>I'm a private pilot and designer in Michigan. I wanted one place that shows the state's sky the way it feels from the ramp: who's flying, what the weather's doing, and where everyone's headed.</p>
-    <p>upwind is that place. It's a personal project, built for pilots and for anyone who looks up when they hear an engine.</p>
+    <h2>General Aviation Matters.</h2>
+    <p>Michigan's general aviation runs on small fields, flight schools, mechanics and people who simply love to fly. It moves medical flights, trains future airline pilots and connects towns that a highway never reaches. When nobody sees that activity, it's easy to overlook, and fields that get overlooked can close.</p>
+    <p>upwind exists to show how much flying really happens here. Every plane on the map makes the case for the airports that keep it going, and might be the thing that gets someone new to visit a field, take a discovery flight or start lessons.</p>
   </section>
 
   <section class="reveal">
@@ -1793,7 +1811,7 @@ function closeOthers(keep){
 function openPlane(p){
   closeOthers("card");
   if(mode!=="sky") document.body.classList.add("mcard-hide");
-  sel={p:p,h:[]}; card.classList.add("float"); updPlaneCard(p); card.classList.add("on"); sound.target(p); placeCard(true);
+  sel={p:p,h:[]}; card.classList.add("float"); body._k=null; updPlaneCard(p); card.classList.add("on"); sound.target(p); placeCard(true);
   if(isAirline(p)) routeFor(p.cs);
 }
 // Where the floating card sits. It tries above, below, right and left of the plane and takes the spot that covers
@@ -1880,16 +1898,19 @@ var OPS={"AAL": "American Airlines", "DAL": "Delta Air Lines", "UAL": "United Ai
 function opName(p){ var m=p.cs&&/^([A-Z]{3})[0-9]/.exec(p.cs); if(!m) return ""; var r=ROUTES[p.cs]; return OPS[m[1]]||(r&&r.airline)||""; }
 function hdgText(t){ var d=Math.round(((t%360)+360)%360)%360; return String(d).padStart(3,"0")+"° ("+["N","NE","E","SE","S","SW","W","NW"][Math.round(d/45)%8]+")"; }
 function updPlaneCard(p){
-  var w=where(p), id=p.cs||p.reg||(p.orb?"Sightseeing":"");
+  var w=where(p), id=p.cs||p.reg||(p.priv?"Private":(p.orb?"Sightseeing":"")), nm=(p.priv&&p.name==="An Aircraft")?"Private Aircraft":p.name;
   if(sel&&sel.p===p){ sel.h.push([clock,p.alt]); while(sel.h.length>2&&sel.h[sel.h.length-1][0]-sel.h[0][0]>90) sel.h.shift(); }
   var rt=routeLine(p)||esc(cap(w.txt))+(p.orb?". Circling "+esc(p.orb.sp.n):"");
   var more=sel&&sel.more;
-  body.innerHTML='<span class="k">'+esc(id)+(p.reg&&p.reg!==id?" · "+esc(p.reg):"")+'</span><h3>'+esc(p.name)+'</h3>'+
-    (rt?'<p class="rt">'+rt+'</p>':'')+
-    '<div class="nums"><div><span>Altitude</span>'+fmtAlt(p.alt)+'</div><div><span>Speed</span>'+Math.round(p.gs)+' kt</div><div><span>Heading</span>'+hdgText(p.trk)+'</div></div>'+
-    (more?'<div class="more">'+(opName(p)?'<p>Flown by '+esc(opName(p))+'.</p>':'')+'<p>'+esc(cap(w.txt))+'.</p><p>About '+feel(p)+'.</p>'+(p.src&&p.src.h?'<p><a href="#" class="lnk" data-act="share" data-q="plane='+esc(p.src.h)+'">Copy a link to this plane</a></p>':'')+'</div>':'')+
+  var head='<span class="k">'+esc(id)+(p.reg&&p.reg!==id?" · "+esc(p.reg):"")+'</span><h3>'+esc(nm)+'</h3>'+(rt?'<p class="rt">'+rt+'</p>':'');
+  var nums='<div><span>Altitude</span>'+fmtAlt(p.alt)+'</div><div><span>Speed</span>'+Math.round(p.gs)+' kt</div><div><span>Heading</span>'+hdgText(p.trk)+'</div>';
+  var tail=(more?'<div class="more">'+(p.priv?'<p>The owner has asked to keep this aircraft\'s registration private.</p>':'')+(opName(p)?'<p>Flown by '+esc(opName(p))+'.</p>':'')+'<p>'+esc(cap(w.txt))+'.</p><p>About '+feel(p)+'.</p>'+(p.src&&p.src.h?'<p><a href="#" class="lnk" data-act="share" data-q="plane='+esc(p.src.h)+'">Copy a link to this plane</a></p>':'')+'</div>':'')+
     '<div class="acts">'+(follow===p?'<button class="btn ghost" data-act="stop">Stop Riding Along</button>':'<button class="btn" data-act="ride">Ride Along</button>')+
     '<button class="btn ghost" data-act="more">'+(more?"Less":"More")+'</button></div>';
+  // Update in place: rebuilding the whole card twice a second made it flicker and reset the button hover
+  var key=head+'|'+tail, nEl=body.querySelector(".nums");
+  if(body._k===key&&nEl){ if(nEl._n!==nums){ nEl.innerHTML=nums; nEl._n=nums; } return; }
+  body._k=key; body.innerHTML=head+'<div class="nums">'+nums+'</div>'+tail; var n2=body.querySelector(".nums"); if(n2) n2._n=nums;
 }
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function feel(p){ // rough outside air temperature from standard lapse rate and the nearest surface report
@@ -1975,12 +1996,14 @@ function windComps(a,w,longest){
   return '<div class="wc-k">Crosswind on each runway</div>'+rows+'<div class="wc-n">From the latest report. Approximate.</div>';
 }
 function rwSvg(a,w,f){
-  var rws=rwParse(a), S=74, c=S/2, out='<svg width="'+S+'" height="'+S+'" viewBox="0 0 '+S+' '+S+'" aria-hidden="true"><circle cx="'+c+'" cy="'+c+'" r="'+(c-1)+'" fill="none" stroke="rgba(236,231,222,.15)"/>';
+  var rws=rwParse(a), S=74, c=S/2, out='<svg width="'+S+'" height="'+S+'" viewBox="0 0 '+S+' '+S+'" aria-hidden="true"><circle cx="'+c+'" cy="'+c+'" r="35.5" fill="none" stroke="rgba(236,231,222,.15)"/>';
   var mx=Math.max.apply(null,rws.map(function(r){return r.len;}).concat([1]));
-  rws.forEach(function(r){ var L=(c-10)*(0.55+0.45*r.len/mx), an=(r.ht)*Math.PI/180, dx=Math.sin(an)*L, dy=-Math.cos(an)*L, isF=f&&f.rw===r;
+  rws.forEach(function(r){ var L=22*(0.6+0.4*r.len/mx), an=(r.ht)*Math.PI/180, dx=Math.sin(an)*L, dy=-Math.cos(an)*L, isF=f&&f.rw===r;
     out+='<line x1="'+(c-dx)+'" y1="'+(c-dy)+'" x2="'+(c+dx)+'" y2="'+(c+dy)+'" stroke="'+(isF?"#f2a33a":"#ece7de")+'" stroke-width="'+(r.paved?5:3)+'" stroke-linecap="butt" opacity="'+(r.paved?1:.6)+'"/>'; });
-  if(w&&!w.calm&&!w.vrb&&w.dir!=null){ var an2=(w.dir)*Math.PI/180, x1=c+Math.sin(an2)*(c-3), y1=c-Math.cos(an2)*(c-3), x2=c+Math.sin(an2)*(c-16), y2=c-Math.cos(an2)*(c-16);
-    out+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="#e8692c" stroke-width="2"/><circle cx="'+x2+'" cy="'+y2+'" r="2.6" fill="#e8692c"/>'; }
+  if(w&&!w.calm&&!w.vrb&&w.dir!=null){ var an2=(w.dir)*Math.PI/180, sx=Math.sin(an2), ky=-Math.cos(an2), px=Math.cos(an2), py=Math.sin(an2);
+    var P=function(r,o){ return (c+sx*r+px*o).toFixed(2)+','+(c+ky*r+py*o).toFixed(2); };
+    out+='<line x1="'+(c+sx*35.5).toFixed(2)+'" y1="'+(c+ky*35.5).toFixed(2)+'" x2="'+(c+sx*30).toFixed(2)+'" y2="'+(c+ky*30).toFixed(2)+'" stroke="#e8692c" stroke-width="1.8" stroke-linecap="round"/>'+
+      '<polygon points="'+P(25.5,0)+' '+P(31,3.6)+' '+P(31,-3.6)+'" fill="#e8692c" stroke="#e8692c" stroke-width="1" stroke-linejoin="round"/>'; }
   return out+'</svg>';
 }
 function nearestApts(lat,lon,n){ return APTS.map(function(a){ return {a:a,nm:d3.geoDistance([a.lon,a.lat],[lon,lat])*3440.065}; }).sort(function(x,y){return x.nm-y.nm;}).slice(0,n); }
@@ -2481,6 +2504,7 @@ function findApt(q){ q=q.trim().toUpperCase(); if(!q) return null;
 function setHome(a){ home=a; try{ if(a) localStorage.setItem("upwind-home",a.id); else localStorage.removeItem("upwind-home"); }catch(e){} renderHome(); }
 hp.addEventListener("click",function(e){
   e.stopPropagation();
+  if(hf.classList.contains("on")){ hf.classList.remove("on"); return; } // second tap collapses it
   if(home){ hf.classList.remove("on"); openAirport(home); flyToLL(home.lat,home.lon,Math.max(T.k,2.6),null,null,800); return; }
   openHomeForm();
 });
@@ -2489,6 +2513,14 @@ hf.addEventListener("submit",function(e){ e.preventDefault(); var a=findApt(hin.
 document.getElementById("home-clear").addEventListener("click",function(){ setHome(null); hf.classList.remove("on"); });
 document.addEventListener("click",function(e){ if(!e.target.closest(".home")) hf.classList.remove("on"); });
 renderHome();
+// One window at a time, What's Overhead included: whichever opened last wins. The Overhead card steps aside
+// while another window is open and comes back when that window closes.
+(function(){
+  var watch=[card,panel,pop,hf,document.getElementById("about"),document.querySelector(".credits")].filter(Boolean);
+  function sync(){ var any=watch.some(function(el){ return el.classList.contains("on"); }); document.body.classList.toggle("mcard-hide",mode!=="sky"&&any); }
+  var mo=new MutationObserver(sync); watch.forEach(function(el){ mo.observe(el,{attributes:true,attributeFilter:["class"]}); });
+  lookBtn.addEventListener("click",function(){ if(mode==="look") closeOthers("look"); sync(); });
+})();
 
 /* ---------------- Live data ---------------- */
 function applyTraffic(ac){
@@ -2903,7 +2935,7 @@ var aboutEl=document.getElementById("about"), wmEl=document.getElementById("wm")
 wmEl.addEventListener("click",function(e){ e.preventDefault(); e.stopPropagation(); var on=!aboutEl.classList.contains("on"); if(on) closeOthers("about"); aboutEl.classList.toggle("on",on); wmEl.setAttribute("aria-expanded",on); });
 document.addEventListener("click",function(e){ if(!e.target.closest("#about")){ aboutEl.classList.remove("on"); wmEl.setAttribute("aria-expanded",false); } });
 aboutEl.addEventListener("click",function(e){ if(e.target.closest("button,a")) aboutEl.classList.remove("on"); },true);
-document.getElementById("replay-intro").addEventListener("click",function(){ if(follow) stopFollow(); closeCard(); playSplash(); });
+
 /* Page-to-page transition between the map and the About page.
    Leaving: the screen darkens and the plane flies straight up (to About) or down (back to the map),
    drawing the three stripes behind it. Arriving: the stripes split the screen open sideways,

@@ -108,6 +108,8 @@ body.about-open .topstripe{z-index:60}
 body.about-open #c-blur{display:block}
 body.about-open #c-map,body.about-open #c-wind,body.about-open #c-top{visibility:hidden}
 body.about-open .hud,body.about-open .ticker,body.about-open .foot,body.about-open .home,body.about-open .open-panel,body.about-open .stale{opacity:0!important;pointer-events:none!important}
+/* About sits over a clean map: every window, card and control underneath steps out of view */
+body.about-open :is(.topright,.panel,.a2hs,.card,.toast,.credits,.mcard,.follow,.tour-block,.tour-spot,.tour-card){visibility:hidden!important;pointer-events:none!important}
 @media (max-width:760px){#aboutL{font-size:16px}#aboutL .ahead{padding:24px 22px 36px}}
 #aboutL .pill{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 18px;border-radius:999px;border:1px solid rgba(236,231,222,.22);background:rgba(20,19,17,.6);color:var(--bone);font:500 .9rem var(--sans);text-decoration:none;cursor:pointer;transition:border-color .25s,color .25s}
 #aboutL .pill:hover{border-color:var(--s2);color:var(--s2)}

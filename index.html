@@ -142,17 +142,14 @@ body.about-open .hud,body.about-open .ticker,body.about-open .foot,body.about-op
 #aboutL .hero h1 .ln>span{display:inline-block;animation:heroUp 1.15s cubic-bezier(.22,1,.36,1) .5s both,heroTint 1.5s linear .5s both}
 #aboutL .hero h1 .ln:nth-child(2)>span{animation-delay:.64s,.64s}
 #aboutL .hero p{margin-top:26px;font-size:1.25rem;color:#cfc9be;max-width:36ch;animation:heroFade .9s ease 1.25s both}
-#aboutL .hero .cue{position:absolute;left:0;bottom:3.2vh;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:10px;animation:heroFade .9s ease 1.8s both}
-#aboutL .hero .cue i{display:block;width:1px;height:22px;background:linear-gradient(var(--s2),transparent);animation:cueBob 2.2s ease-in-out 2.4s infinite}
 #aboutL .band i{transform-origin:left center;animation:bandIn .9s cubic-bezier(.7,0,.25,1) both}
 #aboutL .band i:nth-child(1){animation-delay:.9s}#aboutL .band i:nth-child(2){animation-delay:1s}#aboutL .band i:nth-child(3){animation-delay:1.1s}
 @keyframes heroUp{from{transform:translateY(105%)}to{transform:none}}
 @keyframes heroTint{0%{color:var(--s1);text-shadow:0 .05em 0 var(--s2),0 .1em 0 var(--s3)}35%{color:var(--s2);text-shadow:0 .03em 0 var(--s3),0 .06em 0 var(--s3)}70%{color:var(--s3);text-shadow:0 0 0 rgba(244,226,198,0),0 0 0 rgba(244,226,198,0)}100%{color:var(--bone);text-shadow:0 0 0 rgba(244,226,198,0),0 0 0 rgba(244,226,198,0)}}
 @keyframes heroFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes bandIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-@keyframes cueBob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
 @media (max-width:760px){#aboutL .hero{min-height:calc(100svh - 106px);padding-bottom:12vh}#aboutL .hero p{font-size:1.1rem}}
-@media (prefers-reduced-motion:reduce){#aboutL .hero h1 .ln>span,#aboutL .hero p,#aboutL .hero .cue,#aboutL .hero .cue i,#aboutL .band i{animation:none}}
+@media (prefers-reduced-motion:reduce){#aboutL .hero h1 .ln>span,#aboutL .hero p,#aboutL .band i{animation:none}}
 #aboutL .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
 #aboutL .reveal.in{opacity:1;transform:none}
 @media (max-width:760px){#aboutL main{padding:20px 22px 30px}#aboutL .grid{grid-template-columns:1fr;gap:16px}#aboutL h2{font-size:1.6rem}#aboutL footer{padding:26px 22px 60px;flex-direction:column;align-items:flex-start}}
@@ -724,7 +721,6 @@ body.no-ticker .ticker{display:none}
   <div class="hero">
     <h1><span class="ln"><span>Michigan's Sky,</span></span><span class="ln"><span>Live.</span></span></h1>
     <p>Every plane in the air, every airport on the ground, all of it happening now. For the people who fly them and anyone who wants to watch.</p>
-    <span class="cue" aria-hidden="true"><i></i>Scroll</span>
   </div>
   <div class="band" aria-hidden="true"><i></i><i></i><i></i></div>
 

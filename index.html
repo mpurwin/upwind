@@ -1411,7 +1411,7 @@ var LINES={
 };
 var CARD=["north","north-northeast","northeast","east-northeast","east","east-southeast","southeast","south-southeast","south","south-southwest","southwest","west-southwest","west","west-northwest","northwest","north-northwest"];
 function cardinal(h){ return CARD[Math.round(((h%360)+360)%360/22.5)%16]; }
-function typeInfo(p){ var t=TYPES[p.t]; if(t) return {n:t[0],k:t[1]}; var k=p.cat==="A7"?"heli":(p.cat==="A3"||p.cat==="A4")?"airliner":p.cat==="A5"?"widebody":p.cat==="A2"?((p.a||0)>=18000?"bizjet":"twin"):p.cat==="A1"?"single":((p.a||0)>=18000?"airliner":"other"); return {n:p.t?p.t:"An Aircraft",k:k}; }
+function typeInfo(p){ var t=TYPES[p.t]; if(t) return {n:t[0],k:t[1]}; var k=p.cat==="A7"?"heli":(p.cat==="A3"||p.cat==="A4")?"airliner":p.cat==="A5"?"widebody":p.cat==="A2"?((p.a||0)>=18000?"bizjet":"twin"):p.cat==="A1"?"single":((p.a||0)>=18000?"airliner":"other"); return {n:p.t?p.t:((p.f&12)?"Private Aircraft":"An Aircraft"),k:k}; }
 var B={la0:40.0,la1:48.8,lo0:-92.8,lo1:-79.0};
 function inBox(p){ return p.la>B.la0&&p.la<B.la1&&p.lo>B.lo0&&p.lo<B.lo1&&typeof p.a==="number"; }
 var planes=SNAP.filter(inBox).map(makePlane);
@@ -2137,7 +2137,7 @@ function moments(){
   if(P.length&&statPick.indexOf("ga")<0&&statPick.indexOf("total")<0) M.push([null,P.length+" small plane"+(P.length>1?"s are":" is")+" up over Michigan right now."]);
   return M;
 }
-function an(n){ return (/^[AEIOU]/i.test(n)&&!/^U[^n]/.test(n)?"An ":"A ")+n; }
+function an(n){ if(/^(An?|The) /.test(n)) return n; return (/^[AEIOU]/i.test(n)&&!/^U[^n]/.test(n)?"An ":"A ")+n; }
 function nextMoment(){
   var M=moments(); document.querySelector(".ticker").style.visibility=M.length?"visible":"hidden"; if(!M.length) return; var m=M[tickI++%M.length];
   tick.classList.add("out");

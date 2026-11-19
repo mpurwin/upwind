@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>About upwind · Michigan's Sky, Live</title>
+<meta name="description" content="What upwind is, where its data comes from, and how it counts Michigan's general aviation flights.">
+<meta name="theme-color" content="#0d0d0c">
+<link rel="canonical" href="https://upwind.fly/about.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="upwind">
+<meta property="og:title" content="About upwind">
+<meta property="og:description" content="Michigan's Sky, Live. What upwind is, where its data comes from, and how it counts Michigan's general aviation flights.">
+<meta property="og:image:alt" content="upwind: Michigan's Sky, Live.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"AboutPage","name":"About upwind","url":"https://upwind.fly/about.html","isPartOf":{"@type":"WebSite","name":"upwind","url":"https://upwind.fly/"}}</script>
+<meta property="og:url" content="https://upwind.fly/about.html">
+<meta property="og:image" content="https://upwind.fly/og-image.png">
+<script>try{if(sessionStorage.getItem("upwind-xfer"))document.documentElement.classList.add("xfer")}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;900&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:"Calogen Exp";src:url("fonts/calogen-exp-italic.woff2") format("woff2");font-weight:700;font-style:italic;font-display:swap}
+:root{--ink:#0d0d0c;--bone:#ece7de;--muted:#a39d92;--dim:#6a665e;--s1:#e8692c;--s2:#f2a33a;--s3:#f4e2c6;--sans:"Hanken Grotesk",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--ink);color:var(--bone);-webkit-text-size-adjust:100%;overflow-x:hidden}
+html.xfer body:before{content:"";position:fixed;inset:0;background:var(--ink);z-index:299}
+body{font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;
+  background:radial-gradient(90% 60% at 80% 0%,rgba(232,105,44,.09),transparent 60%),radial-gradient(70% 50% at 0% 30%,rgba(242,163,58,.05),transparent 60%),var(--ink)}
+a{color:var(--s2);text-decoration:underline;text-decoration-color:rgba(242,163,58,.35);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--s2)}
+.topstripe{position:fixed;left:0;right:0;top:0;z-index:10;display:flex;flex-direction:column}
+.topstripe i{display:block;height:3px}.topstripe i:nth-child(1){background:var(--s1)}.topstripe i:nth-child(2){background:var(--s2)}.topstripe i:nth-child(3){background:var(--s3)}
+header{position:sticky;top:0;z-index:9;display:flex;align-items:center;justify-content:space-between;padding:26px 32px 40px;margin-bottom:-24px;background:linear-gradient(var(--ink) 0,rgba(13,13,12,.88) 45%,rgba(13,13,12,0) 100%)}
+.wm{font-family:"Calogen Exp","Hanken Grotesk",sans-serif;font-weight:700;font-style:italic;font-size:1.15rem;color:var(--bone);text-decoration:none}
+.pill{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 18px;border-radius:999px;border:1px solid rgba(236,231,222,.22);background:rgba(20,19,17,.6);color:var(--bone);font:500 .9rem var(--sans);text-decoration:none;cursor:pointer;transition:border-color .25s,color .25s}
+.pill:hover{border-color:var(--s2);color:var(--s2)}
+main{max-width:720px;margin:0 auto;padding:40px 32px 40px}
+.hero{padding:9vh 0 7vh}
+.hero h1{font-weight:900;font-size:clamp(2.6rem,7vw,4.6rem);line-height:1;letter-spacing:-.035em}
+.hero p{margin-top:22px;font-size:1.2rem;color:#cfc9be;max-width:34ch}
+/* Full-bleed stripes across the page, like a horizon under the headline */
+.band{display:flex;flex-direction:column;width:100vw;margin:0 calc(50% - 50vw) 0}.band i{display:block;height:4px}
+.band i:nth-child(1){background:var(--s1)}.band i:nth-child(2){background:var(--s2)}.band i:nth-child(3){background:var(--s3)}
+.band+section{border-top:0}
+section{padding:46px 0;border-top:1px solid rgba(236,231,222,.1)}
+.k{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+h2{font-weight:900;font-size:1.9rem;letter-spacing:-.025em;line-height:1.1;margin-bottom:16px}
+section p+p{margin-top:14px}
+section p{color:#d6d0c5}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:24px}
+.grid div{padding-top:14px;border-top:2px solid var(--s1)}.grid div:nth-child(2){border-color:var(--s2)}.grid div:nth-child(3){border-color:var(--s3)}
+.grid b{display:block;font-weight:600;margin-bottom:6px}.grid span{font-size:.92rem;color:var(--muted);line-height:1.5;display:block}
+ul.src{list-style:none;margin-top:8px}
+ul.src li{padding:12px 0;border-bottom:1px solid rgba(236,231,222,.08);color:#d6d0c5}
+ul.src li b{color:var(--bone);font-weight:600}
+.note{margin-top:22px;padding:16px 18px;border-radius:12px;background:rgba(232,105,44,.08);border:1px solid rgba(232,105,44,.28);color:var(--bone)}
+footer{max-width:720px;margin:0 auto;padding:30px 32px 70px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid rgba(236,231,222,.1);color:var(--dim);font-size:.85rem}
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+@media (max-width:760px){
+  body{font-size:16px}
+  header{padding:24px 22px 36px}
+  main{padding:20px 22px 30px}
+  .hero{padding:6vh 0 5vh}
+  .grid{grid-template-columns:1fr;gap:16px}
+  h2{font-size:1.6rem}
+  footer{padding:26px 22px 60px;flex-direction:column;align-items:flex-start}
+}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+<div class="topstripe" aria-hidden="true"><i></i><i></i><i></i></div>
+<header>
+  <a class="wm" href="./" data-back>upwind</a>
+  <a class="pill" href="./" data-back>Back to the Map</a>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Michigan's Sky,<br>Live.</h1>
+    <p>Every small plane over the state right now, the weather at each airport, and a running tally of where Michigan pilots fly.</p>
+  </div>
+  <div class="band" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <section class="reveal">
+    <div class="k">What it is</div>
+    <h2>One Look at Who's Up.</h2>
+    <p>upwind is a live map of Michigan's general aviation. It shows the planes in the air, the conditions at every airport that reports them, and the patterns that build up over days and weeks.</p>
+    <div class="grid">
+      <div><b>The Sky Now</b><span>Live traffic, drawn by aircraft type and colored by altitude, with weather, radar and clouds underneath.</span></div>
+      <div><b>Every Airport</b><span>Current conditions, crosswind on each runway, and how busy the field usually is.</span></div>
+      <div><b>Explore</b><span>This week's flights and landings, places worth flying over, and a heat map of where people fly.</span></div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="k">Why</div>
+    <h2>Made in Michigan.</h2>
+    <!-- DRAFT: replace with Max's own words -->
+    <p>I'm a private pilot and designer in Michigan. I wanted one place that shows the state's sky the way it feels from the ramp: who's flying, what the weather's doing, and where everyone's headed.</p>
+    <p>upwind is that place. It's a personal project, built for pilots and for anyone who looks up when they hear an engine.</p>
+  </section>
+
+  <section class="reveal">
+    <div class="k">Where the data comes from</div>
+    <h2>Public, Live and Volunteer-Built.</h2>
+    <ul class="src">
+      <li><b>Traffic</b> from <a href="https://adsb.lol" target="_blank" rel="noopener">adsb.lol</a>, with <a href="https://airplanes.live" target="_blank" rel="noopener">airplanes.live</a> and <a href="https://adsb.fi" target="_blank" rel="noopener">adsb.fi</a> as backups: networks of volunteer ADS-B receivers.</li>
+      <li><b>Weather reports and forecasts</b> from the <a href="https://aviationweather.gov" target="_blank" rel="noopener">NOAA Aviation Weather Center</a>.</li>
+      <li><b>Clouds and radar</b> from NOAA satellite and NEXRAD imagery, served by the <a href="https://mesonet.agron.iastate.edu" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>.</li>
+      <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Terrain from NOAA.</li>
+      <li><b>Airline routes</b> from <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>, community route data that can be out of date.</li>
+    </ul>
+  </section>
+
+  <section class="reveal">
+    <div class="k">How the numbers work</div>
+    <h2>Flights and Landings.</h2>
+    <p>upwind checks the receivers every 5 minutes. A flight is one plane's trip, from when it shows up in the air until it lands or goes quiet for 20 minutes. A landing is a flight that ended low over a Michigan airport.</p>
+    <p>Some flying is always missed: touch-and-goes inside one flight, short hops between checks, very low arrivals at small fields, and planes without ADS-B. So every count on upwind is a minimum.</p>
+  </section>
+
+  <section class="reveal">
+    <div class="k">Good to know</div>
+    <h2>Privacy and Safety.</h2>
+    <p>No accounts, no ads and no tracking. Your home airport and settings stay in your browser.</p>
+    <p>Aircraft whose owners have asked to keep their registration private are still shown and counted, but never named.</p>
+    <p class="note">upwind is for fun and awareness only. It is not for navigation or flight planning. Use current charts, NOTAMs and an official briefing.</p>
+  </section>
+</main>
+
+<footer>
+  <span>upwind · Michigan's Sky, Live.</span>
+  <a class="pill" href="./" data-back>Back to the Map</a>
+</footer>
+
+<script>
+/* Page-to-page transition between the map and the About page.
+   Leaving: the screen darkens and the plane flies straight up (to About) or down (back to the map),
+   drawing the three stripes behind it. Arriving: the stripes split the screen open sideways,
+   the same way the landing animation splits it open top and bottom. */
+var XFER = (function () {
+  var COLS = ["#e8692c", "#f2a33a", "#f4e2c6"], BAND = 3, INK = "#0d0d0c";
+  var PLANE = "M0,-13 C1.6,-13 2.3,-9 2.3,-5 L13,2 L13,5 L2.3,2 L1.6,9 L5.5,12 L5.5,14 L0,12.5 L-5.5,14 L-5.5,12 L-1.6,9 L-2.3,2 L-13,5 L-13,2 L-2.3,-5 C-2.3,-9 -1.6,-13 0,-13 Z";
+  var still = window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches;
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+  function layer() {
+    var d = document.createElement("div");
+    d.style.cssText = "position:fixed;inset:0;z-index:300;pointer-events:none;background:" + INK;
+    var s = el("svg", { width: "100%", height: "100%" }); s.style.cssText = "position:absolute;inset:0;overflow:visible";
+    d.appendChild(s); return { d: d, s: s };
+  }
+  function stripes(svg, x, y0, y1) {
+    return COLS.map(function (c, k) {
+      var X = x + (k - 1) * BAND;
+      var ln = el("line", { x1: X, x2: X, y1: y0, y2: y1, stroke: c, "stroke-width": BAND + 0.6 }); svg.appendChild(ln); return ln;
+    });
+  }
+  // dir "up": plane climbs from the bottom; "down": it descends from the top
+  function out(dir, href) {
+    if (XFER.busy) return; XFER.busy = true;
+    var W = innerWidth, H = innerHeight, cx = Math.round(W / 2) + 0.5;
+    var L = layer(); L.d.style.opacity = "0"; L.d.style.transition = "opacity .28s ease"; L.d.style.pointerEvents = "auto";
+    document.body.appendChild(L.d); void L.d.offsetWidth; L.d.style.opacity = "1";
+    var go = typeof href === "function"
+      ? function () { href(); into(function () { XFER.busy = false; }, L.d); }   // same page: swap what's underneath, then split open
+      : function () { try { sessionStorage.setItem("upwind-xfer", dir); } catch (e) {} location.href = href; };
+    if (still) { setTimeout(go, 300); return; }
+    var start = dir === "up" ? H + 40 : -40, end = dir === "up" ? -40 : H + 40;
+    var lines = stripes(L.s, cx, start, start);
+    var pl = el("path", { d: PLANE, fill: "#f4e2c6" }); L.s.appendChild(pl);
+    var dur = 950, t0 = performance.now() + 220;
+    (function step(now) {
+      var t = Math.max(0, Math.min(1, (now - t0) / dur)), p = 0.5 - 0.5 * Math.cos(Math.PI * t), y = start + (end - start) * p;
+      lines.forEach(function (ln) { ln.setAttribute("y2", y.toFixed(1)); });
+      pl.setAttribute("transform", "translate(" + cx + "," + y.toFixed(1) + ") rotate(" + (dir === "up" ? 0 : 180) + ") scale(1.15)");
+      if (t < 1) requestAnimationFrame(step); else setTimeout(go, 140);
+    })(performance.now());
+  }
+  // Arriving: full-height stripes down the middle, then the two halves slide apart
+  function into(cb, cover0) {
+    var W = innerWidth, H = innerHeight, cx = Math.round(W / 2) + 0.5;
+    var cover = document.getElementById("xfer-cover");
+    if (still) { if (cover) cover.remove(); if (cover0) cover0.remove(); document.documentElement.classList.remove("xfer"); if (cb) cb(); return; }
+    var halves = [["inset(0 " + (W - cx) + "px 0 0)", -(cx + BAND * 3)], ["inset(0 0 0 " + cx + "px)", W - cx + BAND * 3]].map(function (c) {
+      var L = layer(); L.d.style.clipPath = c[0]; L.d.style.transition = "transform .95s cubic-bezier(.7,0,.25,1)"; L.d.style.willChange = "transform";
+      stripes(L.s, cx, -10, H + 10); document.body.appendChild(L.d); L.d.dataset.to = c[1]; return L.d;
+    });
+    if (cover) cover.remove(); if (cover0) cover0.remove(); document.documentElement.classList.remove("xfer");
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      halves.forEach(function (h) { h.style.transform = "translateX(" + h.dataset.to + "px)"; });
+      setTimeout(function () { halves.forEach(function (h) { h.remove(); }); if (cb) cb(); }, 1000);
+    }); });
+  }
+  function arriving() { try { var d = sessionStorage.getItem("upwind-xfer"); if (d) { sessionStorage.removeItem("upwind-xfer"); return d; } } catch (e) {} return null; }
+  function swap(dir, mid) { out(dir, mid); }
+  return { out: out, into: into, swap: swap, arriving: arriving, busy: false };
+})();
+
+(function(){
+  // Arriving from the map: the stripes split the screen open
+  var d=XFER.arriving(); if(d) XFER.into(); else document.documentElement.classList.remove("xfer");
+  // Back to the map: the plane flies down
+  document.querySelectorAll("[data-back]").forEach(function(a){ a.addEventListener("click",function(e){ if(e.metaKey||e.ctrlKey) return; e.preventDefault(); XFER.out("down","./"); }); });
+  // Sections ease in as they scroll into view
+  var io="IntersectionObserver" in window?new IntersectionObserver(function(es){ es.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add("in"); io.unobserve(x.target); } }); },{threshold:.15}):null;
+  document.querySelectorAll(".reveal").forEach(function(s){ if(io) io.observe(s); else s.classList.add("in"); });
+  // Coming back with the browser's back button: clear any leftover transition
+  addEventListener("pageshow",function(e){ if(e.persisted){ XFER.busy=false; document.querySelectorAll("body > div[style*='z-index:300']").forEach(function(n){ n.remove(); }); } });
+})();
+</script>
+</body>
+</html>

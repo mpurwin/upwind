@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>upwind · Michigan's Sky</title>
+<title>upwind · Michigan's Sky, Live · Flight Tracker and Airport Weather</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJjIj48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjKSI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjMGQwZDBjIi8+PHJlY3QgeT0iMzciIHdpZHRoPSI2NCIgaGVpZ2h0PSI5IiBmaWxsPSIjZTg2OTJjIi8+PHJlY3QgeT0iNDYiIHdpZHRoPSI2NCIgaGVpZ2h0PSI5IiBmaWxsPSIjZjJhMzNhIi8+PHJlY3QgeT0iNTUiIHdpZHRoPSI2NCIgaGVpZ2h0PSI5IiBmaWxsPSIjZjRlMmM2Ii8+PC9nPjwvc3ZnPgo=">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -12,7 +12,11 @@
 <meta name="apple-mobile-web-app-title" content="upwind">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#0d0d0c">
-<meta name="description" content="Michigan's sky, live. Every small plane over Michigan right now, with current weather at each airport. Made for general aviation.">
+<meta name="description" content="A live map of every small plane over Michigan, with current weather, crosswinds and radar at each airport, and where Michigan pilots fly. Made for general aviation.">
+<link rel="canonical" href="https://upwind.fly/">
+<meta name="robots" content="index,follow">
+<meta name="author" content="upwind">
+<meta name="keywords" content="Michigan, flight tracker, general aviation, airport weather, METAR, ADS-B, live planes, pilots, crosswind">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="upwind">
 <meta property="og:title" content="upwind">
@@ -21,11 +25,15 @@
 <meta property="og:image" content="https://upwind.fly/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="upwind: Michigan's Sky, Live. A map of Michigan with small planes in flight.">
+<meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://upwind.fly/#site","name":"upwind","alternateName":"upwind: Michigan's Sky, Live","url":"https://upwind.fly/","inLanguage":"en-US"},{"@type":"WebApplication","name":"upwind","url":"https://upwind.fly/","applicationCategory":"TravelApplication","operatingSystem":"Any","description":"A live map of every small plane over Michigan, with current weather, crosswinds and radar at each airport, and where Michigan pilots fly.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"areaServed":{"@type":"State","name":"Michigan"},"isPartOf":{"@id":"https://upwind.fly/#site"}}]}</script>
 <meta name="twitter:title" content="upwind">
 <meta name="twitter:description" content="Every small plane over Michigan right now, with current weather at each airport.">
 <meta name="twitter:image" content="https://upwind.fly/og-image.png">
 <link rel="canonical" href="https://upwind.fly/">
+<script>try{if(sessionStorage.getItem("upwind-xfer"))document.documentElement.classList.add("xfer")}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;900&display=swap" rel="stylesheet">
@@ -33,6 +41,8 @@
 @font-face{font-family:"Calogen Exp";src:url("fonts/calogen-exp-italic.woff2") format("woff2");font-weight:700;font-style:italic;font-display:swap}
 :root{--ink:#0d0d0c;--bone:#ece7de;--muted:#a39d92;--dim:#6a665e;--s1:#e8692c;--s2:#f2a33a;--s3:#f4e2c6;--sans:"Hanken Grotesk",system-ui,sans-serif;--display:"Hanken Grotesk",system-ui,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
+html.xfer body:before{content:"";position:fixed;inset:0;background:#0d0d0c;z-index:299}
+html.xfer .splash{display:none}
 html,body{height:100%;background:var(--ink);color:var(--bone);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
 canvas{position:fixed;inset:0;width:100vw;height:100vh;display:block}
 #c-top{cursor:grab}
@@ -82,6 +92,55 @@ body.menu-open .card,body.menu-open .mcard{opacity:0!important;pointer-events:no
 .card{position:fixed;right:32px;top:76px;width:340px;background:rgba(13,13,12,.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(236,231,222,.14);border-radius:16px;padding:22px 22px 20px;z-index:6;opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .35s,transform .35s}
 .card.on{opacity:1;transform:none;pointer-events:auto}
 .card:not(.float){max-height:calc(100vh - 76px - 88px);overflow-y:auto;scrollbar-width:thin}
+
+/* About, as a layer over the live map: the planes keep moving faintly behind the text */
+#aboutL{position:fixed;inset:0;z-index:50;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:rgba(13,13,12,.78);display:none;font-size:17px;line-height:1.6;color:var(--bone)}
+#aboutL.on{display:block}
+#aboutL a{color:var(--s2);text-decoration:underline;text-decoration-color:rgba(242,163,58,.35);text-underline-offset:3px}
+#aboutL .ahead{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:26px 32px 40px;margin-bottom:-24px;background:linear-gradient(rgba(13,13,12,.92) 0,rgba(13,13,12,.8) 45%,rgba(13,13,12,0) 100%)}
+#aboutL .ahead .wm{font-size:1.15rem;color:var(--bone)!important;text-decoration:none!important}
+#aboutL .pill{text-decoration:none!important;color:var(--bone)!important}
+#aboutL .pill:hover{color:var(--s2)!important}
+body.about-open .topstripe{z-index:60}
+/* Behind About: a quarter-size, pre-blurred copy of the map stands in for the live canvases, so scrolling stays light */
+#c-blur{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:none;pointer-events:none}
+body.about-open #c-blur{display:block}
+body.about-open #c-map,body.about-open #c-wind,body.about-open #c-top{visibility:hidden}
+body.about-open .hud,body.about-open .ticker,body.about-open .foot,body.about-open .home,body.about-open .open-panel,body.about-open .stale{opacity:0!important;pointer-events:none!important}
+@media (max-width:760px){#aboutL{font-size:16px}#aboutL .ahead{padding:24px 22px 36px}}
+#aboutL .pill{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 18px;border-radius:999px;border:1px solid rgba(236,231,222,.22);background:rgba(20,19,17,.6);color:var(--bone);font:500 .9rem var(--sans);text-decoration:none;cursor:pointer;transition:border-color .25s,color .25s}
+#aboutL .pill:hover{border-color:var(--s2);color:var(--s2)}
+#aboutL main{max-width:720px;margin:0 auto;padding:40px 32px 40px}
+#aboutL .hero{padding:9vh 0 7vh}
+#aboutL .hero h1{font-weight:900;font-size:clamp(2.6rem,7vw,4.6rem);line-height:1;letter-spacing:-.035em}
+#aboutL .hero p{margin-top:22px;font-size:1.2rem;color:#cfc9be;max-width:34ch}
+#aboutL /* Full-bleed stripes across the page,#aboutL like a horizon under the headline */
+.band{display:flex;flex-direction:column;width:100vw;margin:0 calc(50% - 50vw) 0}
+#aboutL .band i{display:block;height:4px}
+#aboutL .band i:nth-child(1){background:var(--s1)}
+#aboutL .band i:nth-child(2){background:var(--s2)}
+#aboutL .band i:nth-child(3){background:var(--s3)}
+#aboutL .band+section{border-top:0}
+#aboutL section{padding:46px 0;border-top:1px solid rgba(236,231,222,.1)}
+#aboutL .k{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+#aboutL h2{font-weight:900;font-size:1.9rem;letter-spacing:-.025em;line-height:1.1;margin-bottom:16px}
+#aboutL section p+p{margin-top:14px}
+#aboutL section p{color:#d6d0c5}
+#aboutL .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:24px}
+#aboutL .grid div{padding-top:14px;border-top:2px solid var(--s1)}
+#aboutL .grid div:nth-child(2){border-color:var(--s2)}
+#aboutL .grid div:nth-child(3){border-color:var(--s3)}
+#aboutL .grid b{display:block;font-weight:600;margin-bottom:6px}
+#aboutL .grid span{font-size:.92rem;color:var(--muted);line-height:1.5;display:block}
+#aboutL ul.src{list-style:none;margin-top:8px}
+#aboutL ul.src li{padding:12px 0;border-bottom:1px solid rgba(236,231,222,.08);color:#d6d0c5}
+#aboutL ul.src li b{color:var(--bone);font-weight:600}
+#aboutL .note{margin-top:22px;padding:16px 18px;border-radius:12px;background:rgba(232,105,44,.08);border:1px solid rgba(232,105,44,.28);color:var(--bone)}
+#aboutL footer{max-width:720px;margin:0 auto;padding:30px 32px 70px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid rgba(236,231,222,.1);color:var(--dim);font-size:.85rem}
+#aboutL .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+#aboutL .reveal.in{opacity:1;transform:none}
+@media (max-width:760px){#aboutL main{padding:20px 22px 30px}#aboutL .hero{padding:6vh 0 5vh}#aboutL .grid{grid-template-columns:1fr;gap:16px}#aboutL h2{font-size:1.6rem}#aboutL footer{padding:26px 22px 60px;flex-direction:column;align-items:flex-start}}
+@media (prefers-reduced-motion:reduce){#aboutL .reveal{opacity:1;transform:none;transition:none}}
 /* Shown when live traffic stops arriving, so an empty sky isn't mistaken for a quiet one */
 /* One-time "add to home screen" hint on phones */
 .a2hs{position:fixed;left:16px;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:8;display:flex;align-items:center;gap:10px;padding:12px 12px 12px 16px;border-radius:14px;background:rgba(20,19,17,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(236,231,222,.14);opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .4s,transform .4s}
@@ -96,12 +155,8 @@ body.a2hs-on .ticker{opacity:0;pointer-events:none}
 .stale i{width:7px;height:7px;border-radius:50%;background:var(--s2);animation:stalePulse 1.6s ease-in-out infinite}
 @keyframes stalePulse{50%{opacity:.25}}
 /* Plane card: small, floats above the plane and follows it (fixed at the bottom on phones) */
-.card.float{left:0;top:0;right:auto!important;width:244px;padding:13px 15px 12px;border-radius:13px;transition:opacity .25s;overflow:visible}
+.card.float{left:0;top:0;right:auto!important;width:244px;padding:16px 15px 12px;border-radius:13px;transition:opacity .25s;overflow:hidden}
 .card.float.on{transform:translate3d(var(--px,0),var(--py,0),0)}
-.card.float:after{content:"";position:absolute;left:var(--cx,50%);bottom:-7px;width:12px;height:12px;margin-left:-6px;background:rgba(20,19,17,.92);border-right:1px solid rgba(236,231,222,.14);border-bottom:1px solid rgba(236,231,222,.14);transform:rotate(45deg);border-radius:0 0 3px 0}
-.card.float.below:after{bottom:auto;top:-7px;transform:rotate(225deg)}
-.card.float.side-l:after{left:-7px;top:var(--cy,50%);bottom:auto;margin:-6px 0 0;transform:rotate(135deg)}
-.card.float.side-r:after{left:auto;right:-7px;top:var(--cy,50%);bottom:auto;margin:-6px 0 0;transform:rotate(-45deg)}
 .under-card{opacity:.12!important;transition:opacity .3s!important}
 .card.float .x{right:6px;top:4px;font-size:1.15rem;padding:5px}
 .card.float .k{font-size:.72rem;padding-right:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
@@ -109,8 +164,11 @@ body.a2hs-on .ticker{opacity:0;pointer-events:none}
 .card.float .rt{font-size:.84rem;color:var(--s2);margin-top:5px;line-height:1.35}
 .card.float .nums{display:flex;gap:12px;margin-top:9px;padding-top:9px;border-top:1px solid rgba(236,231,222,.12);font-size:.86rem;font-variant-numeric:tabular-nums;color:var(--bone)}
 .card.float .nums span{color:var(--dim);font-size:.7rem;display:block;margin-bottom:1px}
-.card.float .acts{margin-top:10px;gap:6px}
-.card.float .btn{padding:5px 11px;font-size:.78rem}
+.card.float .acts{margin-top:11px;gap:18px;align-items:center}
+/* Quiet text actions instead of pill buttons */
+.card.float .btn{background:none!important;border:0!important;padding:2px 0;font-size:.78rem;font-weight:500;color:var(--muted);letter-spacing:.01em;box-shadow:none!important}
+.card.float .btn:hover{color:var(--bone)}
+.card.float .btn[data-act="ride"],.card.float .btn[data-act="stop"]{color:var(--bone)}
 .card.float .more{margin-top:9px;font-size:.82rem;color:#cfc9be;line-height:1.45}
 .card.float .more p+p{margin-top:4px}
 .wc{font-variant-numeric:tabular-nums;line-height:1.5}.wc b{display:inline-block;min-width:4.6em;color:var(--bone);font-weight:600}
@@ -408,7 +466,6 @@ body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transp
   .card{left:12px;right:12px;top:auto;bottom:12px;width:auto;transform:translateY(20px)}
   .card.on{transform:none}
   .card.float,.card.float.on{left:12px;right:12px!important;top:auto;bottom:12px;width:auto;transform:none}
-  .card.float:after{display:none}
   body.card-on .ticker,body.card-on .foot{opacity:0;pointer-events:none;transition:opacity .25s}
   body.card-on .hud .sum,body.card-on .hud .stats,body.card-on .hud .hud-toggle{opacity:0;pointer-events:none;transition:opacity .25s}
   body.menu-open .ticker,body.panel-open .ticker,body.panel-open .foot{opacity:0;pointer-events:none;transition:opacity .25s}
@@ -427,6 +484,14 @@ body.lobby #lobby{display:block;position:fixed;inset:0;z-index:6;pointer-events:
 #lobby .lb-name{font-family:var(--display);font-weight:900;letter-spacing:-.035em;font-size:max(34px,3.9vw);line-height:1;margin-top:.45vw;text-shadow:0 2px 18px rgba(0,0,0,.6)}
 #lobby .lb-mark{position:absolute;right:4vw;top:3.8vw;text-align:right}
 #lobby .lb-mark .wm{font-size:max(16px,1.35vw)}
+#lobby .lb-qr{margin-top:1.4vw;margin-left:auto;width:max(88px,6.4vw);display:flex;flex-direction:column;align-items:stretch;gap:.55vw;transition:opacity .6s}
+#lobby .lb-qr .qr{width:max(88px,6.4vw);height:max(88px,6.4vw);padding:max(7px,.5vw);border-radius:max(8px,.55vw);background:#141311;border:1px solid rgba(236,231,222,.16);box-shadow:0 6px 24px rgba(0,0,0,.45)}
+#lobby .lb-qr .qr svg{display:block;width:100%;height:100%}
+#lobby .lb-qr span{display:block;white-space:nowrap;text-align:center;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;line-height:1}
+body.lb-noqr #lobby .lb-qr{display:none}
+/* Overnight: everything dims to protect the screen and keep an empty lobby calm */
+#lobby .lb-dim{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 4s ease;z-index:20}
+body.lb-dimmed #lobby .lb-dim{opacity:.74}
 #lobby .lb-mark .st{display:block;width:max(64px,5.2vw);margin:.5vw 0 0 auto}
 #lobby .lb-mark .st i{display:block;height:max(2px,.18vw)}
 #lobby .lb-mark .st i:nth-child(1){background:var(--s1)}#lobby .lb-mark .st i:nth-child(2){background:var(--s2)}#lobby .lb-mark .st i:nth-child(3){background:var(--s3)}
@@ -550,13 +615,15 @@ body.no-ticker .ticker{display:none}
 <body>
 <canvas id="c-map" aria-hidden="true"></canvas>
 <canvas id="c-wind" aria-hidden="true"></canvas>
+<canvas id="c-blur" aria-hidden="true"></canvas>
 <canvas id="c-top" role="img" aria-label="Live map of aircraft and flying conditions over Michigan"></canvas>
 <div class="vig"></div>
+<noscript><div style="position:fixed;inset:0;z-index:999;background:#0d0d0c;color:#ece7de;padding:48px 32px;font-family:system-ui,sans-serif;line-height:1.6"><h1>upwind: Michigan's Sky, Live.</h1><p>A live map of every small plane over Michigan, with current weather, crosswinds and radar at each airport, and where Michigan pilots fly. upwind needs JavaScript to show the live map.</p><p><a style="color:#f2a33a" href="about.html">About upwind</a></p></div></noscript>
 <div class="topstripe" aria-hidden="true"><i></i><i></i><i></i></div>
 
 <div class="hud">
   <div class="wmrow"><a class="wm" href="#" id="wm" aria-haspopup="true" aria-expanded="false">upwind</a>
-    <div class="about" id="about" role="menu"><button id="tour-again">Take the Tour</button><button id="credits-menu">Data &amp; Credits</button><a id="feedback-menu" hidden href="#">Send Feedback</a><button id="replay-intro">Replay the Intro</button></div></div>
+    <div class="about" id="about" role="menu"><button id="about-page">About upwind</button><button id="tour-again">Take the Tour</button><button id="credits-menu">Data &amp; Credits</button><a id="feedback-menu" hidden href="#">Send Feedback</a><button id="replay-intro">Replay the Intro</button></div></div>
   <h1 id="h-title">Over Michigan.</h1>
   <p class="sum" id="h-sum"></p>
   <div class="stats" id="h-stats"></div>
@@ -575,6 +642,7 @@ body.no-ticker .ticker{display:none}
     <span><i style="background:var(--s3)"></i>Above 18,000</span>
     <span class="fine">Connecting · Not for flight planning</span>
     <button class="fine credits-btn" id="credits-btn">Data &amp; Credits</button>
+    <a class="fine credits-btn" id="about-link" href="about.html">About</a>
   </div>
   <div class="ctrls">
     <button class="chip" id="look-btn" aria-pressed="false"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="7" cy="7" r="1.6" fill="currentColor"/></svg><span class="lk-on">What's Overhead</span><span class="lk-off">Back to the Map</span></button>
@@ -628,12 +696,68 @@ body.no-ticker .ticker{display:none}
 </div>
 <div class="open-panel"><button class="chip" id="open-panel"><b>Explore</b></button></div>
 </div>
-<div class="panel" id="panel" role="dialog" aria-label="This weekend in Michigan's sky">
+<div class="panel" id="panel" role="dialog" aria-label="Explore Michigan's sky">
   <div class="tabs" role="tablist"><button role="tab" data-tab="week" aria-selected="true">This Week</button><button role="tab" data-tab="places" aria-selected="false">Places to Go</button><button role="tab" data-tab="heat" aria-selected="false">Where We Fly</button></div>
   <button class="x" id="panel-x" aria-label="Close">×</button>
   <div class="pbody" id="pbody"></div>
 </div>
 <div class="a2hs" id="a2hs" role="dialog" aria-label="Add upwind to your home screen"><div><b>Add upwind to your home screen</b><span id="a2hs-how"></span></div><button class="btn" id="a2hs-go" hidden>Install</button><button class="a2x" id="a2hs-x" aria-label="Dismiss">×</button></div>
+<div id="aboutL" role="dialog" aria-label="About upwind" aria-hidden="true"><div class="ahead"><a class="wm" href="./" data-aclose>upwind</a><a class="pill" href="./" data-aclose>Back to the Map</a></div><main>
+  <div class="hero">
+    <h1>Michigan's Sky,<br>Live.</h1>
+    <p>Every small plane over the state right now, the weather at each airport, and a running tally of where Michigan pilots fly.</p>
+  </div>
+  <div class="band" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <section class="reveal">
+    <div class="k">What it is</div>
+    <h2>One Look at Who's Up.</h2>
+    <p>upwind is a live map of Michigan's general aviation. It shows the planes in the air, the conditions at every airport that reports them, and the patterns that build up over days and weeks.</p>
+    <div class="grid">
+      <div><b>The Sky Now</b><span>Live traffic, drawn by aircraft type and colored by altitude, with weather, radar and clouds underneath.</span></div>
+      <div><b>Every Airport</b><span>Current conditions, crosswind on each runway, and how busy the field usually is.</span></div>
+      <div><b>Explore</b><span>This week's flights and landings, places worth flying over, and a heat map of where people fly.</span></div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="k">Why</div>
+    <h2>Made in Michigan.</h2>
+    <!-- DRAFT: replace with Max's own words -->
+    <p>I'm a private pilot and designer in Michigan. I wanted one place that shows the state's sky the way it feels from the ramp: who's flying, what the weather's doing, and where everyone's headed.</p>
+    <p>upwind is that place. It's a personal project, built for pilots and for anyone who looks up when they hear an engine.</p>
+  </section>
+
+  <section class="reveal">
+    <div class="k">Where the data comes from</div>
+    <h2>Public, Live and Volunteer-Built.</h2>
+    <ul class="src">
+      <li><b>Traffic</b> from <a href="https://adsb.lol" target="_blank" rel="noopener">adsb.lol</a>, with <a href="https://airplanes.live" target="_blank" rel="noopener">airplanes.live</a> and <a href="https://adsb.fi" target="_blank" rel="noopener">adsb.fi</a> as backups: networks of volunteer ADS-B receivers.</li>
+      <li><b>Weather reports and forecasts</b> from the <a href="https://aviationweather.gov" target="_blank" rel="noopener">NOAA Aviation Weather Center</a>.</li>
+      <li><b>Clouds and radar</b> from NOAA satellite and NEXRAD imagery, served by the <a href="https://mesonet.agron.iastate.edu" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>.</li>
+      <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Terrain from NOAA.</li>
+      <li><b>Airline routes</b> from <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>, community route data that can be out of date.</li>
+    </ul>
+  </section>
+
+  <section class="reveal">
+    <div class="k">How the numbers work</div>
+    <h2>Flights and Landings.</h2>
+    <p>upwind checks the receivers every 5 minutes. A flight is one plane's trip, from when it shows up in the air until it lands or goes quiet for 20 minutes. A landing is a flight that ended low over a Michigan airport.</p>
+    <p>Some flying is always missed: touch-and-goes inside one flight, short hops between checks, very low arrivals at small fields, and planes without ADS-B. So every count on upwind is a minimum.</p>
+  </section>
+
+  <section class="reveal">
+    <div class="k">Good to know</div>
+    <h2>Privacy and Safety.</h2>
+    <p>No accounts, no ads and no tracking. Your home airport and settings stay in your browser.</p>
+    <p>Aircraft whose owners have asked to keep their registration private are still shown and counted, but never named.</p>
+    <p class="note">upwind is for fun and awareness only. It is not for navigation or flight planning. Use current charts, NOTAMs and an official briefing.</p>
+  </section>
+</main><footer>
+  <span>upwind · Michigan's Sky, Live.</span>
+  <a class="pill" href="./" data-aclose>Back to the Map</a>
+</footer></div>
 <div class="stale" id="stale" role="status" aria-live="polite"><i></i><span>Live traffic paused, retrying</span></div>
 <div class="card" id="card" role="dialog" aria-label="Details"><button class="x" id="card-x" aria-label="Close">×</button><div id="card-body"></div></div>
 <div class="toast" id="toast"></div>
@@ -641,11 +765,12 @@ body.no-ticker .ticker{display:none}
   <button class="x" id="credits-x" aria-label="Close">×</button>
   <h3>Data &amp; Credits.</h3>
   <ul>
-    <li><b>Traffic</b> from <a href="https://adsb.lol" target="_blank" rel="noopener">adsb.lol</a>, a community network of volunteer receivers. Data under the <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener">Open Database License</a>.</li>
+    <li><b>Traffic</b> from <a href="https://adsb.lol" target="_blank" rel="noopener">adsb.lol</a>, a community network of volunteer receivers, with airplanes.live and adsb.fi as backups. Data under the <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener">Open Database License</a>.</li>
     <li><b>Weather</b> from the <a href="https://aviationweather.gov" target="_blank" rel="noopener">NOAA Aviation Weather Center</a>.</li>
+    <li><b>Clouds and radar</b> from NOAA satellite and NEXRAD imagery, served by the <a href="https://mesonet.agron.iastate.edu" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>. Terrain from NOAA.</li>
     <li><b>Airline routes</b> from <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>, community route data that can be out of date. Small-plane departures are worked out from what upwind saw near each field.</li>
     <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>.</li>
-    <li><b>Fonts:</b> Calogen and Hanken Grotesk.</li>
+    <li><b>Fonts:</b> Calogen and Hanken Grotesk. QR codes by Kazuhiko Arase's qrcode-generator (MIT).</li>
   </ul>
   <p class="cnote">upwind is for fun and awareness only. It is not for navigation or flight planning; use current charts, NOTAMs and an official briefing.</p>
   <p class="cnote" id="privacy-note">No cookies or tracking. Your home airport and settings stay in your browser.</p>
@@ -660,13 +785,15 @@ body.no-ticker .ticker{display:none}
 <div id="grain" aria-hidden="true"></div>
 <div id="lobby" aria-live="polite">
   <div class="lb-top"><div class="lb-krow"><span class="lb-k" id="lb-k"></span><b class="lb-tcat" id="lb-tcat"></b></div><div class="lb-name" id="lb-name"></div></div>
-  <div class="lb-mark"><span class="wm">upwind</span></div>
+  <div class="lb-mark"><span class="wm">upwind</span><div class="lb-qr" id="lb-qr" aria-label="Scan for upwind on your phone"><div class="qr" id="lb-qr-img"></div><span>Live on your phone</span></div></div>
+  <div class="lb-dim" id="lb-dim" aria-hidden="true"></div>
   <div class="lb-cond"><div class="lb-cat" id="lb-cat"></div><dl class="lb-grid" id="lb-grid"></dl></div>
   <div class="lb-scene" id="lb-scene"><div class="lb-k" id="lb-sk"></div><div class="lb-line" id="lb-sl"></div><div class="lb-sub" id="lb-ss"></div></div>
 </div>
 <div id="lb-ctl" aria-label="Display options">
   <div class="lb-pan" id="lb-pan">
-    <div class="row"><span>On screen</span><div class="toggles"><button class="chip" data-lbo="catTop">Field Conditions</button><button class="chip" data-lbo="cond">Weather Details</button><button class="chip" data-lbo="cap">Captions</button><button class="chip" data-lbo="chart">Sectional Up Close</button></div></div>
+    <div class="row"><span>On screen</span><div class="toggles"><button class="chip" data-lbo="catTop">Field Conditions</button><button class="chip" data-lbo="cond">Weather Details</button><button class="chip" data-lbo="cap">Captions</button><button class="chip" data-lbo="chart">Sectional Up Close</button><button class="chip" data-lbo="qr">QR Code</button></div></div>
+    <div class="row"><span>Dim overnight</span><div class="toggles"><button class="chip" data-lbd="off">Off</button><button class="chip" data-lbd="22-6">10 PM to 6 AM</button><button class="chip" data-lbd="23-5">11 PM to 5 AM</button><button class="chip" data-lbd="0-6">Midnight to 6 AM</button></div></div>
     <div class="row"><span>Map color</span><div class="toggles"><button class="chip" data-lbt="season">Seasonal</button><button class="chip" data-lbt="warm">Warm</button><button class="chip" data-lbt="slate">Slate</button><button class="chip" data-lbt="forest">Forest</button><button class="chip" data-lbt="ink">Ink</button></div></div>
     <div class="row"><span>Light</span><div class="toggles"><button class="chip" data-lbl="live">Real Time</button><button class="chip" data-lbl="day">Day</button><button class="chip" data-lbl="dusk">Dusk</button><button class="chip" data-lbl="night">Night</button></div></div>
   </div>
@@ -678,6 +805,18 @@ body.no-ticker .ticker{display:none}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//  http://www.opensource.org/licenses/mit-license.php
+//
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});</script>
 <script>
 (function(){
 "use strict";
@@ -700,7 +839,7 @@ function surf(c){ if(!c) return ""; var k=Object.keys(SURF).find(function(x){ret
       if(m=x.match(/^(\d{3}|VRB)(\d{2,3})(G(\d{2,3}))?KT$/)){ o.spd=+m[2]; o.gust=m[4]?+m[4]:0; if(m[1]==="VRB") o.vrb=true; else o.dir=+m[1]; if(o.spd===0) o.calm=true; }
       else if(/SM$/.test(x)&&/^[PM]?[\d\/]+SM$/.test(x)){ var v=x.replace("SM",""); o.vis=(v==="10"||v==="P6"?"10+":v.replace(/^M/,"under "))+" mi"; }
       else if((m=x.match(/^(BKN|OVC|VV)(\d{3})/))&&!o.ceil){ o.ceil=(+m[2]*100).toLocaleString()+" ft "+CN[m[1]]; }
-      else if(m=x.match(/^(M?\d{2})\/(M?\d{2})?$/)){ var tc=+(m[1].replace("M","-")); o.temp=tc+"°C / "+Math.round(tc*9/5+32)+"°F"; }
+      else if(m=x.match(/^(M?\d{2})\/(M?\d{2})?$/)){ var tc=+(m[1].replace("M","-")); o.temp=Math.round(tc*9/5+32)+"°F ("+tc+"°C)"; }
       else if(m=x.match(/^A(\d{4})$/)){ o.alt=m[1].slice(0,2)+"."+m[1].slice(2); }
     }
     return o;
@@ -1199,6 +1338,32 @@ function drawPrecip(dt,t){
 
 /* ---------------- Aircraft ---------------- */
 var TYPES={
+  C120:["Cessna 120","vintage"],C140:["Cessna 140","vintage"],C170:["Cessna 170","vintage"],C175:["Cessna 175 Skylark","single"],C177:["Cessna 177 Cardinal","single"],C77R:["Cessna 177RG Cardinal","single"],C180:["Cessna 180 Skywagon","vintage"],C185:["Cessna 185 Skywagon","single"],
+  C195:["Cessna 195","vintage"],C162:["Cessna Skycatcher","trainer"],T206:["Cessna Turbo Stationair","single"],T210:["Cessna Turbo Centurion","single"],P210:["Cessna Pressurized Centurion","single"],C303:["Cessna Crusader","twin"],C337:["Cessna Skymaster","twin"],C402:["Cessna 402","twin"],
+  C404:["Cessna Titan","twin"],C421:["Cessna 421 Golden Eagle","twin"],C425:["Cessna Conquest I","turboprop"],C441:["Cessna Conquest II","turboprop"],C408:["Cessna SkyCourier","turboprop"],C500:["Cessna Citation I","bizjet"],C501:["Cessna Citation I","bizjet"],C550:["Cessna Citation II","bizjet"],
+  C551:["Cessna Citation II","bizjet"],C55B:["Cessna Citation Bravo","bizjet"],C650:["Cessna Citation III","bizjet"],C750:["Cessna Citation X","bizjet"],C25M:["Cessna Citation M2","bizjet"],PA11:["Piper Cub Special","vintage"],PA12:["Piper Super Cruiser","vintage"],PA20:["Piper Pacer","vintage"],
+  PA22:["Piper Tri-Pacer","vintage"],PA25:["Piper Pawnee","single"],PA23:["Piper Aztec","twin"],PA27:["Piper Aztec","twin"],PA28:["Piper Cherokee","trainer"],P28T:["Piper Arrow","single"],PA38:["Piper Tomahawk","trainer"],PA60:["Piper Aerostar","twin"],
+  P46T:["Piper Meridian","turboprop"],PAY1:["Piper Cheyenne","turboprop"],PAY2:["Piper Cheyenne","turboprop"],PAY3:["Piper Cheyenne III","turboprop"],PA42:["Piper Cheyenne","turboprop"],PA36:["Piper Brave","single"],BE19:["Beechcraft Sport","trainer"],BE23:["Beechcraft Sundowner","single"],
+  BE24:["Beechcraft Sierra","single"],BE76:["Beechcraft Duchess","twin"],BE95:["Beechcraft Travel Air","twin"],BE60:["Beechcraft Duke","twin"],BE50:["Beechcraft Twin Bonanza","twin"],BE17:["Beech Staggerwing","vintage"],BE18:["Beech 18","vintage"],BE10:["Beechcraft King Air 100","turboprop"],
+  BE30:["Beechcraft King Air 300","turboprop"],BE99:["Beechcraft 99","turboprop"],B190:["Beechcraft 1900","turboprop"],BE40:["Beechjet 400","bizjet"],PRM1:["Beechcraft Premier","bizjet"],DA62:["Diamond DA62","twin"],DV20:["Diamond Katana","trainer"],DA50:["Diamond DA50","single"],
+  AA1:["Grumman American AA-1","trainer"],AA5:["Grumman Tiger","single"],G21:["Grumman Goose","vintage"],HUSK:["Aviat Husky","single"],PTS1:["Pitts Special","single"],PTS2:["Pitts Special","single"],E300:["Extra 300","single"],M4:["Maule","single"],
+  M5:["Maule","single"],M6:["Maule","single"],M7:["Maule","single"],CH7A:["Champion Citabria","trainer"],CH7B:["Champion Citabria","trainer"],BL8:["Bellanca Decathlon","single"],ERCO:["Ercoupe","vintage"],L8:["Luscombe Silvaire","vintage"],
+  S108:["Stinson Voyager","vintage"],NAVI:["Ryan Navion","vintage"],GC1:["Globe Swift","vintage"],COL3:["Cessna Corvalis","single"],COL4:["Cessna TTx","single"],LNC4:["Lancair IV","homebuilt"],GLAS:["Glasair","homebuilt"],RV3:["Van's RV-3","homebuilt"],
+  RV4:["Van's RV-4","homebuilt"],RV6:["Van's RV-6","homebuilt"],RV9:["Van's RV-9","homebuilt"],RV14:["Van's RV-14","homebuilt"],AC11:["Commander 112/114","single"],AC50:["Aero Commander 500","twin"],AC68:["Aero Commander 680","twin"],AC90:["Turbo Commander","turboprop"],
+  AC95:["Turbo Commander","turboprop"],T6:["North American T-6 Texan","vintage"],P51:["P-51 Mustang","vintage"],DC3:["Douglas DC-3","vintage"],C47:["Douglas C-47","vintage"],B25:["B-25 Mitchell","vintage"],B17:["B-17 Flying Fortress","vintage"],PT17:["Boeing Stearman","vintage"],
+  DHC2:["de Havilland Beaver","vintage"],DHC3:["de Havilland Otter","vintage"],KODI:["Kodiak 100","turboprop"],PC6T:["Pilatus Porter","turboprop"],EPIC:["Epic E1000","turboprop"],P180:["Piaggio Avanti","turboprop"],MU2:["Mitsubishi MU-2","turboprop"],DHC6:["de Havilland Twin Otter","turboprop"],
+  SF34:["Saab 340","regional"],E120:["Embraer Brasilia","regional"],D328:["Dornier 328","regional"],PC24:["Pilatus PC-24","bizjet"],LJ24:["Learjet 24","bizjet"],LJ25:["Learjet 25","bizjet"],LJ31:["Learjet 31","bizjet"],LJ35:["Learjet 35","bizjet"],
+  LJ40:["Learjet 40","bizjet"],LJ55:["Learjet 55","bizjet"],LJ60:["Learjet 60","bizjet"],G150:["Gulfstream G150","bizjet"],GALX:["Gulfstream G200","bizjet"],G280:["Gulfstream G280","bizjet"],GLF3:["Gulfstream III","bizjet"],GA5C:["Gulfstream G500","bizjet"],
+  GA6C:["Gulfstream G600","bizjet"],GA7C:["Gulfstream G700","bizjet"],GA8C:["Gulfstream G800","bizjet"],GA4C:["Gulfstream G400","bizjet"],GL7T:["Bombardier Global 7500","bizjet"],GL6T:["Bombardier Global 6500","bizjet"],FA10:["Dassault Falcon 10","bizjet"],FA20:["Dassault Falcon 20","bizjet"],
+  FA50:["Dassault Falcon 50","bizjet"],F900:["Dassault Falcon 900","bizjet"],FA8X:["Dassault Falcon 8X","bizjet"],FA6X:["Dassault Falcon 6X","bizjet"],H25C:["Hawker 1000","bizjet"],HA4T:["Hawker 4000","bizjet"],EA50:["Eclipse 500","bizjet"],ASTR:["IAI Astra","bizjet"],
+  WW24:["IAI Westwind","bizjet"],E35L:["Embraer Legacy 600","bizjet"],E135:["Embraer 135","regional"],E45X:["Embraer 145XR","regional"],CRJ1:["Bombardier CRJ100","regional"],CRJX:["Bombardier CRJ1000","regional"],E195:["Embraer 195","regional"],E290:["Embraer E190-E2","regional"],
+  E295:["Embraer E195-E2","regional"],B712:["Boeing 717","airliner"],B733:["Boeing 737-300","airliner"],B734:["Boeing 737-400","airliner"],B735:["Boeing 737-500","airliner"],B736:["Boeing 737-600","airliner"],MD82:["McDonnell Douglas MD-82","airliner"],MD83:["McDonnell Douglas MD-83","airliner"],
+  MD88:["McDonnell Douglas MD-88","airliner"],MD90:["McDonnell Douglas MD-90","airliner"],B762:["Boeing 767-200","widebody"],B764:["Boeing 767-400","widebody"],B773:["Boeing 777-300","widebody"],A306:["Airbus A300","widebody"],A310:["Airbus A310","widebody"],A343:["Airbus A340-300","widebody"],
+  A346:["Airbus A340-600","widebody"],A388:["Airbus A380","widebody"],DC10:["McDonnell Douglas DC-10","widebody"],C5M:["C-5 Galaxy","military"],C30J:["C-130J Super Hercules","military"],B52:["B-52 Stratofortress","military"],P8:["P-8 Poseidon","military"],F15:["F-15 Eagle","military"],
+  F18S:["F/A-18 Super Hornet","military"],F35:["F-35 Lightning II","military"],F22:["F-22 Raptor","military"],T38:["T-38 Talon","military"],TEX2:["T-6 Texan II","military"],C12:["C-12 Huron","military"],H60:["Black Hawk","military"],PC21:["Pilatus PC-21","military"],
+  B429:["Bell 429","heli"],B430:["Bell 430","heli"],B412:["Bell 412","heli"],B212:["Bell 212","heli"],B505:["Bell 505","heli"],B47G:["Bell 47","heli"],R66:["Robinson R66","heli"],EC30:["Airbus H130","heli"],
+  EC20:["Airbus H120","heli"],EC55:["Airbus H155","heli"],EC75:["Airbus H175","heli"],AS65:["Airbus Dauphin","heli"],AS55:["Airbus TwinStar","heli"],H500:["MD 500","heli"],EXPL:["MD Explorer","heli"],A119:["Leonardo AW119","heli"],
+  A139:["Leonardo AW139","heli"],A169:["Leonardo AW169","heli"],S92:["Sikorsky S-92","heli"],EN48:["Enstrom 480","heli"],EN28:["Enstrom 280","heli"],H269:["Schweizer 300","heli"],BALL:["Hot-air balloon","other"],GLID:["Glider","other"],
   C172:["Cessna 172 Skyhawk","trainer"],C72R:["Cessna 172RG Cutlass","single"],C152:["Cessna 152","trainer"],C150:["Cessna 150","vintage"],C182:["Cessna 182 Skylane","single"],C82R:["Cessna 182RG","single"],C206:["Cessna 206 Stationair","single"],C210:["Cessna 210 Centurion","single"],C310:["Cessna 310","twin"],C340:["Cessna 340","twin"],C414:["Cessna 414","twin"],C208:["Cessna Caravan","turboprop"],
   P28A:["Piper Cherokee","trainer"],P28R:["Piper Arrow","single"],P28B:["Piper Dakota","single"],PA32:["Piper Saratoga","single"],P32R:["Piper Saratoga","single"],PA46:["Piper Malibu","single"],PA30:["Piper Twin Comanche","twin"],PA34:["Piper Seneca","twin"],PA44:["Piper Seminole","twin"],PA31:["Piper Navajo","twin"],PA24:["Piper Comanche","vintage"],PA18:["Piper Super Cub","vintage"],J3:["Piper J-3 Cub","vintage"],
   BE35:["Beechcraft Bonanza (V-tail)","vintage"],BE36:["Beechcraft Bonanza","single"],BE33:["Beechcraft Debonair","single"],BE55:["Beechcraft Baron","twin"],BE58:["Beechcraft Baron","twin"],BE20:["Beechcraft King Air","turboprop"],B350:["Beechcraft King Air 350","turboprop"],BE9L:["Beechcraft King Air","turboprop"],
@@ -1520,7 +1685,7 @@ function drawClouds(dt,low){
 var last=performance.now(), clock=0, lightTimer=0;
 var lobbyLast=0;
 function frame(now){
-  if(!follow&&now-zoomAt>600){ if(now-lobbyLast<31){ requestAnimationFrame(frame); return; } }
+  if(!follow&&now-zoomAt>600){ if(now-lobbyLast<((LOBBY&&document.body.classList.contains("lb-dimmed"))||aboutOpen?(aboutOpen?220:100):31)){ requestAnimationFrame(frame); return; } }
   lobbyLast=now;
   var dt=Math.min(0.05,(now-last)/1000); last=now; clock+=dt;
   lightTimer+=dt; if(lightTimer>30&&mood==="live"){ lightTimer=0; var k0=light.day.toFixed(2); updLight(); if(light.day.toFixed(2)!==k0) mapDirty=true; }
@@ -1542,9 +1707,19 @@ function frame(now){
   if(LOBBY&&!chart&&lob.apt){ var la=lob.apt; ga=ga.filter(function(p){ return p===follow||p.mi||d3.geoDistance([la.lon,la.lat],[p.lon,p.lat])*3440.065<60; }); }
   drawPlanes(ga,clock);
   if(layers.jets) drawPlanes(jets,clock);
+  // What's Overhead: an airliner headed over you is always drawn, even with Airliners turned off, so its line has a plane on the end
+  else if(mode==="look"&&lookPos){ var lj=jets.filter(function(p){ return lookList.indexOf(p)>=0||(p._pr&&p._pr.now<1.5); }); if(lj.length) drawPlanes(lj,clock); }
   if(sel&&sel.p&&card.classList.contains("on")&&clock-(sel.u||0)>0.5){ sel.u=clock; updPlaneCard(sel.p); placeCard(true); }
   else if(sel&&sel.p&&card.classList.contains("on")) placeCard(false);
+  if(aboutOpen) blurCopy();
   requestAnimationFrame(frame);
+}
+var cBlur=document.getElementById("c-blur"), gBlur=cBlur.getContext("2d");
+function blurCopy(){
+  var w=Math.max(1,Math.round(innerWidth/4)), h=Math.max(1,Math.round(innerHeight/4));
+  if(cBlur.width!==w||cBlur.height!==h){ cBlur.width=w; cBlur.height=h; }
+  gBlur.filter="blur(1.6px) saturate(1.1)"; gBlur.clearRect(0,0,w,h);
+  gBlur.drawImage(cMap,0,0,w,h); gBlur.drawImage(cWind,0,0,w,h); gBlur.drawImage(cTop,0,0,w,h); gBlur.filter="none";
 }
 
 /* ---------------- Zoom and interaction ---------------- */
@@ -1634,7 +1809,7 @@ function overlapArea(x,y,w,h){ var tot=0; OBS.forEach(function(o){ var ix=Math.m
 function placeCard(measure){
   if(!sel||!sel.p||!card.classList.contains("float")||W<=760) return;
   if(measure){ cardW=card.offsetWidth||244; cardH=card.offsetHeight||150; obstacles(); }
-  var q=scr(sel.p.lon,sel.p.lat), gap=20, m=12, w=cardW, h=cardH;
+  var q=scr(sel.p.lon,sel.p.lat), gap=16, m=12, w=cardW, h=cardH;
   var cl=function(v,lo,hi){ return Math.max(lo,Math.min(hi,v)); };
   var C={above:[cl(q[0]-w/2,m,W-w-m),q[1]-gap-h],below:[cl(q[0]-w/2,m,W-w-m),q[1]+gap],right:[q[0]+gap,cl(q[1]-h/2,m,H-h-m)],left:[q[0]-gap-w,cl(q[1]-h/2,m,H-h-m)]};
   var pref={above:0,below:900,right:1800,left:2200}, best=null, scores={};
@@ -1700,6 +1875,10 @@ function likelyLanding(p){
     if(off<25){ bd=d; best=a; } });
   return best;
 }
+// Who flies a callsign: the operator behind common three-letter codes over Michigan (shown under More)
+var OPS={"AAL": "American Airlines", "DAL": "Delta Air Lines", "UAL": "United Airlines", "SWA": "Southwest Airlines", "JBU": "JetBlue", "ASA": "Alaska Airlines", "NKS": "Spirit Airlines", "FFT": "Frontier Airlines", "AAY": "Allegiant Air", "SCX": "Sun Country Airlines", "HAL": "Hawaiian Airlines", "MXY": "Breeze Airways", "ACA": "Air Canada", "WJA": "WestJet", "JZA": "Air Canada Jazz", "ROU": "Air Canada Rouge", "POE": "Porter Airlines", "SKW": "SkyWest Airlines", "RPA": "Republic Airways", "ENY": "Envoy Air", "EDV": "Endeavor Air", "PDT": "Piedmont Airlines", "JIA": "PSA Airlines", "ASH": "Mesa Airlines", "GJS": "GoJet Airlines", "AWI": "Air Wisconsin", "QXE": "Horizon Air", "UCA": "CommutAir", "FDX": "FedEx", "UPS": "UPS Airlines", "GTI": "Atlas Air", "ABX": "ABX Air", "ATN": "Air Transport International", "CKS": "Kalitta Air", "KFS": "Kalitta Charters", "AMF": "Ameriflight", "MRA": "Martinaire", "PAC": "Polar Air Cargo", "CLX": "Cargolux", "BCS": "DHL (European Air Transport)", "MTN": "Mountain Air Cargo", "CFS": "Empire Airlines", "WIG": "Wiggins Airways", "SNC": "Air Cargo Carriers", "BVN": "Baron Aviation Services", "USC": "AirNet Express", "EJA": "NetJets", "LXJ": "Flexjet", "JTL": "Jet Linx", "EJM": "Executive Jet Management", "VJT": "VistaJet", "WUP": "Wheels Up", "RAX": "Royal Air Freight", "RCH": "U.S. Air Force (Air Mobility Command)", "CNV": "U.S. Navy", "PAT": "U.S. Army", "SAM": "U.S. Air Force (Special Air Mission)"};
+function opName(p){ var m=p.cs&&/^([A-Z]{3})[0-9]/.exec(p.cs); if(!m) return ""; var r=ROUTES[p.cs]; return OPS[m[1]]||(r&&r.airline)||""; }
+function hdgText(t){ var d=Math.round(((t%360)+360)%360)%360; return String(d).padStart(3,"0")+"° ("+["N","NE","E","SE","S","SW","W","NW"][Math.round(d/45)%8]+")"; }
 function updPlaneCard(p){
   var w=where(p), id=p.cs||p.reg||(p.orb?"Sightseeing":"");
   if(sel&&sel.p===p){ sel.h.push([clock,p.alt]); while(sel.h.length>2&&sel.h[sel.h.length-1][0]-sel.h[0][0]>90) sel.h.shift(); }
@@ -1707,15 +1886,15 @@ function updPlaneCard(p){
   var more=sel&&sel.more;
   body.innerHTML='<span class="k">'+esc(id)+(p.reg&&p.reg!==id?" · "+esc(p.reg):"")+'</span><h3>'+esc(p.name)+'</h3>'+
     (rt?'<p class="rt">'+rt+'</p>':'')+
-    '<div class="nums"><div><span>Altitude</span>'+fmtAlt(p.alt)+'</div><div><span>Speed</span>'+Math.round(p.gs)+' kt</div><div><span>Heading</span>'+cardinal(p.trk)+'</div></div>'+
-    (more?'<div class="more"><p>'+esc(cap(w.txt))+', heading '+String(Math.round((p.trk%360+360)%360)).padStart(3,"0")+'°.</p><p>About '+feel(p)+'.</p>'+(p.src&&p.src.h?'<p><a href="#" class="lnk" data-act="share" data-q="plane='+esc(p.src.h)+'">Copy a link to this plane</a></p>':'')+'</div>':'')+
+    '<div class="nums"><div><span>Altitude</span>'+fmtAlt(p.alt)+'</div><div><span>Speed</span>'+Math.round(p.gs)+' kt</div><div><span>Heading</span>'+hdgText(p.trk)+'</div></div>'+
+    (more?'<div class="more">'+(opName(p)?'<p>Flown by '+esc(opName(p))+'.</p>':'')+'<p>'+esc(cap(w.txt))+'.</p><p>About '+feel(p)+'.</p>'+(p.src&&p.src.h?'<p><a href="#" class="lnk" data-act="share" data-q="plane='+esc(p.src.h)+'">Copy a link to this plane</a></p>':'')+'</div>':'')+
     '<div class="acts">'+(follow===p?'<button class="btn ghost" data-act="stop">Stop Riding Along</button>':'<button class="btn" data-act="ride">Ride Along</button>')+
     '<button class="btn ghost" data-act="more">'+(more?"Less":"More")+'</button></div>';
 }
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function feel(p){ // rough outside air temperature from standard lapse rate and the nearest surface report
   var s=nearStn(p.lat,p.lon), t0=s?surfT(s.raw):5, t=t0-2*(p.alt/1000);
-  return Math.round(t)+"°C outside";
+  return Math.round(t*9/5+32)+"°F ("+Math.round(t)+"°C) outside";
 }
 function surfT(raw){ var m=raw.match(/\s(M?\d{2})\/(M?\d{2})?\s/); return m?+(m[1].replace("M","-")):5; }
 function nearStn(lat,lon){ var b=null,bd=1e9; STN.forEach(function(s){ var d=Math.pow(s.lat-lat,2)+Math.pow((s.lon-lon)*0.72,2); if(d<bd){bd=d;b=s;} }); return b; }
@@ -2259,7 +2438,7 @@ function renderLook(){
   var cand=[], nearest=null;
   planes.forEach(function(p){ if(p.fade<0.5) return; var pr=predict(p); p._pr=pr; if(pr.now>60) return;
     if(!nearest||pr.now<nearest._pr.now) nearest=p;
-    if(pr.t>0&&pr.t<12&&pr.dmin<3&&(p.alt<18000||layers.jets)) cand.push(p); });
+    if(pr.t>0&&pr.t<12&&pr.dmin<3) cand.push(p); });
   cand.sort(function(a,b){return a._pr.t-b._pr.t;}); lookList=cand.slice(0,4);
   var over=planes.filter(function(p){ return p._pr&&p._pr.now<1.5&&p.fade>0.5; })[0];
   mcard.classList.add("on");
@@ -2369,7 +2548,7 @@ var tour=(function(){
   var blk=document.getElementById("tour-block"), spot=document.getElementById("tour-spot"), cardT=document.getElementById("tour-card"), i=0, on=false;
   var PLANE='<svg width="22" height="22" viewBox="-14 -14 28 28" aria-hidden="true"><path transform="rotate(90)" fill="#f4e2c6" d="M0,-13 C1.6,-13 2.3,-9 2.3,-5 L13,2 L13,5 L2.3,2 L1.6,9 L5.5,12 L5.5,14 L0,12.5 L-5.5,14 L-5.5,12 L-1.6,9 L-2.3,2 L-13,5 L-13,2 L-2.3,-5 C-2.3,-9 -1.6,-13 0,-13 Z"/></svg>';
   var STEPS=[
-    {t:null,h:"Welcome to upwind.",p:"Michigan's sky, live, focused on general aviation: small planes, local airports and the weather that decides whether you go.",cta:"Take the Tour",intro:true},
+    {t:null,h:"Welcome to upwind.",p:"Michigan's Sky, Live. Built for general aviation: small planes, local airports and the weather around them.",cta:"Take the Tour",intro:true},
     {t:".legend",h:"Colors Show Altitude.",key:true},
     {t:"map",h:"Tap Anything.",p:"Planes show what they are and where they're headed. Airports show conditions, runways and frequencies."},
     {t:"#home-pill",h:"Set Your Home Airport.",p:"It stays on the map, and distances are measured from it.",home:true},
@@ -2480,7 +2659,7 @@ function lobbySpot(){
   return opts[(lob.spotI=(lob.spotI||0)+1)%Math.min(opts.length,3)]||opts[0];
 }
 var RARE={J3:1,PA18:1,ST75:1,BT13:1,P51:1,T6:1,SNJ:1,B25:1,DC3:1,C47:1,GLID:1,BALL:1,AN2:1,P40:1,F4U:1,TBM:0,CUB:1,WACO:1,PITS:1,EXTRA:1,L4:1};
-var LBO={cond:true,cap:true,catTop:false,chart:true,theme:"season",light:"live"};
+var LBO={cond:true,cap:true,catTop:false,chart:true,theme:"season",light:"live",qr:true,dim:"23-5"};
 try{ var lbs=JSON.parse(localStorage.getItem("upwind-lobby")||"null"); if(lbs) Object.keys(LBO).forEach(function(k){ if(k in lbs) LBO[k]=lbs[k]; }); }catch(e){}
 var THEMES={
   warm:{land:["#151110","#41332a"],other:["#0c0a09","#2a211b"],lake:["#06080a","#16202a"],edge:["#1f2122","#3a3b3a"]},
@@ -2497,6 +2676,8 @@ function lobbyApply(){
   document.querySelectorAll("[data-lbo]").forEach(function(b){ b.setAttribute("aria-pressed",!!LBO[b.dataset.lbo]); });
   document.querySelectorAll("[data-lbt]").forEach(function(b){ b.setAttribute("aria-pressed",b.dataset.lbt===LBO.theme); });
   document.querySelectorAll("[data-lbl]").forEach(function(b){ b.setAttribute("aria-pressed",b.dataset.lbl===LBO.light); });
+  document.querySelectorAll("[data-lbd]").forEach(function(b){ b.setAttribute("aria-pressed",b.dataset.lbd===LBO.dim); });
+  B.classList.toggle("lb-noqr",!LBO.qr); lobbyDim();
   if(mood!==LBO.light){ mood=LBO.light; updLight(); }
   if(!LBO.chart&&chart) lobbyChart(false); else if(LBO.chart&&lob.scene>=1&&!chart) lobbyChart(true);
   mapDirty=true; try{ localStorage.setItem("upwind-lobby",JSON.stringify(LBO)); }catch(e){}
@@ -2511,15 +2692,40 @@ function lobbyApply(){
     if(b.dataset.lbo){ LBO[b.dataset.lbo]=!LBO[b.dataset.lbo]; }
     if(b.dataset.lbt) LBO.theme=b.dataset.lbt;
     if(b.dataset.lbl) LBO.light=b.dataset.lbl;
+    if(b.dataset.lbd) LBO.dim=b.dataset.lbd;
     lobbyApply(); });
   addEventListener("click",function(e){ if(LOBBY&&!e.target.closest("#lb-ctl")) pan.classList.remove("on"); },true);
 })();
+// Overnight dimming: between the chosen hours the whole screen eases down and redraws slowly
+function lobbyDim(){
+  if(!LOBBY) return; var on=false;
+  if(LBO.dim&&LBO.dim!=="off"){ var p=LBO.dim.split("-").map(Number), h=new Date().getHours(); on=p[0]>p[1]?(h>=p[0]||h<p[1]):(h>=p[0]&&h<p[1]); }
+  document.body.classList.toggle("lb-dimmed",on);
+}
+// QR code: opens upwind on a phone with this airport set as home
+function lobbyQR(a){
+  var box=document.getElementById("lb-qr-img"); if(!box||typeof qrcode==="undefined") return;
+  var url="https://upwind.fly/?apt="+encodeURIComponent(code(a))+"&home=1";
+  try{ var q=qrcode(0,"M"); q.addData(url); q.make(); var n=q.getModuleCount(), d="";
+    for(var r=0;r<n;r++) for(var c=0;c<n;c++) if(q.isDark(r,c)) d+="M"+c+" "+r+"h1v1h-1z";
+    box.innerHTML='<svg viewBox="0 0 '+n+' '+n+'" shape-rendering="crispEdges" role="img" aria-label="QR code for '+esc(url)+'"><path d="'+d+'" fill="#e6e0d6"/></svg>';
+    fitQRLabel();
+  }catch(e){ document.body.classList.add("lb-noqr"); }
+}
+// The caption under the code is sized to match the code's width exactly
+function fitQRLabel(){
+  var wrap=document.getElementById("lb-qr"), lb=wrap&&wrap.querySelector("span"), q=document.getElementById("lb-qr-img"); if(!lb||!q) return;
+  lb.style.fontSize="20px"; var w=lb.scrollWidth, t=q.getBoundingClientRect().width; if(w>0&&t>0) lb.style.fontSize=(20*t/w).toFixed(2)+"px";
+}
+addEventListener("resize",function(){ if(LOBBY) fitQRLabel(); });
 function lobbyInit(){
+  try{ var nr=document.createElement("meta"); nr.name="robots"; nr.content="noindex"; document.head.appendChild(nr); }catch(e){}
   var a=findApt(LOBBY)||findApt("ARB"); lob.apt=a; home=a;
   document.body.classList.add("lobby");
   layers.wind=false; layers.jets=false; layers.places=false; layers.beacons=true; layers.conds=true; layers.clouds=true; layers.precip=true;
   d3.select(cTop).on(".zoom",null);
   lobbyClock(); setInterval(lobbyClock,5000);
+  lobbyQR(a); lobbyDim(); setInterval(lobbyDim,60000);
   document.getElementById("lb-name").textContent=a.n;
   try{ if(navigator.wakeLock){ var wl=function(){ navigator.wakeLock.request("screen").catch(function(){}); }; wl(); document.addEventListener("visibilitychange",function(){ if(!document.hidden) wl(); }); } }catch(e){}
   // A fresh start every night around 4 a.m., so a screen left on for weeks never goes stale
@@ -2595,9 +2801,9 @@ function lobbyNext(){
     lob.timer=setTimeout(lobbyNext,LB_T[1]*slow);
   }
 }
-var deep=(function(){ try{ var q=new URLSearchParams(location.search); return {apt:q.get("apt"),plane:q.get("plane")}; }catch(e){ return {}; } })();
+var deep=(function(){ try{ var q=new URLSearchParams(location.search); return {apt:q.get("apt"),plane:q.get("plane"),home:q.get("home")==="1"}; }catch(e){ return {}; } })();
 function runDeep(){
-  if(deep.apt){ var a=findApt(deep.apt); deep.apt=null; if(a){ try{ localStorage.setItem("upwind-tour","done"); }catch(e){} flyTo(a); } }
+  if(deep.apt){ var a=findApt(deep.apt); deep.apt=null; if(a){ try{ localStorage.setItem("upwind-tour","done"); }catch(e){} if(deep.home&&!LOBBY){ setHome(a); toast(code(a)+" is now your home airport."); } flyTo(a); } }
   if(deep.plane){ var tries=0, iv=setInterval(function(){ var p=planes.find(function(x){return x.src&&x.src.h===deep.plane;}); if(p){ clearInterval(iv); deep.plane=null; openPlane(p); startFollow(p); } else if(++tries>20){ clearInterval(iv); toast("That plane isn't in the air over Michigan right now.",3500); deep.plane=null; } },1000); }
 }
 
@@ -2698,7 +2904,91 @@ wmEl.addEventListener("click",function(e){ e.preventDefault(); e.stopPropagation
 document.addEventListener("click",function(e){ if(!e.target.closest("#about")){ aboutEl.classList.remove("on"); wmEl.setAttribute("aria-expanded",false); } });
 aboutEl.addEventListener("click",function(e){ if(e.target.closest("button,a")) aboutEl.classList.remove("on"); },true);
 document.getElementById("replay-intro").addEventListener("click",function(){ if(follow) stopFollow(); closeCard(); playSplash(); });
-if(document.visibilityState==="visible") playSplash();
+/* Page-to-page transition between the map and the About page.
+   Leaving: the screen darkens and the plane flies straight up (to About) or down (back to the map),
+   drawing the three stripes behind it. Arriving: the stripes split the screen open sideways,
+   the same way the landing animation splits it open top and bottom. */
+var XFER = (function () {
+  var COLS = ["#e8692c", "#f2a33a", "#f4e2c6"], BAND = 3, INK = "#0d0d0c";
+  var PLANE = "M0,-13 C1.6,-13 2.3,-9 2.3,-5 L13,2 L13,5 L2.3,2 L1.6,9 L5.5,12 L5.5,14 L0,12.5 L-5.5,14 L-5.5,12 L-1.6,9 L-2.3,2 L-13,5 L-13,2 L-2.3,-5 C-2.3,-9 -1.6,-13 0,-13 Z";
+  var still = window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches;
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+  function layer() {
+    var d = document.createElement("div");
+    d.style.cssText = "position:fixed;inset:0;z-index:300;pointer-events:none;background:" + INK;
+    var s = el("svg", { width: "100%", height: "100%" }); s.style.cssText = "position:absolute;inset:0;overflow:visible";
+    d.appendChild(s); return { d: d, s: s };
+  }
+  function stripes(svg, x, y0, y1) {
+    return COLS.map(function (c, k) {
+      var X = x + (k - 1) * BAND;
+      var ln = el("line", { x1: X, x2: X, y1: y0, y2: y1, stroke: c, "stroke-width": BAND + 0.6 }); svg.appendChild(ln); return ln;
+    });
+  }
+  // dir "up": plane climbs from the bottom; "down": it descends from the top
+  function out(dir, href) {
+    if (XFER.busy) return; XFER.busy = true;
+    var W = innerWidth, H = innerHeight, cx = Math.round(W / 2) + 0.5;
+    var L = layer(); L.d.style.opacity = "0"; L.d.style.transition = "opacity .28s ease"; L.d.style.pointerEvents = "auto";
+    document.body.appendChild(L.d); void L.d.offsetWidth; L.d.style.opacity = "1";
+    var go = typeof href === "function"
+      ? function () { href(); into(function () { XFER.busy = false; }, L.d); }   // same page: swap what's underneath, then split open
+      : function () { try { sessionStorage.setItem("upwind-xfer", dir); } catch (e) {} location.href = href; };
+    if (still) { setTimeout(go, 300); return; }
+    var start = dir === "up" ? H + 40 : -40, end = dir === "up" ? -40 : H + 40;
+    var lines = stripes(L.s, cx, start, start);
+    var pl = el("path", { d: PLANE, fill: "#f4e2c6" }); L.s.appendChild(pl);
+    var dur = 950, t0 = performance.now() + 220;
+    (function step(now) {
+      var t = Math.max(0, Math.min(1, (now - t0) / dur)), p = 0.5 - 0.5 * Math.cos(Math.PI * t), y = start + (end - start) * p;
+      lines.forEach(function (ln) { ln.setAttribute("y2", y.toFixed(1)); });
+      pl.setAttribute("transform", "translate(" + cx + "," + y.toFixed(1) + ") rotate(" + (dir === "up" ? 0 : 180) + ") scale(1.15)");
+      if (t < 1) requestAnimationFrame(step); else setTimeout(go, 140);
+    })(performance.now());
+  }
+  // Arriving: full-height stripes down the middle, then the two halves slide apart
+  function into(cb, cover0) {
+    var W = innerWidth, H = innerHeight, cx = Math.round(W / 2) + 0.5;
+    var cover = document.getElementById("xfer-cover");
+    if (still) { if (cover) cover.remove(); if (cover0) cover0.remove(); document.documentElement.classList.remove("xfer"); if (cb) cb(); return; }
+    var halves = [["inset(0 " + (W - cx) + "px 0 0)", -(cx + BAND * 3)], ["inset(0 0 0 " + cx + "px)", W - cx + BAND * 3]].map(function (c) {
+      var L = layer(); L.d.style.clipPath = c[0]; L.d.style.transition = "transform .95s cubic-bezier(.7,0,.25,1)"; L.d.style.willChange = "transform";
+      stripes(L.s, cx, -10, H + 10); document.body.appendChild(L.d); L.d.dataset.to = c[1]; return L.d;
+    });
+    if (cover) cover.remove(); if (cover0) cover0.remove(); document.documentElement.classList.remove("xfer");
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      halves.forEach(function (h) { h.style.transform = "translateX(" + h.dataset.to + "px)"; });
+      setTimeout(function () { halves.forEach(function (h) { h.remove(); }); if (cb) cb(); }, 1000);
+    }); });
+  }
+  function arriving() { try { var d = sessionStorage.getItem("upwind-xfer"); if (d) { sessionStorage.removeItem("upwind-xfer"); return d; } } catch (e) {} return null; }
+  function swap(dir, mid) { out(dir, mid); }
+  return { out: out, into: into, swap: swap, arriving: arriving, busy: false };
+})();
+
+var aboutL=document.getElementById("aboutL"), aboutOpen=false;
+function openAbout(){ if(aboutOpen||XFER.busy) return; closeOthers(""); if(follow) stopFollow();
+  XFER.swap("up",function(){ aboutOpen=true; blurCopy(); aboutL.classList.add("on"); aboutL.scrollTop=0; aboutL.setAttribute("aria-hidden","false"); document.body.classList.add("about-open");
+    aboutL.querySelectorAll(".reveal").forEach(function(x){ x.classList.remove("in"); }); aboutReveal();
+    try{ history.replaceState(null,"","./?about"); }catch(e){} }); }
+function closeAbout(){ if(!aboutOpen||XFER.busy) return;
+  XFER.swap("down",function(){ aboutOpen=false; aboutL.classList.remove("on"); aboutL.setAttribute("aria-hidden","true"); document.body.classList.remove("about-open");
+    try{ history.replaceState(null,"","./"); }catch(e){} }); }
+function aboutReveal(){ var els=aboutL.querySelectorAll(".reveal");
+  if(!("IntersectionObserver" in window)){ els.forEach(function(x){ x.classList.add("in"); }); return; }
+  var io=new IntersectionObserver(function(es){ es.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add("in"); io.unobserve(x.target); } }); },{root:aboutL,threshold:.15}); els.forEach(function(x){ io.observe(x); }); }
+document.getElementById("about-page").addEventListener("click",function(e){ e.preventDefault(); openAbout(); });
+document.getElementById("about-link").addEventListener("click",function(e){ if(e.metaKey||e.ctrlKey) return; e.preventDefault(); openAbout(); });
+aboutL.addEventListener("click",function(e){ var c=e.target.closest("[data-aclose]"); if(c){ e.preventDefault(); closeAbout(); } });
+addEventListener("keydown",function(e){ if(e.key==="Escape"&&aboutOpen) closeAbout(); });
+addEventListener("pageshow",function(e){ if(e.persisted){ XFER.busy=false; document.querySelectorAll("body > div[style*='z-index:300']").forEach(function(n){ n.remove(); }); } });
+// Coming back from About: skip the landing animation and open with the stripes splitting sideways
+var xferIn=XFER.arriving();
+var wantAbout=/about(\.html)?$/.test(location.pathname)||/[?&]about\b/.test(location.search);
+if(xferIn){ splash.classList.add("gone"); XFER.into(); }
+else if(wantAbout){ splash.classList.add("gone"); document.documentElement.classList.remove("xfer"); aboutOpen=true; setTimeout(blurCopy,50); aboutL.classList.add("on"); aboutL.setAttribute("aria-hidden","false"); document.body.classList.add("about-open"); aboutReveal(); }
+else if(document.visibilityState==="visible") playSplash();
 else document.addEventListener("visibilitychange",function once(){ if(document.visibilityState==="visible"){ document.removeEventListener("visibilitychange",once); playSplash(); } });
 })();
 </script>

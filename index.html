@@ -171,6 +171,40 @@ body.aptw-open :is(.hud,.ticker,.foot,.topright,.mcard,.stale,.a2hs){opacity:0!i
   #aptW .spot{grid-template-columns:1fr}#aptW .spot svg{display:none}
   #aptW .regs div{grid-template-columns:1fr 90px 34px}
 }
+/* Replay of today */
+#rpBar{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:25;display:flex;align-items:center;gap:14px;padding:10px 12px 10px 10px;width:min(720px,calc(100vw - 32px));
+  background:rgba(13,13,12,.5);backdrop-filter:blur(20px) saturate(1.2);-webkit-backdrop-filter:blur(20px) saturate(1.2);border:1px solid rgba(236,231,222,.12);border-radius:999px}
+#rpBar[hidden]{display:none}
+#rpBar .rp-play{width:38px;height:38px;flex:none;padding:0;display:grid;place-items:center;color:var(--bone)}
+#rpBar .rp-play svg{display:block}
+#rpBar .rp-mid{flex:1;min-width:0;position:relative;padding-top:22px}
+#rpBar .rp-tip{position:absolute;top:0;left:0;transform:translateX(-50%);white-space:nowrap;font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums;pointer-events:none}
+#rpBar .rp-tip b{color:var(--bone);font-weight:600;margin-right:6px}
+#rpBar input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;margin:0;background:transparent;cursor:pointer;--p:0%;display:block}
+#rpBar input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(90deg,var(--s1),var(--s2) var(--p),rgba(236,231,222,.16) var(--p))}
+#rpBar input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:rgba(236,231,222,.16)}
+#rpBar input[type=range]::-moz-range-progress{height:3px;border-radius:2px;background:linear-gradient(90deg,var(--s1),var(--s2))}
+#rpBar input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--bone);margin-top:-5.5px;box-shadow:0 0 0 4px rgba(242,163,58,.18)}
+#rpBar input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:var(--bone);box-shadow:0 0 0 4px rgba(242,163,58,.18)}
+#rpBar .chip{padding:6px 12px;font-size:.78rem}
+#rpBar .rp-play.chip{padding:0}
+#rpBar .rp-spd{position:relative;flex:none}
+#rpBar .rp-sbtn{min-width:46px;color:var(--bone);font-variant-numeric:tabular-nums}
+#rpBar .rp-menu{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);display:none;flex-direction:column;padding:4px;border-radius:12px;
+  background:rgba(13,13,12,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(236,231,222,.14)}
+#rpBar .rp-menu.on{display:flex}
+#rpBar .rp-menu button{border:0;background:none;color:var(--muted);font:500 .8rem var(--sans);padding:7px 14px;border-radius:8px;cursor:pointer;font-variant-numeric:tabular-nums}
+#rpBar .rp-menu button:hover{color:var(--bone);background:rgba(236,231,222,.06)}
+#rpBar .rp-menu button[aria-checked="true"]{color:var(--ink);background:var(--bone)}
+#rpBar .rp-x{flex:none;color:var(--bone);display:inline-flex;align-items:center;gap:7px}
+#rpBar .rp-x i{width:7px;height:7px;border-radius:50%;background:var(--s1);box-shadow:0 0 0 3px rgba(232,105,44,.22)}
+body.replay :is(.hud .stats,.hud .sum,.ticker,.mcard,.stale,.a2hs,.foot){opacity:0!important;pointer-events:none!important}
+@media (max-width:760px){
+  #rpBar{bottom:12px;gap:8px;padding:8px 8px 8px 8px}
+  #rpBar .chip{padding:6px 10px}
+  #rpBar .rp-mid{flex:1}
+  body.replay .foot{opacity:0;pointer-events:none}
+}
 /* About sits over a clean map: every window, card and control underneath steps out of view */
 body.about-open :is(.topright,.panel,.a2hs,.card,.toast,.credits,.mcard,.follow,.tour-block,.tour-spot,.tour-card){visibility:hidden!important;pointer-events:none!important}
 @media (max-width:760px){#aboutL{font-size:16px}#aboutL .ahead{padding:24px 22px 36px}}
@@ -247,6 +281,8 @@ body.a2hs-on .ticker{opacity:0;pointer-events:none}
 .card.float .btn{background:none!important;border:0!important;padding:2px 0;font-size:.78rem;font-weight:500;color:var(--muted);letter-spacing:.01em;box-shadow:none!important}
 .card.float .btn:hover{color:var(--bone)}
 .card.float .btn:after{display:none}
+.card .more .fl{color:var(--bone)}.card .more .fl b{font-weight:600}
+.card .more .prof{display:block;width:100%;height:30px;margin:8px 0 2px}.card .more .prof-k{font-size:.72rem;color:var(--dim);margin-top:0}
 .card.float .btn:active{transform:none;opacity:.7}
 .card.float .btn[data-act="ride"],.card.float .btn[data-act="stop"]{color:var(--bone)}
 .card.float .more{margin-top:9px;font-size:.82rem;color:#cfc9be;line-height:1.45}
@@ -366,12 +402,13 @@ body.chart .vig{background:linear-gradient(to right,rgba(13,13,12,.92) 0,rgba(13
 .home-form input:focus{outline:none;border-color:var(--s2)}
 .home-form .row{display:flex;gap:6px}
 .home-form .msg{font-size:.78rem;color:var(--muted);min-height:1em}
+.home-form .msg:empty{display:none}
 body.panel-open .topright{opacity:0;pointer-events:none}
 @media (max-width:760px){
   .topright{right:16px;top:18px;gap:6px}
   .home-pill{padding:6px 10px;font-size:.76rem}
   .home-pill .hw{display:none}
-  .home-form{width:calc(100vw - 32px);right:-0px}
+  .home-form{width:calc(100vw - 24px);right:0;box-sizing:border-box}
 }
 
 /* Modes */
@@ -731,7 +768,7 @@ body.no-ticker .ticker{display:none}
       <div class="pop" id="pop" role="menu">
         <div class="ptabs" role="tablist"><button role="tab" data-ptab="map" aria-selected="true">Map Layers</button><button role="tab" data-ptab="view" aria-selected="false">Display</button></div>
         <div class="ppane" data-pane="map">
-          <div class="row"><span>Base Map</span><div class="group seg" role="group" aria-label="Base map"><button class="chip" id="base-dark" aria-pressed="true">Dark</button><button class="chip" id="chart-btn" aria-pressed="false">Sectional</button></div></div>
+          <div class="row"><span>Base Map</span><div class="group seg" role="group" aria-label="Base map"><button class="chip" id="base-dark" aria-pressed="true">Dark</button><button class="chip" id="sat-btn" aria-pressed="false">Satellite</button><button class="chip" id="chart-btn" aria-pressed="false">Sectional</button></div></div>
           <div class="row"><span>Weather</span><div class="toggles">
             <button class="chip" data-layer="clouds" aria-pressed="true">Clouds</button>
             <button class="chip" data-layer="precip" aria-pressed="true">Rain &amp; Snow</button>
@@ -741,6 +778,8 @@ body.no-ticker .ticker{display:none}
           <div class="row"><span>Traffic</span><div class="toggles">
             <button class="chip" data-layer="jets" aria-pressed="false">Airliners</button>
             <button class="chip" data-layer="tails" aria-pressed="true">Tail Numbers</button>
+            <button class="chip" data-layer="paths" aria-pressed="false">Today's Paths</button>
+            <button class="chip" id="replay-btn">Replay Today</button>
           </div></div>
           <div class="row"><span>Airports</span><div class="toggles">
             <button class="chip" data-layer="airspace" aria-pressed="true">Airspace</button>
@@ -815,6 +854,7 @@ body.no-ticker .ticker{display:none}
       <li><b>Weather reports and forecasts</b> from the <a href="https://aviationweather.gov" target="_blank" rel="noopener">NOAA Aviation Weather Center</a>.</li>
       <li><b>Clouds and radar</b> from NOAA satellite and NEXRAD imagery, served by the <a href="https://mesonet.agron.iastate.edu" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>.</li>
       <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Terrain from NOAA.</li>
+    <li><b>Satellite map</b> from the <a href="https://www.usgs.gov/programs/national-geospatial-program/national-map" target="_blank" rel="noopener">USGS National Map</a> and NASA's <a href="https://earthobservatory.nasa.gov/features/BlueMarble" target="_blank" rel="noopener">Blue Marble</a>.</li>
       <li><b>Airline routes</b> from <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>, community route data that can be out of date.</li>
     </ul>
   </section>
@@ -838,6 +878,13 @@ body.no-ticker .ticker{display:none}
   <a class="pill" href="./" data-aclose>Back to the Map</a>
 </footer></div>
 <div class="stale" id="stale" role="status" aria-live="polite"><i></i><span>Live traffic paused, retrying</span></div>
+<div id="rpBar" role="region" aria-label="Replay of today" hidden>
+  <button class="chip rp-play" id="rp-play" aria-label="Pause"></button>
+  <div class="rp-mid"><div class="rp-tip" id="rp-tip"><b id="rp-time">—</b><span id="rp-n"></span></div><input type="range" id="rp-range" min="0" max="1440" step="1" value="0" aria-label="Time of day"></div>
+  <div class="rp-spd"><button class="chip rp-sbtn" id="rp-sbtn" aria-haspopup="true" aria-expanded="false" aria-label="Playback speed">1×</button>
+    <div class="rp-menu" id="rp-menu" role="menu"><button role="menuitemradio" data-rps="7.5" aria-checked="false">0.5×</button><button role="menuitemradio" data-rps="15" aria-checked="true">1×</button><button role="menuitemradio" data-rps="30" aria-checked="false">2×</button></div></div>
+  <button class="chip rp-x" id="rp-x"><i></i>Live</button>
+</div>
 <div id="aptW" role="dialog" aria-label="Airport" aria-hidden="true"><div class="aw-top"><span class="aw-st"></span><button class="aw-x" id="aw-x" aria-label="Close">×</button></div><div class="aw-in" id="aw-in"></div></div>
 <div class="card" id="card" role="dialog" aria-label="Details"><button class="x" id="card-x" aria-label="Close">×</button><div id="card-body"></div></div>
 <div class="toast" id="toast"></div>
@@ -874,7 +921,7 @@ body.no-ticker .ticker{display:none}
   <div class="lb-pan" id="lb-pan">
     <div class="row"><span>On screen</span><div class="toggles"><button class="chip" data-lbo="catTop">Field Conditions</button><button class="chip" data-lbo="cond">Weather Details</button><button class="chip" data-lbo="cap">Captions</button><button class="chip" data-lbo="chart">Sectional Up Close</button><button class="chip" data-lbo="qr">QR Code</button></div></div>
     <div class="row"><span>Dim overnight</span><div class="toggles"><button class="chip" data-lbd="off">Off</button><button class="chip" data-lbd="22-6">10 PM to 6 AM</button><button class="chip" data-lbd="23-5">11 PM to 5 AM</button><button class="chip" data-lbd="0-6">Midnight to 6 AM</button></div></div>
-    <div class="row"><span>Map color</span><div class="toggles"><button class="chip" data-lbt="season">Seasonal</button><button class="chip" data-lbt="warm">Warm</button><button class="chip" data-lbt="slate">Slate</button><button class="chip" data-lbt="forest">Forest</button><button class="chip" data-lbt="ink">Ink</button></div></div>
+    <div class="row"><span>Map color</span><div class="toggles"><button class="chip" data-lbt="season">Seasonal</button><button class="chip" data-lbt="warm">Warm</button><button class="chip" data-lbt="slate">Slate</button><button class="chip" data-lbt="forest">Forest</button><button class="chip" data-lbt="ink">Ink</button><button class="chip" data-lbt="sat">Satellite</button></div></div>
     <div class="row"><span>Light</span><div class="toggles"><button class="chip" data-lbl="live">Real Time</button><button class="chip" data-lbl="day">Day</button><button class="chip" data-lbl="dusk">Dusk</button><button class="chip" data-lbl="night">Night</button></div></div>
   </div>
   <button class="chip" id="lb-gear"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 3h12M1 7h12M1 11h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> Display</button>
@@ -979,7 +1026,7 @@ var home=null; try{ var hs=localStorage.getItem("upwind-home"); if(hs&&A[hs]) ho
 function aptVisible(a){ var k=T.k; if(a===home||(sel&&sel.a===a)) return true; if(mobile) return (a.tier===1&&k>=1.3)||(a.tier===2&&k>=3.2)||k>=5; return a.tier===1||(a.tier===2&&k>=1.7)||k>=2.8; }
 function code(a){ return a.icao||a.id; }
 
-var layers={wind:false,clouds:true,jets:false,precip:true,places:false,beacons:true,conds:true,tails:true,ticker:true,airspace:true};
+var layers={paths:false,wind:false,clouds:true,jets:false,precip:true,places:false,beacons:true,conds:true,tails:true,ticker:true,airspace:true};
 try{ var lp=JSON.parse(localStorage.getItem("upwind-layers")||"null"); if(lp) Object.keys(layers).forEach(function(k){ if(typeof lp[k]==="boolean") layers[k]=lp[k]; }); }catch(e){}
 function saveLayers(){ try{ localStorage.setItem("upwind-layers",JSON.stringify(layers)); }catch(e){} }
 var seasonPick="live";
@@ -1095,8 +1142,89 @@ function drawChart(){
   }
   gMap.fillStyle="rgba(8,10,14,"+(LOBBY?0.06+0.2*light.night:0.12+0.5*light.night)+")"; gMap.fillRect(0,0,W,H);
 }
-document.getElementById("base-dark").addEventListener("click",function(e){ if(chart) document.getElementById("chart-btn").click(); });
-document.getElementById("chart-btn").addEventListener("click",function(){ document.getElementById("base-dark").setAttribute("aria-pressed",chart); chart=!chart; this.setAttribute("aria-pressed",chart); document.body.classList.toggle("chart",chart); mapDirty=true; clearWind(); if(chart) toast("FAA VFR sectional chart. Not for navigation; use current charts.",3600); });
+/* ---------------- Satellite base map ---------------- */
+// Aerial imagery from the USGS National Map (public domain, US only) over a NASA Blue Marble picture of the
+// whole region (public domain) for Canada and the far lakes. Darkened and muted so planes, airports and airspace
+// stay on top. Tiles come straight from USGS, so nothing here needs updating; if they fail, the solid map shows.
+var SATB={url:"https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/",
+  fill:null, fillOk:false, fb:[-95.625,38.8226,-74.53125,50.7365], c:{}, n:0, busy:0, ok:0, bad:0, sat:0.1, dk:0.28, dbg:{}};
+var satBase=false; try{ satBase=localStorage.getItem("upwind-sat")==="1"; }catch(e){}
+window.upwindSat=SATB;
+function satOn(){ return !chart && (LOBBY?LBO.theme==="sat":satBase); }
+function satFill(){ if(SATB.fill) return; SATB.fill=new Image(); SATB.fill.onload=function(){ SATB.fillOk=true; mapDirty=true; }; SATB.fill.src="sat-fill.webp"; }
+// USGS marks "no imagery" (Canada, open water past the border) as pure white; those pixels are cut out so the
+// Blue Marble picture shows through, with a soft edge so the seam doesn't show
+function satKey(im){
+  var c=document.createElement("canvas"); c.width=c.height=256; var x=c.getContext("2d",{willReadFrequently:true});
+  // USGS imagery runs yellow at state zooms; nudged toward the greener Blue Marble so the two match
+  x.filter="hue-rotate(16deg) saturate(.82) contrast(1.06)"; x.drawImage(im,0,0,256,256); x.filter="none"; var d; try{ d=x.getImageData(0,0,256,256); }catch(e){ return {cv:c,empty:false}; }
+  var p=d.data, cut=0;
+  for(var i=0;i<p.length;i+=4){ var m=Math.min(p[i],p[i+1],p[i+2]); if(m>238){ var a=Math.max(0,Math.min(255,(250-m)*21)); p[i+3]=a; if(a<8) cut++; } }
+  if(cut===65536) return {cv:null,empty:true};
+  if(cut) x.putImageData(d,0,0);
+  return {cv:c,empty:false};
+}
+function satTile(z,x,y,load){
+  var k=z+"/"+y+"/"+x, t=SATB.c[k]; if(t){ t.u=SATB.n; return t; }
+  if(!load||SATB.busy>=10||(SATB.bad>24&&!SATB.ok)) return null;
+  t=SATB.c[k]={ok:false,u:SATB.n}; SATB.busy++;
+  var im=new Image(); im.crossOrigin="anonymous";
+  im.onload=function(){ SATB.busy--; SATB.ok++; var r=satKey(im); t.cv=r.cv; t.empty=r.empty; t.ok=true; mapDirty=true; };
+  im.onerror=function(){ SATB.busy--; SATB.bad++; t.bad=true; setTimeout(function(){ delete SATB.c[k]; },60000); mapDirty=true; };
+  im.src=SATB.url+k; return t;
+}
+function satTrim(){ var ks=Object.keys(SATB.c); if(ks.length<420) return; ks.sort(function(a,b){ return SATB.c[a].u-SATB.c[b].u; }); ks.slice(0,ks.length-320).forEach(function(k){ if(SATB.c[k].ok||SATB.c[k].bad) delete SATB.c[k]; }); }
+function drawSat(S2){
+  satFill(); SATB.n++;
+  var s=proj.scale()*T.k, zf=Math.log2(2*Math.PI*s/256)+Math.log2(Math.min(DPR,1.5)), z=Math.max(6,Math.min(16,Math.round(zf))), n=Math.pow(2,z);
+  var day=light.day, zt=Math.max(0,Math.min(1,(zf-7)/5));     // 0 zoomed out on the state, 1 zoomed in on a field
+  gMap.save(); gMap.setTransform(DPR,0,0,DPR,0,0); gMap.imageSmoothingEnabled=true; gMap.imageSmoothingQuality="high";
+  // Whole-region picture first
+  if(SATB.fillOk){ var f0=proj([SATB.fb[0],SATB.fb[3]]), f1=proj([SATB.fb[2],SATB.fb[1]]);
+    gMap.drawImage(SATB.fill,f0[0]*T.k+T.x,f0[1]*T.k+T.y,(f1[0]-f0[0])*T.k,(f1[1]-f0[1])*T.k); }
+  // Sharp aerial tiles over the US, once zoomed in past the state view
+  if(zf>5.4){
+    var nw=proj.invert([(0-T.x)/T.k,(0-T.y)/T.k]), se=proj.invert([(W-T.x)/T.k,(H-T.y)/T.k]);
+    var tx=function(lo){ return Math.floor((lo+180)/360*n); }, ty=function(la){ var r=la*Math.PI/180; return Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n); };
+    var lon=function(x){ return x/n*360-180; }, lat=function(y){ var v=Math.PI-2*Math.PI*y/n; return 180/Math.PI*Math.atan(0.5*(Math.exp(v)-Math.exp(-v))); };
+    var x0=tx(Math.max(nw[0],-97)), x1=tx(Math.min(se[0],-73)), y0=ty(Math.min(nw[1],50)), y1=ty(Math.max(se[1],38.5));
+    if((x1-x0+1)*(y1-y0+1)<=160){
+      // load from the middle of the screen out
+      var cx=(x0+x1)/2, cy=(y0+y1)/2, list=[];
+      for(var x=x0;x<=x1;x++) for(var y=y0;y<=y1;y++) list.push([x,y]);
+      list.sort(function(a,b){ return (Math.abs(a[0]-cx)+Math.abs(a[1]-cy))-(Math.abs(b[0]-cx)+Math.abs(b[1]-cy)); });
+      list.forEach(function(q){ var x=q[0], y=q[1];
+        var a=proj([lon(x),lat(y)]), b=proj([lon(x+1),lat(y+1)]);
+        var dx=a[0]*T.k+T.x, dy=a[1]*T.k+T.y, dw=(b[0]-a[0])*T.k+0.5, dh=(b[1]-a[1])*T.k+0.5;
+        var t=satTile(z,x,y,true);
+        if(t&&t.ok){ if(t.cv) gMap.drawImage(t.cv,dx,dy,dw,dh); return; }
+        // still loading: stretch the matching piece of a lower-zoom tile so there are no holes
+        for(var up=1;up<=4&&z-up>=7;up++){
+          var pt=satTile(z-up,x>>up,y>>up,false); if(!pt||!pt.ok) continue; if(!pt.cv) return;
+          var sz=256/(1<<up), sx=(x-((x>>up)<<up))*sz, sy=(y-((y>>up)<<up))*sz;
+          gMap.drawImage(pt.cv,sx,sy,sz,sz,dx,dy,dw,dh); return;
+        }
+      });
+      satTrim();
+    }
+  }
+  // Mute the color, then darken: darker at night and as you zoom in, where the ground gets busy
+  gMap.globalCompositeOperation="saturation"; gMap.fillStyle="rgba(128,128,128,"+(SATB.sat+0.16*zt).toFixed(3)+")"; gMap.fillRect(0,0,W,H);
+  gMap.globalCompositeOperation="source-over";
+  var dark=Math.min(0.86,(LOBBY?SATB.dk-0.04:SATB.dk)+0.26*(1-day)+0.2*zt);
+  gMap.fillStyle="rgba(6,7,8,"+dark.toFixed(3)+")"; gMap.fillRect(0,0,W,H);
+  // Michigan lifted a little above its neighbors, like the solid map
+  gMap.setTransform(DPR*T.k,0,0,DPR*T.k,DPR*T.x,DPR*T.y);
+  var out=new Path2D(); out.rect((-T.x)/T.k-10,(-T.y)/T.k-10,W/T.k+20,H/T.k+20); out.addPath(S2.mi);
+  gMap.fillStyle="rgba(4,5,6,"+(0.34-0.14*zt).toFixed(3)+")"; gMap.fill(out,"evenodd");
+  gMap.restore();
+}
+function baseUI(){ document.getElementById("base-dark").setAttribute("aria-pressed",!chart&&!satBase); document.getElementById("sat-btn").setAttribute("aria-pressed",!chart&&satBase); document.getElementById("chart-btn").setAttribute("aria-pressed",chart); }
+function setSat(v){ satBase=v; try{ localStorage.setItem("upwind-sat",v?"1":"0"); }catch(e){} }
+document.getElementById("base-dark").addEventListener("click",function(e){ setSat(false); if(chart) document.getElementById("chart-btn").click(); else { baseUI(); mapDirty=true; } });
+document.getElementById("sat-btn").addEventListener("click",function(e){ setSat(true); if(chart) document.getElementById("chart-btn").click(); else { baseUI(); mapDirty=true; } });
+baseUI();
+document.getElementById("chart-btn").addEventListener("click",function(){ chart=!chart; baseUI(); document.body.classList.toggle("chart",chart); mapDirty=true; clearWind(); if(chart) toast("FAA VFR sectional chart. Not for navigation; use current charts.",3600); });
 
 /* ---------------- Map ---------------- */
 var mapDirty=true, lastLightKey="";
@@ -1227,6 +1355,7 @@ function drawTerminator(){
 // The projection only changes on resize, so the coastlines are turned into ready-made shapes once
 // instead of being re-projected point by point on every redraw
 var P2=null;
+function projKey(){ return proj.scale()+"|"+proj.translate().join(","); }
 function shapes2(){
   var key=proj.scale()+"|"+proj.translate().join(","); if(P2&&P2.key===key) return P2;
   var sp=d3.geoPath(proj), mk=function(fs){ return new Path2D(fs.map(function(f){ return sp(f)||""; }).join("")); };
@@ -1247,9 +1376,10 @@ function drawMap(){
   // Lakes
   gMap.fillStyle=P.lake; gMap.fill(S2.lakes);
   // Terrain and lake depth from NOAA elevation data, laid over the flat colors
+  var SATM=satOn(); if(SATM) drawSat(S2);
   if(RELIEF.ok){ var r0=proj([RELIEF.b[0],RELIEF.b[3]]), r1=proj([RELIEF.b[2],RELIEF.b[1]]);
-    gMap.globalCompositeOperation="soft-light"; gMap.globalAlpha=Math.max(0.55,Math.min(1,(6-T.k)/3)); gMap.drawImage(RELIEF.img,r0[0],r0[1],r1[0]-r0[0],r1[1]-r0[1]);
-    var rs=Math.max(0,Math.min(1,(4.5-T.k)/2.5)); if(rs>0){ gMap.globalAlpha=0.55*rs; gMap.drawImage(RELIEF.img,r0[0],r0[1],r1[0]-r0[0],r1[1]-r0[1]); }
+    gMap.globalCompositeOperation="soft-light"; gMap.globalAlpha=SATM?Math.max(0,Math.min(0.4,(5-T.k)/6)):Math.max(0.55,Math.min(1,(6-T.k)/3)); gMap.drawImage(RELIEF.img,r0[0],r0[1],r1[0]-r0[0],r1[1]-r0[1]);
+    var rs=SATM?0:Math.max(0,Math.min(1,(4.5-T.k)/2.5)); if(rs>0){ gMap.globalAlpha=0.55*rs; gMap.drawImage(RELIEF.img,r0[0],r0[1],r1[0]-r0[0],r1[1]-r0[1]); }
     gMap.globalCompositeOperation="source-over"; gMap.globalAlpha=1; }
   gMap.lineWidth=0.8/T.k; gMap.strokeStyle=P.lakeEdge; gMap.stroke(S2.lakes);
 
@@ -1258,7 +1388,7 @@ function drawMap(){
   // Michigan shoreline
   gMap.lineWidth=1/T.k; gMap.strokeStyle=P.shore; gMap.stroke(S2.mi);
   // Weather from above: radar, then satellite clouds with their shadows
-  drawRadarSat(); drawLowCloud();
+  drawRadarSat(); drawLowCloud(); drawPathsLayer();
   drawHeat();
   // Lake names, set like a printed map
   gMap.setTransform(DPR,0,0,DPR,0,0); drawLakeLabels();
@@ -1497,6 +1627,13 @@ function inBox(p){ return p.la>B.la0&&p.la<B.la1&&p.lo>B.lo0&&p.lo<B.lo1&&typeof
 var planes=SNAP.filter(inBox).map(makePlane);
 // Owners in the FAA's privacy programs (LADD, PIA) keep their registration off upwind: no tail number, and no callsign that is just the tail number
 function privCs(a){ var c=(a.c||"").trim(); if((a.f&12)&&(/^N[0-9]/.test(c)||c===(a.r||""))) return ""; return c; }
+// Fetch a selected plane's recent path from the relay, at most once a minute
+function loadPast(p){
+  if(!p||(p.pastAt&&Date.now()-p.pastAt<60000)) return; p.pastAt=Date.now();
+  if(!LIVE){ if(PREVIEW&&!p.past){ var pts=[], la=p.lat, lo=p.lon, tr=p.trk, now=Date.now()-p.hist.length*4000; for(var i=1;i<=40;i++){ tr+=(i%9<4?4:-2); var r=(tr+180)*Math.PI/180, d=p.gs/60; la+=d*Math.cos(r)/60; lo+=d*Math.sin(r)/(60*Math.cos(la*Math.PI/180)); pts.unshift([now-i*60000,la,lo,Math.max(800,p.alt-(i>30?(i-30)*450:0))]); } p.past=pts; p.flight={st:Date.now()-46*60000,sa:"ARB",max:p.alt+300}; } return; }
+  if(!p.src||!p.src.h) return;
+  fetch(RELAY+"/trail?hex="+encodeURIComponent(p.src.h)).then(function(r){ return r.json(); }).then(function(j){ if(j&&Array.isArray(j.pts)) p.past=j.pts; if(j) p.flight=j.f||null; }).catch(function(){});
+}
 function makePlane(p,i){
   var ti=typeInfo(p);
   return {i:typeof i==="number"?i:(Math.random()*1e6|0),src:p,lat:p.la,lon:p.lo,alt:p.a,gs:Math.max(40,p.g||80),trk:p.k||0,t:p.t,cat:p.cat,cs:privCs(p),reg:(p.f&12)?"":(p.r||""),priv:!!(p.f&12),name:ti.n,kind:ti.k,trail:[],fade:1,wob:Math.random()*100,line:LINES[ti.k][(Math.random()*LINES[ti.k].length)|0]};
@@ -1635,14 +1772,14 @@ var LIT=APTS.filter(function(a){ return a.twr || a.rw.some(function(r){return r[
 // FAA Class B, C and D shapes, projected once per resize
 var aspPaths=null, aspW=0, aspH=0;
 function buildAirspace(){
-  aspW=W; aspH=H; aspPaths=ASP.map(function(f){
+  aspW=projKey(); aspH=0; aspPaths=ASP.map(function(f){
     var path=new Path2D(), x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
     f.r.forEach(function(ring){ ring.forEach(function(c,i){ var q=proj(c); if(!q) return; if(q[0]<x0)x0=q[0]; if(q[0]>x1)x1=q[0]; if(q[1]<y0)y0=q[1]; if(q[1]>y1)y1=q[1]; if(i) path.lineTo(q[0],q[1]); else path.moveTo(q[0],q[1]); }); path.closePath(); });
     return {c:f.c,path:path,b:[x0,y0,x1,y1],home:home&&f.id===home.id};
   });
 }
 function drawAirspace(fa,g){
-  if(!ASP.length) return; if(!aspPaths||aspW!==W||aspH!==H) buildAirspace();
+  if(!ASP.length) return; if(!aspPaths||aspW!==projKey()) buildAirspace(); // rebuilt whenever the map is refitted, e.g. when the headline panel opens or closes
   var vx0=-T.x/T.k, vy0=-T.y/T.k, vx1=(W-T.x)/T.k, vy1=(H-T.y)/T.k;
   g.save(); g.setTransform(DPR,0,0,DPR,0,0); g.translate(T.x,T.y); g.scale(T.k,T.k);
   ["D","C","B"].forEach(function(cl){
@@ -1742,6 +1879,20 @@ function drawPlanes(set,t){
     selTrailA=Math.min(1,selTrailA+0.04);
     var pts=sp.hist.concat([[sp.lon,sp.lat]]).map(function(c){return scr(c[0],c[1]);}), n=pts.length, col=BC[band(sp.alt)];
     g.lineCap="round"; g.lineJoin="round";
+    // Older path from the relay's flight record (one point a minute, up to an hour), drawn faint behind the live trail
+    loadPast(sp);
+    if(sp.past&&sp.past.length){
+      var cut=Date.now()-sp.hist.length*4000, pp=[];
+      sp.past.forEach(function(x){ if(x[0]<cut) pp.push(scr(x[2],x[1])); });
+      if(pp.length){ pp.push(pts[0]); var m=pp.length;
+        g.beginPath(); g.moveTo(pp[0][0],pp[0][1]);
+        for(var j=1;j<m-1;j++){ var mx=(pp[j][0]+pp[j+1][0])/2, my=(pp[j][1]+pp[j+1][1])/2; g.quadraticCurveTo(pp[j][0],pp[j][1],mx,my); }
+        g.lineTo(pp[m-1][0],pp[m-1][1]);
+        var gr=g.createLinearGradient(pp[0][0],pp[0][1],pp[m-1][0],pp[m-1][1]);
+        gr.addColorStop(0,"rgba("+col+",0)"); gr.addColorStop(1,"rgba("+col+","+(0.42*selTrailA*sp.fade).toFixed(3)+")");
+        g.strokeStyle=gr; g.lineWidth=1.3*Math.min(1.5,sk); g.setLineDash([]); g.stroke();
+      }
+    }
     for(var pass=0;pass<2;pass++){
       for(var i=1;i<n;i++){
         var f=i/(n-1), al=Math.pow(f,1.6)*selTrailA*sp.fade;
@@ -1827,10 +1978,11 @@ function frame(now){
   drawLook(clock);
   if(mode==="look"&&lookPos){ lookT+=dt; if(lookT>1){ lookT=0; renderLook(); } }
   if(LOBBY&&!chart&&lob.apt){ var la=lob.apt; ga=ga.filter(function(p){ return p===follow||p.mi||d3.geoDistance([la.lon,la.lat],[p.lon,p.lat])*3440.065<60; }); }
-  drawPlanes(ga,clock);
+  if(RP.on){ stepReplay(dt); drawPlanes(RP.planes,clock); ga=[]; jets=[]; }
+  else { drawPlanes(ga,clock);
   if(layers.jets) drawPlanes(jets,clock);
   // What's Overhead: an airliner headed over you is always drawn, even with Airliners turned off, so its line has a plane on the end
-  else if(mode==="look"&&lookPos){ var lj=jets.filter(function(p){ return lookList.indexOf(p)>=0||(p._pr&&p._pr.now<1.5); }); if(lj.length) drawPlanes(lj,clock); }
+  else if(mode==="look"&&lookPos){ var lj=jets.filter(function(p){ return lookList.indexOf(p)>=0||(p._pr&&p._pr.now<1.5); }); if(lj.length) drawPlanes(lj,clock); } }
   if(sel&&sel.p&&card.classList.contains("on")&&clock-(sel.u||0)>0.5){ sel.u=clock; updPlaneCard(sel.p); placeCard(true); }
   else if(sel&&sel.p&&card.classList.contains("on")) placeCard(false);
   if(aboutOpen) blurCopy();
@@ -1913,10 +2065,90 @@ function closeOthers(keep){
   var hfe=document.getElementById("home-form"); if(keep!=="home"&&hfe&&hfe.classList.contains("on")) hfe.classList.remove("on");
   var cr=document.querySelector(".credits"); if(keep!=="credits"&&cr&&cr.classList.contains("on")) cr.classList.remove("on");
 }
+/* ---------------- Today's Paths and Replay ----------------
+   Both use the relay's record of every small plane's path since midnight. The layer draws each path as a faint line,
+   so busy corridors build up brighter, like a long exposure. Replay plays the day back from those same paths. */
+var PATHS={d:null,at:0,busy:false,key:"",p2:null}, RPD={d:null,at:0,busy:false};
+function synthPaths(step){ // preview only: invent a day of wandering paths from the sample planes
+  var P={}, T={}, now=Date.now(), from=now-12*36e5;
+  planes.filter(function(p){ return !isJet(p)&&p.mi; }).slice(0,40).forEach(function(p,k){ var la=p.lat, lo=p.lon, tr=p.trk, a=[], st=(k*37)%400, len=60+(k*53)%300;
+    for(var m=st;m<Math.min(720,st+len);m+=step){ tr+=9*step; la+=Math.cos(tr*Math.PI/180)*0.012*step; lo+=Math.sin(tr*Math.PI/180)*0.016*step; a.push([m,Math.round(la*1000),Math.round(lo*1000),Math.round(p.alt/100),Math.round((tr%360+360)%360)]); }
+    P["s"+k]=a; T["s"+k]=p.t; });
+  return {from:from,step:step,now:now,p:P,t:T};
+}
+function getPaths(step,cb){
+  var st=step===2?RPD:PATHS;
+  if(st.d&&Date.now()-st.at<240000){ cb(st.d); return; }
+  if(st.busy) return; st.busy=true;
+  if(!LIVE&&PREVIEW){ st.d=synthPaths(step); st.at=Date.now(); st.busy=false; cb(st.d); return; }
+  fetch(RELAY+"/paths?step="+step).then(function(r){ return r.json(); }).then(function(j){ st.busy=false; if(j&&j.p){ st.d=j; st.at=Date.now(); cb(j); } }).catch(function(){ st.busy=false; });
+}
+function drawPathsLayer(){
+  if(!layers.paths||chart) return;
+  getPaths(5,function(){ PATHS.key=""; mapDirty=true; });
+  var d=PATHS.d; if(!d) return;
+  var key=projKey()+"|"+d.now;
+  if(PATHS.key!==key){ var p2=new Path2D();
+    Object.keys(d.p).forEach(function(h){ var a=d.p[h], prev=null;
+      a.forEach(function(x){ var q=proj([x[2]/1000,x[1]/1000]); if(!q) return;
+        if(!prev||x[0]-prev[0]>d.step*3) p2.moveTo(q[0],q[1]); else p2.lineTo(q[0],q[1]); prev=x; }); });
+    PATHS.p2=p2; PATHS.key=key; }
+  gMap.save(); gMap.globalCompositeOperation="lighter"; gMap.lineJoin="round"; gMap.lineCap="round";
+  gMap.strokeStyle="rgba(242,163,58,"+(light.day>0.4?0.16:0.2)+")"; gMap.lineWidth=1.1/T.k; gMap.stroke(PATHS.p2);
+  gMap.restore();
+}
+// Replay
+var RP={on:false,t:0,play:true,speed:15,planes:[],end:0};
+var RP_PLAY='<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z" fill="currentColor"/></svg>', RP_PAUSE='<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="3" y="2.5" width="2.6" height="9" rx="1" fill="currentColor"/><rect x="8.4" y="2.5" width="2.6" height="9" rx="1" fill="currentColor"/></svg>';
+function rpSetPlay(on){ RP.play=on; rpPlay.innerHTML=on?RP_PAUSE:RP_PLAY; rpPlay.setAttribute("aria-label",on?"Pause":"Play"); }
+function rpFill(){ var mn=+rpRange.min, mx=+rpRange.max, f=mx>mn?(RP.t-mn)/(mx-mn):0; rpRange.style.setProperty("--p",(f*100).toFixed(2)+"%");
+  // the time label rides above the slider handle, kept inside the bar
+  var tip=document.getElementById("rp-tip"), w=rpRange.clientWidth, x=7+f*(w-14), hw=tip.offsetWidth/2; tip.style.left=Math.max(hw,Math.min(w-hw,x))+"px"; }
+var rpBar=document.getElementById("rpBar"), rpRange=document.getElementById("rp-range"), rpTime=document.getElementById("rp-time"), rpN=document.getElementById("rp-n"), rpPlay=document.getElementById("rp-play");
+function rpClock(m){ var d=RPD.d; return d?new Date(d.from+m*60000).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}):"—"; }
+function startReplay(){
+  closeOthers(""); if(follow) stopFollow(); if(card.classList.contains("on")) closeCard();
+  rpBar.hidden=false; document.body.classList.add("replay"); RP.on=true; rpTime.textContent="Loading"; rpN.textContent="";
+  getPaths(2,function(d){
+    var first=1e9; Object.keys(d.p).forEach(function(h){ if(d.p[h].length) first=Math.min(first,d.p[h][0][0]); });
+    RP.end=Math.round((d.now-d.from)/60000); RP.t=Math.max(0,Math.min(first===1e9?0:first,RP.end-60)); RP.play=true;
+    rpRange.max=RP.end; rpRange.min=Math.max(0,first===1e9?0:first-10); rpRange.value=RP.t; rpSetPlay(true); rpFill();
+  });
+}
+function stopReplay(){ RP.on=false; RP.planes=[]; rpBar.hidden=true; document.body.classList.remove("replay"); mapDirty=true; }
+function rpAt(a,t,step){ // position of one plane at minute t, or null if it wasn't flying then
+  var lo=0, hi=a.length-1; if(!a.length||t<a[0][0]||t>a[hi][0]) return null;
+  while(hi-lo>1){ var mid=(lo+hi)>>1; if(a[mid][0]<=t) lo=mid; else hi=mid; }
+  var p=a[lo], q=a[Math.min(hi,a.length-1)]; if(q[0]-p[0]>step*3) return null;
+  var f=q[0]===p[0]?0:(t-p[0])/(q[0]-p[0]);
+  var la=(p[1]+(q[1]-p[1])*f)/1000, lon=(p[2]+(q[2]-p[2])*f)/1000, alt=(p[3]+(q[3]-p[3])*f)*100;
+  var trk=p[4]>=0?p[4]:0; if(q!==p){ var dy=q[1]-p[1], dx=(q[2]-p[2])*Math.cos(la*Math.PI/180); if(dx||dy) trk=(Math.atan2(dx,dy)*180/Math.PI+360)%360; }
+  return {lat:la,lon:lon,alt:alt,trk:trk};
+}
+function stepReplay(dt){
+  var d=RPD.d; if(!RP.on||!d) return;
+  if(RP.play){ RP.t+=dt*RP.speed; if(RP.t>=RP.end){ RP.t=RP.end; rpSetPlay(false); } rpRange.value=RP.t; rpFill(); }
+  var out=[];
+  Object.keys(d.p).forEach(function(h,i){ var a=d.p[h], c=rpAt(a,RP.t,d.step); if(!c) return;
+    var tr=[]; for(var k=10;k>=1;k-=1.5){ var b=rpAt(a,RP.t-k,d.step); if(b) tr.push([b.lon,b.lat]); }
+    var ty=d.t&&d.t[h], ti=ty&&TYPES[ty];
+    out.push({i:i,lat:c.lat,lon:c.lon,alt:c.alt,trk:c.trk,t:ty||"",kind:ti?ti[1]:"single",cat:"A1",trail:tr,fade:1,mi:true,reg:"",cs:"",name:"",gs:100}); });
+  RP.planes=out; rpTime.textContent=rpClock(RP.t); rpN.textContent=out.length+(out.length===1?" plane up":" planes up");
+}
+document.getElementById("replay-btn").addEventListener("click",function(e){ e.stopPropagation(); startReplay(); });
+document.getElementById("rp-x").addEventListener("click",stopReplay);
+rpPlay.addEventListener("click",function(){ if(!RPD.d) return; if(RP.t>=RP.end) RP.t=+rpRange.min; rpSetPlay(!RP.play); });
+rpRange.addEventListener("input",function(){ RP.t=+rpRange.value; rpSetPlay(false); rpFill(); });
+var rpS=document.getElementById("rp-sbtn"), rpM=document.getElementById("rp-menu");
+rpS.addEventListener("click",function(e){ e.stopPropagation(); var on=!rpM.classList.contains("on"); rpM.classList.toggle("on",on); rpS.setAttribute("aria-expanded",on); });
+rpM.querySelectorAll("[data-rps]").forEach(function(b){ b.addEventListener("click",function(e){ e.stopPropagation(); RP.speed=+b.dataset.rps; rpS.textContent=b.textContent; rpM.querySelectorAll("[data-rps]").forEach(function(x){ x.setAttribute("aria-checked",x===b); }); rpM.classList.remove("on"); rpS.setAttribute("aria-expanded",false); }); });
+document.addEventListener("click",function(e){ if(!e.target.closest(".rp-spd")){ rpM.classList.remove("on"); rpS.setAttribute("aria-expanded",false); } });
+addEventListener("keydown",function(e){ if(e.key==="Escape"&&RP.on) stopReplay(); });
 function openPlane(p){
+  if(RP.on) return;
   closeOthers("card");
   if(mode!=="sky") document.body.classList.add("mcard-hide");
-  sel={p:p,h:[]}; card.classList.add("float"); body._k=null; updPlaneCard(p); card.classList.add("on"); sound.target(p); placeCard(true);
+  sel={p:p,h:[]}; card.classList.add("float"); body._k=null; loadPast(p); updPlaneCard(p); card.classList.add("on"); sound.target(p); placeCard(true);
   if(isAirline(p)) routeFor(p.cs);
 }
 // Where the floating card sits. It tries above, below, right and left of the plane and takes the spot that covers
@@ -2009,13 +2241,24 @@ function updPlaneCard(p){
   var more=sel&&sel.more;
   var head='<span class="k">'+esc(id)+(p.reg&&p.reg!==id?" · "+esc(p.reg):"")+'</span><h3>'+esc(nm)+'</h3>'+(rt?'<p class="rt">'+rt+'</p>':'');
   var nums='<div><span>Altitude</span>'+fmtAlt(p.alt)+'</div><div><span>Speed</span>'+Math.round(p.gs)+' kt</div><div><span>Heading</span>'+hdgText(p.trk)+'</div>';
-  var tail=(more?'<div class="more">'+(p.priv?'<p>The owner has asked to keep this aircraft\'s registration private.</p>':'')+(opName(p)?'<p>Flown by '+esc(opName(p))+'.</p>':'')+'<p>'+esc(cap(w.txt))+'.</p><p>About '+feel(p)+'.</p>'+(p.src&&p.src.h?'<p><a href="#" class="lnk" data-act="share" data-q="plane='+esc(p.src.h)+'">Copy a link to this plane</a></p>':'')+'</div>':'')+
+  var tail=(more?'<div class="more">'+flightInfo(p)+(p.priv?'<p>The owner has asked to keep this aircraft\'s registration private.</p>':'')+(opName(p)?'<p>Flown by '+esc(opName(p))+'.</p>':'')+'<p>'+esc(cap(w.txt))+'.</p><p>About '+feel(p)+'.</p>'+(p.src&&p.src.h?'<p><a href="#" class="lnk" data-act="share" data-q="plane='+esc(p.src.h)+'">Copy a link to this plane</a></p>':'')+'</div>':'')+
     '<div class="acts">'+(follow===p?'<button class="btn ghost" data-act="stop">Stop Riding Along</button>':'<button class="btn" data-act="ride">Ride Along</button>')+
     '<button class="btn ghost" data-act="more">'+(more?"Less":"More")+'</button></div>';
   // Update in place: rebuilding the whole card twice a second made it flicker and reset the button hover
   var key=head+'|'+tail, nEl=body.querySelector(".nums");
   if(body._k===key&&nEl){ if(nEl._n!==nums){ nEl.innerHTML=nums; nEl._n=nums; } return; }
   body._k=key; body.innerHTML=head+'<div class="nums">'+nums+'</div>'+tail; var n2=body.querySelector(".nums"); if(n2) n2._n=nums;
+}
+// "This flight": from the relay's record of the flight in progress, plus a small altitude profile of the last hour
+function flightInfo(p){
+  var f=p.flight; if(!f||!f.st) return "";
+  var tm=new Date(f.st).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}), mins=Math.max(1,Math.round((Date.now()-f.st)/60000)), ap=f.sa&&A[f.sa];
+  var dur=mins<60?mins+" min":Math.floor(mins/60)+" hr "+(mins%60)+" min", hi=Math.max(f.max||0,p.alt||0);
+  var o='<p class="fl"><b>'+(ap?"Took off from "+esc(ap.t||ap.n)+" at "+tm:"In the air since at least "+tm)+'</b><br>'+dur+' in the air · highest '+fmtAlt(hi)+'</p>';
+  var al=(p.past||[]).map(function(x){ return x[3]||0; }).concat([p.alt||0]);
+  if(al.length>=4){ var mx=Math.max.apply(null,al)||1, n=al.length, pts=al.map(function(v,i){ return (i/(n-1)*100).toFixed(1)+","+(26-v/mx*22).toFixed(1); }).join(" ");
+    o+='<svg class="prof" viewBox="0 0 100 28" preserveAspectRatio="none" aria-label="Altitude over the last hour"><polygon points="0,28 '+pts+' 100,28" fill="rgba(242,163,58,.12)"/><polyline points="'+pts+'" fill="none" stroke="rgba(242,163,58,.9)" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg><p class="prof-k">Altitude, '+(p.past&&p.past.length?"last "+Math.min(60,Math.round((Date.now()-p.past[0][0])/60000))+" min":"so far")+'</p>'; }
+  return o;
 }
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function feel(p){ // rough outside air temperature from standard lapse rate and the nearest surface report
@@ -2697,7 +2940,10 @@ hp.addEventListener("click",function(e){
   if(home){ hf.classList.remove("on"); openAptW(home); return; }
   openHomeForm();
 });
-function openHomeForm(){ closeOthers("home"); hf.classList.add("on"); hin.value=home?code(home):""; hmsg.textContent=""; setTimeout(function(){hin.focus(); hin.select();},50); }
+// On phones the box spans the screen with 12px margins, whatever sits beside the home pill
+function fitHomeForm(){ if(!mobile){ hf.style.left=hf.style.right=hf.style.width=""; return; } var r=hf.parentElement.getBoundingClientRect(); hf.style.right="auto"; hf.style.left=(12-r.left)+"px"; hf.style.width=(W-24)+"px"; }
+addEventListener("resize",function(){ if(hf.classList.contains("on")) fitHomeForm(); });
+function openHomeForm(){ closeOthers("home"); hf.classList.add("on"); fitHomeForm(); hin.value=home?code(home):""; hmsg.textContent=""; setTimeout(function(){hin.focus(); hin.select();},50); }
 hf.addEventListener("submit",function(e){ e.preventDefault(); var a=findApt(hin.value); if(!a){ hmsg.textContent="Couldn't find that one. Try a code like KARB."; return; } setHome(a); hf.classList.remove("on"); flyToLL(a.lat,a.lon,2.6); });
 document.getElementById("home-clear").addEventListener("click",function(){ setHome(null); hf.classList.remove("on"); });
 document.addEventListener("click",function(e){ if(!e.target.closest(".home")) hf.classList.remove("on"); });
@@ -2886,7 +3132,8 @@ var THEMES={
   warm:{land:["#151110","#41332a"],other:["#0c0a09","#2a211b"],lake:["#06080a","#16202a"],edge:["#1f2122","#3a3b3a"]},
   slate:{land:["#14171a","#3a4047"],other:["#0b0d0f","#252a30"],lake:["#06090d","#182433"],edge:["#20262c","#3d4750"]},
   forest:{land:["#101410","#2b3a29"],other:["#0a0c0a","#1e2a1d"],lake:["#05090c","#122535"],edge:["#1b2428","#30403f"]},
-  ink:{land:["#121212","#2a2a2a"],other:["#090909","#1b1b1b"],lake:["#05070a","#131a22"],edge:["#1e1e1e","#383838"]}
+  ink:{land:["#121212","#2a2a2a"],other:["#090909","#1b1b1b"],lake:["#05070a","#131a22"],edge:["#1e1e1e","#383838"]},
+  sat:{land:["#0f120f","#262c24"],other:["#090a09","#191c18"],lake:["#04070a","#0f1a24"],edge:["#1b2226","#2e3a3e"]}
 };
 var mapTheme="season"; try{ mapTheme=localStorage.getItem("upwind-theme")||"season"; }catch(e){}
 function themeUI(){ document.querySelectorAll("[data-mtheme]").forEach(function(b){ b.setAttribute("aria-pressed",b.dataset.mtheme===mapTheme); }); var sr=document.getElementById("season-row"); if(sr) sr.style.display=mapTheme==="season"?"":"none"; }

@@ -269,6 +269,7 @@ body.a2hs-on .ticker{opacity:0;pointer-events:none}
 /* Plane card: small, floats above the plane and follows it (fixed at the bottom on phones) */
 .card.float{left:0;top:0;right:auto!important;width:244px;padding:16px 15px 12px;border-radius:13px;transition:opacity .25s;overflow:hidden}
 .card.float.on{transform:translate3d(var(--px,0),var(--py,0),0)}
+@media (hover:hover) and (min-width:761px){ .card.float{cursor:grab} .card.float.dragging{cursor:grabbing;user-select:none} .card.float :is(button,a){cursor:pointer} }
 .under-card{opacity:.12!important;transition:opacity .3s!important}
 .card.float .x{right:6px;top:4px;font-size:1.15rem;padding:5px}
 .card.float .k{font-size:.72rem;padding-right:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
@@ -1208,6 +1209,21 @@ function drawSat(S2){
       satTrim();
     }
   }
+  // Water always comes from the smooth whole-region picture, cut along the map's own shorelines, so the aerial
+  // tiles' square edges out in the lakes never show. A soft blurred pass first feathers the coast into the water.
+  // (the land shape is stored inside-out, as the globe minus the land, so it already covers the water)
+  SATB.sea=S2.land;
+  // two passes: everything that isn't land, then the inland lakes (which can also be holes in the land shape)
+  [[SATB.sea,"evenodd"],[S2.lakes,"nonzero"]].forEach(function(q){
+    gMap.save(); gMap.setTransform(DPR*T.k,0,0,DPR*T.k,DPR*T.x,DPR*T.y); gMap.clip(q[0],q[1]); gMap.setTransform(DPR,0,0,DPR,0,0);
+    if(SATB.fillOk){ var w0=proj([SATB.fb[0],SATB.fb[3]]), w1=proj([SATB.fb[2],SATB.fb[1]]);
+      gMap.drawImage(SATB.fill,w0[0]*T.k+T.x,w0[1]*T.k+T.y,(w1[0]-w0[0])*T.k,(w1[1]-w0[1])*T.k); }
+    else { gMap.fillStyle=pal().lake; gMap.fillRect(0,0,W,H); }
+    gMap.restore(); });
+  // feather: a few px of water color bleeding just over the shoreline
+  gMap.save(); gMap.setTransform(DPR*T.k,0,0,DPR*T.k,DPR*T.x,DPR*T.y); gMap.lineJoin="round";
+  [[7,0.16],[3.5,0.22]].forEach(function(q){ gMap.lineWidth=q[0]/T.k; gMap.strokeStyle="rgba(8,13,18,"+q[1]+")"; gMap.stroke(S2.land); gMap.stroke(S2.lakes); });
+  gMap.restore();
   // Mute the color, then darken: darker at night and as you zoom in, where the ground gets busy
   gMap.globalCompositeOperation="saturation"; gMap.fillStyle="rgba(128,128,128,"+(SATB.sat+0.16*zt).toFixed(3)+")"; gMap.fillRect(0,0,W,H);
   gMap.globalCompositeOperation="source-over";
@@ -2151,8 +2167,9 @@ function openPlane(p){
   sel={p:p,h:[]}; card.classList.add("float"); body._k=null; loadPast(p); updPlaneCard(p); card.classList.add("on"); sound.target(p); placeCard(true);
   if(isAirline(p)) routeFor(p.cs);
 }
-// Where the floating card sits. It tries above, below, right and left of the plane and takes the spot that covers
-// the least on-screen text (headline, numbers, Worth Knowing, buttons). If every spot would cover something,
+// Where the floating card sits. It tries eight spots around the plane (above, below, the sides and the four
+// corners) and takes the one that covers the least: on-screen text (headline, numbers, Worth Knowing, buttons),
+// the plane's own trail and the way it's headed, and the airports around it. Drag the card to pin it to a side. If every spot would cover something,
 // the covered text fades back until the card closes or moves, so nothing ends up stacked and messy.
 var cardW=244, cardH=150, cardSide="above", OBS=[];
 var OBS_SEL=".hud > *:not(.hud-toggle), .hud-toggle, .ticker, .legend, .ctrls > *, .home-pill, .open-panel .chip, .stale.on, .panel.on, #aptW.on";
@@ -2161,25 +2178,57 @@ function obstacles(){
     var cs=getComputedStyle(el); if(cs.visibility==="hidden"||cs.display==="none") return; OBS.push({el:el,l:r.left-8,t:r.top-8,r:r.right+8,b:r.bottom+8}); });
 }
 function overlapArea(x,y,w,h){ var tot=0; OBS.forEach(function(o){ var ix=Math.min(x+w,o.r)-Math.max(x,o.l), iy=Math.min(y+h,o.b)-Math.max(y,o.t); if(ix>0&&iy>0) tot+=ix*iy; }); return tot; }
+// What the card shouldn't sit on, in screen pixels with a weight: the trail behind the plane, the next couple
+// of minutes ahead of it, and nearby airports. Refreshed with the rest every half second.
+var MARKS=[];
+function mapMarks(q){
+  MARKS=[]; var p=sel.p;
+  var h=(p.hist||[]).slice(-90); for(var i=0;i<h.length;i+=2){ var a=scr(h[i][0],h[i][1]); MARKS.push([a[0],a[1],260]); }
+  if(p.past&&p.past.length){ var cut=Date.now()-(p.hist||[]).length*4000; p.past.slice(-40).forEach(function(x){ if(x[0]<cut){ var a=scr(x[2],x[1]); MARKS.push([a[0],a[1],120]); } }); }
+  if(p.gs>30){ var r=(p.trk||0)*Math.PI/180; for(var t=1;t<=6;t++){ var nm=p.gs*t/60*0.5, la=p.lat+nm*Math.cos(r)/60, lo=p.lon+nm*Math.sin(r)/(60*Math.cos(p.lat*Math.PI/180)), a=scr(lo,la); MARKS.push([a[0],a[1],220]); } }
+  APTS.forEach(function(ap){ var a=scr(ap.lon,ap.lat); if(a[0]<-50||a[1]<-50||a[0]>W+50||a[1]>H+50) return; if(Math.abs(a[0]-q[0])>420||Math.abs(a[1]-q[1])>320) return;
+    MARKS.push([a[0],a[1],(home&&ap.id===home.id)?3200:1600]); });
+}
 function placeCard(measure){
   if(!sel||!sel.p||!card.classList.contains("float")||W<=760) return;
   if(measure){ cardW=card.offsetWidth||244; cardH=card.offsetHeight||150; obstacles(); }
   var q=scr(sel.p.lon,sel.p.lat), gap=16, m=12, w=cardW, h=cardH;
   var cl=function(v,lo,hi){ return Math.max(lo,Math.min(hi,v)); };
-  var C={above:[cl(q[0]-w/2,m,W-w-m),q[1]-gap-h],below:[cl(q[0]-w/2,m,W-w-m),q[1]+gap],right:[q[0]+gap,cl(q[1]-h/2,m,H-h-m)],left:[q[0]-gap-w,cl(q[1]-h/2,m,H-h-m)]};
-  var pref={above:0,below:900,right:1800,left:2200}, best=null, scores={};
+  var d=gap*0.75;
+  var C={above:[cl(q[0]-w/2,m,W-w-m),q[1]-gap-h],below:[cl(q[0]-w/2,m,W-w-m),q[1]+gap],right:[q[0]+gap,cl(q[1]-h/2,m,H-h-m)],left:[q[0]-gap-w,cl(q[1]-h/2,m,H-h-m)],
+    ne:[q[0]+d,q[1]-d-h],nw:[q[0]-d-w,q[1]-d-h],se:[q[0]+d,q[1]+d],sw:[q[0]-d-w,q[1]+d]};
+  var pref={above:0,ne:250,nw:250,below:700,se:850,sw:850,right:1400,left:1600}, best=null, scores={};
+  if(measure) mapMarks(q);
   Object.keys(C).forEach(function(k){ var x=C[k][0], y=C[k][1], sc=pref[k];
     if(x<m||y<m||x+w>W-m||y+h>H-m) sc+=1e7; // would run off screen
     if(q[0]>x-6&&q[0]<x+w+6&&q[1]>y-6&&q[1]<y+h+6) sc+=1e7; // would cover the plane
-    sc+=overlapArea(x,y,w,h)*4; scores[k]=sc; if(!best||sc<scores[best]) best=k; });
+    sc+=overlapArea(x,y,w,h)*4;
+    MARKS.forEach(function(mk){ if(mk[0]>x-8&&mk[0]<x+w+8&&mk[1]>y-8&&mk[1]<y+h+8) sc+=mk[2]; }); // trail, heading, airports
+    scores[k]=sc; if(!best||sc<scores[best]) best=k; });
   if(scores[cardSide]!==undefined&&scores[cardSide]<=scores[best]+1500) best=cardSide; // don't flip-flop as the plane moves
+  if(sel.pin&&C[sel.pin]&&scores[sel.pin]<1e7) best=sel.pin;   // the side the person dragged it to
   cardSide=best;
   var x=cl(C[best][0],m,W-w-m), y=cl(C[best][1],m,H-h-m);
-  card.classList.remove("below","side-l","side-r"); if(best==="below") card.classList.add("below"); if(best==="right") card.classList.add("side-l"); if(best==="left") card.classList.add("side-r");
+  card.classList.remove("below","side-l","side-r"); if(best==="below"||best==="se"||best==="sw") card.classList.add("below"); if(best==="right") card.classList.add("side-l"); if(best==="left") card.classList.add("side-r");
   card.style.setProperty("--px",x.toFixed(1)+"px"); card.style.setProperty("--py",y.toFixed(1)+"px");
   card.style.setProperty("--cx",cl(q[0]-x,16,w-16).toFixed(1)+"px"); card.style.setProperty("--cy",cl(q[1]-y,16,h-16).toFixed(1)+"px");
   if(measure){ var rr={l:x,t:y,r:x+w,b:y+h}; OBS.forEach(function(o){ var hitIt=Math.min(rr.r,o.r)>Math.max(rr.l,o.l)&&Math.min(rr.b,o.b)>Math.max(rr.t,o.t)&&!o.el.classList.contains("panel"); o.el.classList.toggle("under-card",hitIt); }); }
 }
+// Drag the card toward any side of the plane and it snaps there and stays until it's closed
+(function(){
+  var dn=null, SIDES=["right","se","below","sw","left","nw","above","ne"];
+  card.addEventListener("pointerdown",function(e){
+    if(!card.classList.contains("float")||W<=760||e.button>0||e.target.closest("button,a,input,select,summary,svg.prof")) return;
+    dn={x:e.clientX,y:e.clientY,go:false,id:e.pointerId}; });
+  addEventListener("pointermove",function(e){
+    if(!dn||!sel||!sel.p) return;
+    if(!dn.go){ if(Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<8) return; dn.go=true; card.classList.add("dragging"); try{ card.setPointerCapture(dn.id); }catch(err){} }
+    var q=scr(sel.p.lon,sel.p.lat), a=Math.atan2(e.clientY-q[1],e.clientX-q[0])*180/Math.PI, i=((Math.round(a/45)%8)+8)%8;
+    if(sel.pin!==SIDES[i]){ sel.pin=SIDES[i]; cardSide=sel.pin; placeCard(false); }
+    e.preventDefault(); });
+  addEventListener("pointerup",function(){ if(dn&&dn.go){ card.classList.remove("dragging"); placeCard(true); card._noclick=Date.now(); } dn=null; });
+  card.addEventListener("click",function(e){ if(card._noclick&&Date.now()-card._noclick<250){ e.stopPropagation(); e.preventDefault(); } },true);
+})();
 // Fixed cards (airports, places, stations): fade anything they'd sit on top of, and on phones hide the bottom text
 function fadeUnderFixed(){
   if(!card.classList.contains("on")||card.classList.contains("float")) return;

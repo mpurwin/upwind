@@ -2356,6 +2356,20 @@ function clearUnderCard(){ document.querySelectorAll(".under-card").forEach(func
 /* Routes and departures */
 var ROUTES={}, FLIGHTS={f:{},at:0};
 function isAirline(p){ return !!p.cs&&/^[A-Z]{3}[0-9]{1,4}[A-Z]{0,2}$/.test(p.cs)&&isJet(p); }
+// Route data comes from a community database by flight number, and airlines reuse numbers for return legs and other
+// routes, so a lookup is often wrong for the flight actually in the air. A route is shown only when the plane is
+// roughly on the way between the two airports and heading toward the destination; if the reverse fits, it is shown
+// the other way round; otherwise no route is shown. Needs the airports' coordinates from the relay.
+function routeFit(p,rt){ var o=rt.from, d=rt.to; if(!o||!d||o.lat==null||d.lat==null) return 0;
+  var P=[p.lon,p.lat], O=[o.lon,o.lat], Dd=[d.lon,d.lat], R=3440.065;
+  function nm(a,b){ return d3.geoDistance(a,b)*R; }
+  function brg(a,b){ var la1=a[1]*Math.PI/180, la2=b[1]*Math.PI/180, dl=(b[0]-a[0])*Math.PI/180;
+    return (Math.atan2(Math.sin(dl)*Math.cos(la2),Math.cos(la1)*Math.sin(la2)-Math.sin(la1)*Math.cos(la2)*Math.cos(dl))*180/Math.PI+360)%360; }
+  var route=nm(O,Dd); if(route<20) return 0;
+  function fits(a,b){ var pa=nm(a,P), pb=nm(P,b), extra=pa+pb-route; if(extra>Math.max(120,route*0.25)) return false;
+    if(pa<40||pb<40) return true;   // climbing out or arriving: headings wander
+    var off=Math.abs(((brg(P,b)-p.trk)%360+540)%360-180); return off<70; }
+  return fits(O,Dd)?1:fits(Dd,O)?-1:0; }
 function routeFor(cs){
   if(ROUTES[cs]!==undefined||!RELAY) return; ROUTES[cs]=null;
   fetch(RELAY+"/route?cs="+encodeURIComponent(cs)).then(function(r){return r.ok?r.json():null;}).then(function(d){ ROUTES[cs]=d&&d.route?d:false; if(sel&&sel.p&&sel.p.cs===cs) updPlaneCard(sel.p); }).catch(function(){ ROUTES[cs]=false; });
@@ -2375,7 +2389,10 @@ function previewRoute(p){
 }
 function routeLine(p){
   if(PREVIEW) return previewRoute(p);
-  if(isAirline(p)){ var r=ROUTES[p.cs]; if(r&&r.route) return esc(cityOf(r.route.from))+" → "+esc(cityOf(r.route.to)); return ""; }
+  if(isAirline(p)){ var r=ROUTES[p.cs], fit=r&&r.route?routeFit(p,r.route):0;
+    if(fit===1) return esc(cityOf(r.route.from))+" → "+esc(cityOf(r.route.to));
+    if(fit===-1) return esc(cityOf(r.route.to))+" → "+esc(cityOf(r.route.from));
+    return ""; }
   if(p.priv) return "";
   var hx=p.src&&p.src.h, lf=hx&&FLIGHTS.f[hx];
   if(lf){ var la=A[lf[0]], age=Date.now()-(FLIGHTS.skew||0)-lf[1];

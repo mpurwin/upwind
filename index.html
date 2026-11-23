@@ -442,6 +442,10 @@ body.mcard-hide .mcard{opacity:0;pointer-events:none}
 .mcard li .t{font-weight:600;color:var(--s2);font-variant-numeric:tabular-nums}
 .mcard li b{font-weight:500;color:var(--bone)}
 .mcard li span{color:var(--muted)}
+.mcard .sky{margin-top:12px;display:flex;flex-direction:column;align-items:center;gap:10px;padding-bottom:4px}
+.mcard .sky canvas{position:static;inset:auto;display:block;cursor:pointer;touch-action:manipulation;max-width:100%}
+.mcard .sky-cap{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;font-size:.76rem;line-height:1.4;color:var(--muted);max-width:34ch}
+.mcard .sky-cap .chip{height:32px;padding:0 13px;font-size:.78rem}
 .mcard .now{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(232,105,44,.14);border:1px solid rgba(232,105,44,.4);color:var(--bone);font-size:.95rem}
 .mcard .fine2{font-size:.75rem;color:var(--dim);margin-top:12px}
 @media (max-width:760px){
@@ -2069,6 +2073,7 @@ function frame(now){
   drawHome(clock);
   drawPlan(clock);
   drawLook(clock);
+  SKY.tick(now);
   if(mode==="look"&&lookPos){ lookT+=dt; if(lookT>1){ lookT=0; renderLook(); } }
   if(LOBBY&&!chart&&lob.apt){ var la=lob.apt; ga=ga.filter(function(p){ return p===follow||p.mi||d3.geoDistance([la.lon,la.lat],[p.lon,p.lat])*3440.065<60; }); }
   if(RP.on){ stepReplay(dt); drawPlanes(RP.planes,clock); ga=[]; jets=[]; }
@@ -3024,7 +3029,10 @@ function renderLook(){
   var over=planes.filter(function(p){ return p._pr&&p._pr.now<1.5&&p.fade>0.5; })[0];
   mcard.classList.add("on");
   function when(t){ return t<1?"&lt;1 min":Math.round(t)+" min"; }
-  mcard.innerHTML='<span class="k">What\'s Overhead</span><h3>Above You.</h3>'+
+  // The header and sky view stay put; only the list below is refreshed each second (rebuilding the whole card made it flicker)
+  var body=mcard.querySelector(".look-body");
+  if(!body){ mcard.innerHTML='<span class="k">What\'s Overhead</span><h3>Above You.</h3>'+(SKY&&SKY.on?'<div class="sky-slot"></div>':'')+'<div class="look-body"></div>'; body=mcard.querySelector(".look-body"); }
+  body.innerHTML=''+
     (over?'<div class="now">Overhead now: '+esc(an(over.name))+' at '+fmtAlt(over.alt)+'. Look up!</div>':'')+
     (lookList.length?'<ul>'+lookList.map(function(p,i){ var pr=p._pr; return '<li data-pi="'+i+'"><span class="t">'+when(pr.t)+'</span><div><b>'+esc(p.name)+'</b><br><span>'+fmtAlt(p.alt)+', coming from the '+pr.from+(pr.dmin<0.8?", right overhead":", passing "+pr.dmin.toFixed(1)+" nm to your "+pr.side)+'</span></div></li>'; }).join("")+'</ul>'
       :'<p>Nothing headed right over you in the next 12 minutes.'+(nearest?' The closest is '+esc(an(nearest.name).replace(/^A/,'a'))+', '+nearest._pr.now.toFixed(0)+' nm '+cardinal((Math.atan2((nearest.lon-lookPos.lon)*Math.cos(lookPos.lat*Math.PI/180),nearest.lat-lookPos.lat)*180/Math.PI+360)%360)+' at '+fmtAlt(nearest.alt)+'.':'')+'</p>')+
@@ -3046,6 +3054,89 @@ function drawLook(t){
   lookList.forEach(function(p){ var a=scr(p.lon,p.lat), pr=p._pr, cl=scr(p.lon+(Math.sin(p.trk*Math.PI/180)*p.gs/60*pr.t)/(60*Math.cos(p.lat*Math.PI/180)),p.lat+(Math.cos(p.trk*Math.PI/180)*p.gs/60*pr.t)/60);
     g.save(); g.setLineDash([4,4]); g.lineDashOffset=-t*10; g.strokeStyle="rgba(242,163,58,.7)"; g.lineWidth=1.3; g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(cl[0],cl[1]); g.stroke(); g.restore(); });
 }
+
+/* What's Overhead: sky view. A round view of the sky from where you are: the center is straight up, the edge is the
+   horizon, and each plane sits at its real direction and height above the horizon (east on the right, like a radar
+   screen). North is up, or on phones the dial can follow the direction the phone is facing. */
+var SKY=(function(){
+  var el=document.createElement("div"); el.className="sky";
+  el.innerHTML='<canvas aria-label="Sky view: planes by direction and height above the horizon" role="img"></canvas>'+
+    '<div class="sky-cap"><span id="sky-st">North is up. The center is straight overhead, the edge is the horizon. Rings show degrees above the horizon.</span>'+
+    '<button class="chip" id="sky-cmp" hidden aria-pressed="false">Use Phone Compass</button></div>';
+  var cv=el.querySelector("canvas"), c=cv.getContext("2d"), st=el.querySelector("#sky-st"), cmpB=el.querySelector("#sky-cmp");
+  var S=0, dpr=1, last=0, heading=null, follow=false, hits=[];
+  // phones and tablets only: it is meant to be held up to the sky
+  var touch=!!(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
+  if(touch&&"DeviceOrientationEvent" in window) cmpB.hidden=false;
+  function slot(){ var s=mcard.querySelector(".sky-slot"); if(s&&el.parentNode!==s) s.appendChild(el); return !!s; }
+  function groundEl(){ var n=nearestApts(lookPos.lat,lookPos.lon,1)[0]; return n&&n.nm<15?n.a.el||0:700; }
+  function altOf(p){ return V3&&V3.trueAlt?V3.trueAlt(p):p.alt; }
+  // direction (degrees from north) and height above the horizon (degrees) of a point, seen from where you are
+  function look(lat,lon,alt,gEl){ var dx=(lon-lookPos.lon)*60*Math.cos(lookPos.lat*Math.PI/180), dy=(lat-lookPos.lat)*60, d=Math.hypot(dx,dy);
+    return {az:(Math.atan2(dx,dy)*180/Math.PI+360)%360, el:Math.atan2(alt-gEl,Math.max(1,d*6076))*180/Math.PI, nm:d}; }
+  function rad(elv){ return 1-Math.sqrt(Math.max(0,Math.min(90,elv))/90); }
+  function xy(az,elv){ var R=S/2-20, r=R*rad(elv), a=(az-(follow&&heading!=null?heading:0))*Math.PI/180; return [S/2+Math.sin(a)*r, S/2-Math.cos(a)*r]; }
+  function draw(){ if(!lookPos||!slot()) return;
+    var w=Math.round(el.clientWidth)||240, want=Math.min(w,mobile?200:250); dpr=Math.min(2,devicePixelRatio||1);
+    if(S!==want){ S=want; cv.width=S*dpr; cv.height=S*dpr; cv.style.width=cv.style.height=S+"px"; }
+    c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,S,S);
+    var R=S/2-20, cx=S/2, cy=S/2, rot=follow&&heading!=null?heading:0, font=getComputedStyle(document.body).fontFamily;
+    c.fillStyle="rgba(244,226,198,.04)"; c.beginPath(); c.arc(cx,cy,R,0,7); c.fill();
+    c.strokeStyle="rgba(236,231,222,.28)"; c.lineWidth=1; c.stroke();
+    // 30 and 60 degrees above the horizon
+    c.save(); c.setLineDash([2,4]); c.strokeStyle="rgba(236,231,222,.16)"; [5,20,45].forEach(function(e){ c.beginPath(); c.arc(cx,cy,R*rad(e),0,7); c.stroke(); }); c.restore();
+    c.font="500 9px "+font; c.fillStyle="rgba(236,231,222,.38)"; c.textAlign="left"; [5,20,45].forEach(function(e){ c.fillText(e+"°",cx+R*rad(e)*0.71+2,cy+R*rad(e)*0.71+2); });
+    c.beginPath(); c.arc(cx,cy,2,0,7); c.fillStyle="rgba(236,231,222,.5)"; c.fill();
+    // compass points on the rim
+    c.font="600 10.5px "+font; c.textAlign="center"; c.textBaseline="middle";
+    [["N",0],["E",90],["S",180],["W",270]].forEach(function(k){ var a=(k[1]-rot)*Math.PI/180; c.fillStyle=k[0]==="N"?"#e8692c":"rgba(236,231,222,.6)"; c.fillText(k[0],cx+Math.sin(a)*(R+11),cy-Math.cos(a)*(R+11)); });
+    var gEl=groundEl(), list=[]; hits=[];
+    planes.forEach(function(p){ if((p.gone&&p.fade<0.5)||p.orb) return; var alt=altOf(p), v=look(p.lat,p.lon,alt,gEl), next=lookList.indexOf(p)>=0;
+      if(!next&&(v.nm>25||v.el<0.5)) return; if(isJet(p)&&!layers.jets&&!next) return; list.push({p:p,v:v,alt:alt,next:next}); });
+    // where the next ones are headed over the coming minutes
+    list.forEach(function(it){ if(!it.next) return; var p=it.p, pr=p._pr, tEnd=Math.min(12,Math.max(2,pr.t+2)), r=p.trk*Math.PI/180;
+      c.save(); c.setLineDash([3,4]); c.strokeStyle="rgba(242,163,58,.7)"; c.lineWidth=1.3; c.beginPath();
+      for(var t=0;t<=tEnd;t+=0.25){ var la=p.lat+Math.cos(r)*p.gs/60*t/60, lo=p.lon+Math.sin(r)*p.gs/60*t/60/Math.cos(p.lat*Math.PI/180), v=look(la,lo,it.alt,gEl), q=xy(v.az,v.el);
+        if(t) c.lineTo(q[0],q[1]); else c.moveTo(q[0],q[1]); }
+      c.stroke(); c.restore(); });
+    list.sort(function(a,b){ return a.v.el-b.v.el; });
+    var labels=[];
+    list.forEach(function(it){ var p=it.p, q=xy(it.v.az,it.v.el), shp=p._shp||(p._shp=shapeOf(p)), s=(SHAPE_SIZE[shp]||5)*(it.next?1.35:1.1);
+      c.fillStyle="rgba("+BC[band(p.alt)]+","+(it.next?1:0.8)+")"; c.strokeStyle=c.fillStyle;
+      if(shp==="heli") heliGlyph(c,q[0],q[1],0,s,clock); else shapeGlyph(c,q[0],q[1],(p.trk-rot)*Math.PI/180,s,shp);
+      if(it.next){ c.strokeStyle="rgba(242,163,58,.9)"; c.lineWidth=1.2; c.beginPath(); c.arc(q[0],q[1],s+5,0,7); c.stroke(); }
+      hits.push({x:q[0],y:q[1],p:p}); labels.push({q:q,s:s,it:it}); });
+    // short labels on the ones that matter most, skipping any that would overlap
+    c.font="500 10px "+font; c.textAlign="left"; c.textBaseline="middle"; var put=[];
+    labels.sort(function(a,b){ return (b.it.next-a.it.next)||(b.it.v.el-a.it.v.el); }).slice(0,mobile?4:6).forEach(function(l){ var p=l.it.p, txt=(p.t||"")+(p.t?" · ":"")+fmtAlt(p.alt), tw=c.measureText(txt).width;
+      var x=l.q[0]+l.s+6, y=l.q[1]; if(x+tw>S-2) x=l.q[0]-l.s-6-tw;
+      if(put.some(function(b){ return x<b[0]+b[2]&&x+tw>b[0]&&Math.abs(y-b[1])<12; })) return; put.push([x,y,tw]);
+      c.fillStyle="rgba(13,13,12,.65)"; c.fillRect(x-3,y-7,tw+6,14); c.fillStyle=l.it.next?"#f2a33a":"rgba(236,231,222,.8)"; c.fillText(txt,x,y); });
+    c.textBaseline="alphabetic"; }
+  cv.addEventListener("click",function(e){ var r=cv.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top, best=null, bd=16;
+    hits.forEach(function(h){ var d=Math.hypot(h.x-x,h.y-y); if(d<bd){ bd=d; best=h.p; } }); if(best) openPlane(best); });
+  // phone compass: iPhones report a compass heading directly; Android reports orientation against north
+  function onOri(e){ var h=null;
+    if(typeof e.webkitCompassHeading==="number") h=e.webkitCompassHeading;
+    else if(e.absolute&&typeof e.alpha==="number") h=(360-e.alpha)%360;
+    if(h==null) return; heading=heading==null?h:(heading+((h-heading+540)%360-180)*0.25+360)%360;
+    if(follow) st.textContent="Turned to match your phone, facing "+cardinal(heading)+". The center is straight overhead."; }
+  function stopCmp(){ follow=false; cmpB.setAttribute("aria-pressed",false); cmpB.textContent="Use Phone Compass";
+    removeEventListener("deviceorientationabsolute",onOri); removeEventListener("deviceorientation",onOri);
+    st.textContent="North is up. The center is straight overhead, the edge is the horizon. Rings show degrees above the horizon."; }
+  function startCmp(){ follow=true; heading=null; cmpB.setAttribute("aria-pressed",true); cmpB.textContent="North Up";
+    st.textContent="Hold your phone flat, screen up, and turn to face a direction.";
+    if("ondeviceorientationabsolute" in window) addEventListener("deviceorientationabsolute",onOri); else addEventListener("deviceorientation",onOri);
+    setTimeout(function(){ if(follow&&heading==null){ stopCmp(); st.textContent="Couldn't read this phone's compass, so north stays up."; } },4000); }
+  cmpB.addEventListener("click",function(e){ e.stopPropagation(); if(follow){ stopCmp(); return; }
+    var D=window.DeviceOrientationEvent;
+    if(D&&typeof D.requestPermission==="function") D.requestPermission().then(function(r){ if(r==="granted") startCmp(); else st.textContent="Compass access wasn't allowed, so north stays up."; }).catch(function(){ st.textContent="Compass access wasn't allowed, so north stays up."; });
+    else startCmp(); });
+  return {
+    on:touch,
+    tick:function(now){ if(!touch||mode!=="look"||!lookPos||!mcard.classList.contains("on")){ if(follow&&mode!=="look") stopCmp(); return; } if(now-last<(follow?50:120)) return; last=now; draw(); }
+  };
+})();
 
 /* ---------------- Home airport UI ---------------- */
 var hp=document.getElementById("home-pill"), hf=document.getElementById("home-form"), hin=document.getElementById("home-in"), hmsg=document.getElementById("home-msg");
@@ -3704,7 +3795,7 @@ var V3=(function(){
   function frame(now){ if(!on) return; if(anim){ anim(now); dirty=true; }
     // planes keep moving, so redraw about 16 times a second at rest and every frame while the view is moving
     if(dirty||now-lastDraw>(now-busy<400?0:60)){ dirty=false; lastDraw=now; draw(); } }
-  return {get on(){ return on; },enter:enter,exit:exit,frame:frame,cam:cam};
+  return {get on(){ return on; },enter:enter,exit:exit,frame:frame,cam:cam,trueAlt:trueAlt};
 })();
 (function(){ var f=document.getElementById("view-flat"), t=document.getElementById("view-3d");
   if(f) f.addEventListener("click",function(){ V3.exit(); });

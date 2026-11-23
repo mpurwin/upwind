@@ -446,6 +446,32 @@ body.mcard-hide .mcard{opacity:0;pointer-events:none}
 .mcard .sky canvas{position:static;inset:auto;display:block;cursor:pointer;touch-action:manipulation;max-width:100%}
 .mcard .sky-cap{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;font-size:.76rem;line-height:1.4;color:var(--muted);max-width:34ch}
 .mcard .sky-cap .chip{height:32px;padding:0 13px;font-size:.78rem}
+.mcard .sky-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#cam{position:fixed;inset:0;z-index:50;background:#0d0d0c;overflow:hidden}
+#cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#cam canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:manipulation}
+#cam .cam-msg{display:none;position:absolute;left:24px;right:24px;top:calc(100px + env(safe-area-inset-top,0px));text-align:center;color:var(--muted);font-size:.86rem;line-height:1.5;pointer-events:none}
+#cam.nocam video{display:none}
+#cam.nocam .cam-msg{display:block}
+.cam-top{position:absolute;left:0;right:0;top:0;padding:calc(14px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:space-between;align-items:flex-start;gap:12px;background:linear-gradient(rgba(13,13,12,.82),rgba(13,13,12,0));pointer-events:none}
+.cam-top b{display:block;font-size:1.08rem;font-weight:600;color:var(--bone)}
+.cam-top span{display:block;margin-top:2px;font-size:.74rem;line-height:1.4;color:var(--muted);max-width:34ch}
+.cam-top .chip{pointer-events:auto;flex:none;height:34px;padding:0 14px}
+.cam-bot{position:absolute;left:0;right:0;bottom:0;padding:22px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:4px;background:linear-gradient(rgba(13,13,12,0),rgba(13,13,12,.82));font-size:.82rem;color:var(--bone);pointer-events:none}
+.cam-fine{font-size:.7rem;line-height:1.4;color:var(--muted)}
+.cam-btns{display:flex;gap:8px;margin-bottom:8px;pointer-events:auto}
+.cam-lock{margin-bottom:10px;padding:12px 14px;border-radius:14px;background:rgba(13,13,12,.8);border:1px solid rgba(244,226,198,.35);pointer-events:auto}
+.cam-lock-t b{display:block;font-size:1rem;font-weight:600;color:var(--bone)}
+.cam-lock-t span{display:block;margin:2px 0 10px;font-size:.8rem;line-height:1.4;color:var(--muted)}
+.cam-lock .cam-btns{margin:0}
+@media (orientation:landscape) and (max-height:500px){
+  .cam-top{padding-top:calc(10px + env(safe-area-inset-top,0px));padding-bottom:10px}
+  .cam-top span,.cam-fine{display:none}
+  .cam-bot{padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+  .cam-lock{max-width:440px;padding:10px 12px}
+  .cam-lock-t span{margin-bottom:8px}
+}
+.cam-btns .chip{height:34px;padding:0 14px;background:rgba(13,13,12,.6)}
 .mcard .now{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(232,105,44,.14);border:1px solid rgba(232,105,44,.4);color:var(--bone);font-size:.95rem}
 .mcard .fine2{font-size:.75rem;color:var(--dim);margin-top:12px}
 @media (max-width:760px){
@@ -810,6 +836,13 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
     </div>
   </div>
   <div class="v3-card" id="v3-card" role="dialog" aria-label="Selected aircraft"></div>
+</div>
+<div id="cam" hidden>
+  <video playsinline muted autoplay></video>
+  <canvas aria-label="Camera view with plane labels" role="img"></canvas>
+  <div class="cam-top"><div><b>What's That Plane?</b><span id="cam-from"></span></div><button class="chip" id="cam-done">Done</button></div>
+  <div class="cam-msg">Camera not available here. The labels still show where each plane is.</div>
+  <div class="cam-bot"><div class="cam-lock" id="cam-lock" hidden><div class="cam-lock-t"><b id="cam-lock-n"></b><span id="cam-lock-d"></span></div><div class="cam-btns"><button class="chip" id="cam-lock-more">Details</button><button class="chip" id="cam-lock-x">Stop Following</button></div></div><div class="cam-btns"><button class="chip" id="cam-line">Line Up</button><button class="chip" id="cam-unline" hidden>Undo Line-Up</button></div><span id="cam-cap"></span><span class="cam-fine">Tap a plane to follow it. The video stays on your phone. For awareness only, not for flight planning.</span></div>
 </div>
 <div class="topstripe" aria-hidden="true"><i></i><i></i><i></i></div>
 
@@ -3062,12 +3095,13 @@ var SKY=(function(){
   var el=document.createElement("div"); el.className="sky";
   el.innerHTML='<canvas aria-label="Sky view: planes by direction and height above the horizon" role="img"></canvas>'+
     '<div class="sky-cap"><span id="sky-st">North is up. The center is straight overhead, the edge is the horizon. Rings show degrees above the horizon.</span>'+
-    '<button class="chip" id="sky-cmp" hidden aria-pressed="false">Use Phone Compass</button></div>';
+    '<div class="sky-btns"><button class="chip" id="sky-cam">Camera View</button><button class="chip" id="sky-cmp" hidden aria-pressed="false">Use Phone Compass</button></div></div>';
   var cv=el.querySelector("canvas"), c=cv.getContext("2d"), st=el.querySelector("#sky-st"), cmpB=el.querySelector("#sky-cmp");
   var S=0, dpr=1, last=0, heading=null, follow=false, hits=[];
   // phones and tablets only: it is meant to be held up to the sky
   var touch=!!(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
   if(touch&&"DeviceOrientationEvent" in window) cmpB.hidden=false;
+  el.querySelector("#sky-cam").addEventListener("click",function(e){ e.stopPropagation(); if(follow) stopCmp(); CAM.open(); });
   function slot(){ var s=mcard.querySelector(".sky-slot"); if(s&&el.parentNode!==s) s.appendChild(el); return !!s; }
   function groundEl(){ var n=nearestApts(lookPos.lat,lookPos.lon,1)[0]; return n&&n.nm<15?n.a.el||0:700; }
   function altOf(p){ return V3&&V3.trueAlt?V3.trueAlt(p):p.alt; }
@@ -3136,6 +3170,180 @@ var SKY=(function(){
     on:touch,
     tick:function(now){ if(!touch||mode!=="look"||!lookPos||!mcard.classList.contains("on")){ if(follow&&mode!=="look") stopCmp(); return; } if(now-last<(follow?50:120)) return; last=now; draw(); }
   };
+})();
+
+/* What's That Plane: camera view (phones and tablets). The back camera fills the screen and each plane gets a label at
+   its spot in the sky. Where the camera points comes from the phone's motion sensors and compass, so labels land close
+   to the plane rather than exactly on it. The video stays on the phone: nothing is recorded or sent. */
+var CAM=(function(){
+  var box=document.getElementById("cam"), vid=box.querySelector("video"), cv=box.querySelector("canvas"), c=cv.getContext("2d");
+  var cap=document.getElementById("cam-cap"), fromEl=document.getElementById("cam-from");
+  var on=false, stream=null, vw=0, vh=0, dpr=1, raf=0, R=null, offset=null, gotAbs=false, lastEv=0, hits=[], denied=false;
+  // Line Up: the user points the center ring at a plane they can see and taps its label. The difference between where
+  // the phone thought that plane was and where it really is shifts every label for the rest of the visit.
+  var lining=false, dAz=0, dEl=0, note="", noteUntil=0, lastAim=null;
+  // Follow: tapping a plane locks onto it, with a panel below and an arrow back to it when it leaves the screen
+  var lock=null, lockBox=document.getElementById("cam-lock"), lockN=document.getElementById("cam-lock-n"), lockD=document.getElementById("cam-lock-d");
+  var lockGoneAt=0;
+  function setLock(p){ lock=p; lockGoneAt=0; lockBox.hidden=!p; }
+  document.getElementById("cam-lock-x").addEventListener("click",function(){ setLock(null); });
+  document.getElementById("cam-lock-more").addEventListener("click",function(){ var p=lock; close(); if(p) openPlane(p); });
+  var lineB=document.getElementById("cam-line"), undoB=document.getElementById("cam-unline");
+  var D2R=Math.PI/180;
+  // Phone compasses read magnetic north; across Michigan that is about 2 to 7 degrees east of true north
+  function declination(lon){ return -4.5-(lon+86)*1.2; }
+  function rotm(a,b,g){ var ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b),cg=Math.cos(g),sg=Math.sin(g);
+    // Z-X'-Y'' rotation from the device frame into east-north-up
+    return [[ca*cg-sa*sb*sg,-sa*cb,ca*sg+sa*sb*cg],[sa*cg+ca*sb*sg,ca*cb,sa*sg-ca*sb*cg],[-cb*sg,sb,cb*cg]]; }
+  function col(m,i){ return [m[0][i],m[1][i],m[2][i]]; }
+  function az(v){ return (Math.atan2(v[0],v[1])/D2R+360)%360; }
+  function angd(a,b){ return ((a-b)%360+540)%360-180; }
+  function onOri(e){ if(e.alpha==null||e.beta==null||e.gamma==null) return;
+    var abs=e.type==="deviceorientationabsolute"||e.absolute===true; if(abs) gotAbs=true; else if(gotAbs&&typeof e.webkitCompassHeading!=="number") return;
+    var m=rotm(e.alpha*D2R,e.beta*D2R,e.gamma*D2R), back=col(m,2).map(function(x){ return -x; }), top=col(m,1);
+    // iPhones give a separate compass heading: line the relative frame up with it, using the camera direction when the
+    // phone is held up and the top edge when it is flat, and let the offset settle slowly so it doesn't jitter
+    var off=0;
+    if(typeof e.webkitCompassHeading==="number"&&e.webkitCompassHeading>=0){ var upright=Math.abs(back[2])<0.8, want=e.webkitCompassHeading, have=upright?az(back):az(top);
+      var o=angd(want,have); offset=offset==null?o:offset+angd(o,offset)*0.08; off=offset; }
+    else if(!abs) return;
+    var decl=lookPos?declination(lookPos.lon):-6, rz=(off+decl)*D2R, k=Math.cos(-rz), s=Math.sin(-rz);
+    function turn(v){ return [v[0]*k-v[1]*s, v[0]*s+v[1]*k, v[2]]; }
+    var nm={r:turn(col(m,0)),u:turn(col(m,1)),f:turn(back)};
+    // smooth the camera frame a little against sensor shake
+    if(R){ ["r","u","f"].forEach(function(key){ for(var i=0;i<3;i++) R[key][i]+=(nm[key][i]-R[key][i])*0.35; }); } else R=nm;
+    lastEv=performance.now(); }
+  // which way the screen faces, for landscape
+  function screenAngle(){ var a=screen.orientation&&typeof screen.orientation.angle==="number"?screen.orientation.angle:(typeof window.orientation==="number"?window.orientation:0); return a*D2R; }
+  function size(){ var r=box.getBoundingClientRect(); vw=Math.round(r.width)||innerWidth; vh=Math.round(r.height)||innerHeight; dpr=Math.min(2,devicePixelRatio||1); cv.width=vw*dpr; cv.height=vh*dpr; }
+  // focal length in screen pixels: the camera's long side covers about 66 degrees, and the video is cropped to fill
+  function focal(){ var w=vid.videoWidth||3, h=vid.videoHeight||4, sc=Math.max(vw/w,vh/h), long=Math.max(w,h)*sc; return (long/2)/Math.tan(33*D2R); }
+  function enu(azd,eld){ var a=azd*D2R, e=eld*D2R; return [Math.sin(a)*Math.cos(e),Math.cos(a)*Math.cos(e),Math.sin(e)]; }
+  function dot(a,b){ return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+  function draw(){ raf=requestAnimationFrame(draw); if(!on) return;
+    c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,vw,vh); hits=[];
+    if(!R||!lookPos){ cap.textContent=!lookPos?"Pick your spot in What's Overhead first.":denied?"Motion access wasn't allowed, so the labels can't follow the phone. Close and reopen the camera view to ask again.":"Waiting for the phone's motion sensors…"; return; }
+    var sa=screenAngle(), ca=Math.cos(sa), sn=Math.sin(sa);
+    var sr=[ca*R.r[0]-sn*R.u[0],ca*R.r[1]-sn*R.u[1],ca*R.r[2]-sn*R.u[2]], su=[sn*R.r[0]+ca*R.u[0],sn*R.r[1]+ca*R.u[1],sn*R.r[2]+ca*R.u[2]], f=R.f, F=focal();
+    var camEl=Math.asin(Math.max(-1,Math.min(1,f[2])))/D2R;
+    var azC=az(f);
+    cap.textContent=lining?"Point the center ring at a plane you can see, then tap that plane's label.":performance.now()<noteUntil?note:
+      "Facing "+cardinal(azC)+(camEl>3?", "+Math.round(camEl)+"° up":camEl<-3?", pointed down":", level")+". "+(dAz||dEl?"Lined up.":"Labels are close, not exact.");
+    var gEl=(function(){ var n=nearestApts(lookPos.lat,lookPos.lon,1)[0]; return n&&n.nm<15?n.a.el||0:700; })();
+    var font=getComputedStyle(document.body).fontFamily, items=[], off=[];
+    planes.forEach(function(p){ if((p.gone&&p.fade<0.5)||p.orb) return;
+      var dx=(p.lon-lookPos.lon)*60*Math.cos(lookPos.lat*D2R), dy=(p.lat-lookPos.lat)*60, d=Math.hypot(dx,dy); if(d>30) return;
+      var alt=V3&&V3.trueAlt?V3.trueAlt(p):p.alt, el=Math.atan2(alt-gEl,Math.max(1,d*6076))/D2R; if(el<-1) return;
+      if(isJet(p)&&!layers.jets&&d>12) return;
+      var az0=az([dx,dy,0]), v=enu(az0+dAz,el+dEl), z=dot(v,f), x=dot(v,sr), y=dot(v,su);
+      var it={p:p,d:d,el:el,alt:alt,az0:az0};
+      if(z>0.05){ it.x=vw/2+x/z*F; it.y=vh/2-y/z*F; if(it.x>-20&&it.x<vw+20&&it.y>-20&&it.y<vh+20){ items.push(it); return; } }
+      it.ang=Math.atan2(-y,x); it.behind=z<-0.2; off.push(it); });
+    // a point a minute ahead of each plane, for its direction-of-travel line
+    function ahead(it){ var p=it.p, s=60/3600*(p.gs||0), r=p.trk*D2R, la=p.lat+Math.cos(r)*s/60, lo=p.lon+Math.sin(r)*s/60/Math.cos(p.lat*D2R);
+      var dx=(lo-lookPos.lon)*60*Math.cos(lookPos.lat*D2R), dy=(la-lookPos.lat)*60, dd=Math.hypot(dx,dy), el=Math.atan2(it.alt-gEl,Math.max(1,dd*6076))/D2R;
+      var v=enu(az([dx,dy,0])+dAz,el+dEl), z=dot(v,f); if(z<=0.05) return null; return [vw/2+dot(v,sr)/z*F, vh/2-dot(v,su)/z*F]; }
+    // steadier labels: each plane's spot eases toward where the sensors put it; a big jump (a fast turn, reopening) snaps
+    var now=performance.now(), land=vw>vh, top=land?56:70, bot=land?(lock?150:96):(lock?280:160);   // room kept clear above the buttons (and the follow panel)
+    items.forEach(function(it){ var p=it.p, s=p._cs;
+      if(!s||now-s.t>400||Math.hypot(s.x-it.x,s.y-it.y)>Math.max(vw,vh)*0.35) p._cs={x:it.x,y:it.y,t:now};
+      else { s.x+=(it.x-s.x)*0.3; s.y+=(it.y-s.y)*0.3; s.t=now; it.x=s.x; it.y=s.y; } });
+    // a plane can drop out of one traffic update and come back; pick it up again by its transponder code, and give up
+    // only after 30 seconds without it
+    if(lock&&(planes.indexOf(lock)<0||lock.gone)){ var hx=lock.src&&lock.src.h, back=hx&&planes.find(function(q){ return q!==lock&&!q.gone&&q.src&&q.src.h===hx; });
+      if(back){ lock=back; lockGoneAt=0; }
+      else if(!lockGoneAt) lockGoneAt=now;
+      else if(now-lockGoneAt>30000){ setLock(null); say("Lost that plane: it has dropped out of the tracking data."); } }
+    else lockGoneAt=0;
+    // circles and planes, far ones first so near ones sit on top
+    items.sort(function(a,b){ return b.d-a.d; });
+    var placed=[], rings=[];
+    items.forEach(function(it){ var p=it.p, isL=p===lock, near=it.d<8, r=isL?30:near?26:18, col=BC[band(p.alt)];
+      var fw=ahead(it); if(fw){ var ddx=fw[0]-it.x, ddy=fw[1]-it.y, L=Math.hypot(ddx,ddy);
+        if(L>r+4){ var k2=Math.min(L,r+46)/L; c.save(); c.setLineDash([3,4]); c.strokeStyle="rgba("+col+",.8)"; c.lineWidth=1.4; c.beginPath(); c.moveTo(it.x+ddx/L*r,it.y+ddy/L*r); c.lineTo(it.x+ddx*k2,it.y+ddy*k2); c.stroke(); c.restore(); } }
+      c.lineWidth=isL?2.5:1.5; c.strokeStyle=isL?"rgba(244,226,198,.95)":"rgba("+col+",.9)"; c.beginPath(); c.arc(it.x,it.y,r,0,7); c.stroke();
+      c.fillStyle="rgba("+col+",.12)"; c.fill();
+      var shp=p._shp||(p._shp=shapeOf(p)); c.fillStyle="rgba("+col+",1)";
+      if(shp==="heli") heliGlyph(c,it.x,it.y,0,6,clock); else shapeGlyph(c,it.x,it.y,(p.trk-azC)*D2R,near||isL?7:5.5,shp);
+      rings.push([it.x-r,it.y-r,2*r,2*r]); it.r=r; it.hit={x:it.x,y:it.y,p:p,r:r,it:it}; hits.push(it.hit); });
+    // labels: the followed plane first, then the nearest; at most 8, so a busy sky stays readable
+    items.slice().sort(function(a,b){ return ((b.p===lock)-(a.p===lock))||(a.d-b.d); }).slice(0,8).forEach(function(it){ var p=it.p, r=it.r;
+      var name=p.priv?"Private Aircraft":p.name, l2=fmtAlt(p.alt)+" · "+(it.d<1?"overhead":it.d.toFixed(1)+" nm "+cardinal(it.az0));
+      c.font="600 13px "+font; var w1=c.measureText(name).width; c.font="500 11.5px "+font; var w2=c.measureText(l2).width, w=Math.max(w1,w2)+18, h=40;
+      // above the circle if there is room, otherwise below; if both are taken, the circle goes unlabeled (still tappable)
+      var bx=Math.max(8,Math.min(vw-w-8,it.x-w/2)), tries=[it.y-r-h-8,it.y+r+8], by=null;
+      function clash(yy){ return yy<top||yy+h>vh-bot||placed.some(function(b){ return bx<b[0]+b[2]+4&&bx+w+4>b[0]&&yy<b[1]+b[3]+4&&yy+h+4>b[1]; }); }
+      for(var ti=0;ti<tries.length;ti++){ if(!clash(tries[ti])){ by=tries[ti]; break; } }
+      if(by==null) return;
+      placed.push([bx,by,w,h]); it.hit.box=[bx,by,w,h];
+      c.fillStyle=p===lock?"rgba(13,13,12,.86)":"rgba(13,13,12,.74)"; c.beginPath(); if(c.roundRect) c.roundRect(bx,by,w,h,10); else c.rect(bx,by,w,h); c.fill();
+      if(p===lock){ c.strokeStyle="rgba(244,226,198,.6)"; c.lineWidth=1; c.stroke(); }
+      c.fillStyle="#ece7de"; c.font="600 13px "+font; c.textBaseline="top"; c.fillText(name,bx+9,by+6);
+      c.fillStyle="#a39d92"; c.font="500 11.5px "+font; c.fillText(l2,bx+9,by+23); c.textBaseline="alphabetic"; });
+    // the center ring to aim with while lining up
+    if(lining){ c.strokeStyle="rgba(244,226,198,.95)"; c.lineWidth=2; c.beginPath(); c.arc(vw/2,vh/2,30,0,7); c.stroke();
+      c.lineWidth=1.2; c.beginPath(); c.moveTo(vw/2-44,vh/2); c.lineTo(vw/2-34,vh/2); c.moveTo(vw/2+34,vh/2); c.lineTo(vw/2+44,vh/2); c.moveTo(vw/2,vh/2-44); c.lineTo(vw/2,vh/2-34); c.moveTo(vw/2,vh/2+34); c.lineTo(vw/2,vh/2+44); c.stroke(); }
+    lastAim={az:azC,el:camEl};
+    // planes off the edge of the screen: an arrow pointing the way to turn. The followed plane always gets one.
+    var lockOff=null;
+    off.sort(function(a,b){ return ((b.p===lock)-(a.p===lock))||(a.d-b.d); }).slice(0,4).forEach(function(it){ var p=it.p, a=it.ang, cx=vw/2, cy=vh/2, isL=p===lock;
+      if(isL) lockOff=it;
+      var t=Math.min((vw/2-28)/Math.abs(Math.cos(a)||1e-6),(vh/2-bot)/Math.abs(Math.sin(a)||1e-6)), x=cx+Math.cos(a)*t, y=cy-Math.sin(a)*t;   // clear of the top bar and the buttons
+      if(!isL&&placed.concat(rings).some(function(b){ return x+12>b[0]&&x-12<b[0]+b[2]&&y+12>b[1]&&y-12<b[1]+b[3]; })) return;   // never cover a label or a plane
+      var sc=isL?1.7:1; c.save(); c.translate(x,y); c.rotate(-a); c.scale(sc,sc); c.fillStyle=isL?"rgba(244,226,198,.98)":"rgba("+BC[band(p.alt)]+",.95)"; c.beginPath(); c.moveTo(12,0); c.lineTo(-6,-8); c.lineTo(-2,0); c.lineTo(-6,8); c.closePath(); c.fill(); c.restore();
+      var txt=isL?"Following":(p.priv?"Private":(p.t||p.name))+" · "+it.d.toFixed(0)+" nm"; c.font=(isL?"600 ":"500 ")+"11px "+font; var tw=c.measureText(txt).width;
+      var tx=Math.max(8,Math.min(vw-tw-8,x-Math.cos(a)*(isL?24:16)-tw/2)), ty=Math.max(84,Math.min(vh-bot,y+Math.sin(a)*(isL?24:16)+4));
+      // step aside from labels already drawn; skip the label (keep the arrow) if there is no room
+      function hit(yy){ return placed.concat(rings).some(function(b){ return tx-4<b[0]+b[2]&&tx+tw+4>b[0]&&yy-11<b[1]+b[3]&&yy+4>b[1]; }); }
+      var k=0; while(hit(ty)&&k<6){ ty+=(k%2?-1:1)*18*(k+1); ty=Math.max(84,Math.min(vh-bot,ty)); k++; }
+      if(hit(ty)) return; placed.push([tx-4,ty-11,tw+8,15]);
+      c.fillStyle="rgba(13,13,12,.65)"; c.fillRect(tx-4,ty-11,tw+8,15); c.fillStyle="#ece7de"; c.fillText(txt,tx,ty); });
+    // the followed plane's panel: what it is, and which way to look when it's off screen
+    if(lock){ var li=items.find(function(x){ return x.p===lock; })||lockOff, guide="In view.";
+      if(lockGoneAt) guide="Waiting for its next position report…"; else if(!li) guide="Out of range from here right now.";
+      else if(lockOff){ var ga=lockOff.ang, ca2=Math.cos(ga), sa2=Math.sin(ga);
+        guide=lockOff.behind?"Behind you: turn around.":Math.abs(ca2)>=Math.abs(sa2)?(ca2>0?"Turn right to find it.":"Turn left to find it."):(sa2>0?"Tilt up to find it.":"Tilt down to find it."); }
+      var dtxt=li?(li.d<1?"overhead":li.d.toFixed(1)+" nm "+cardinal(li.az0)):"";
+      lockN.textContent=lock.priv?"Private Aircraft":(lock.reg||lock.cs||lock.name);
+      lockD.textContent=(lock.priv?"":lock.name+" · ")+fmtAlt(lock.alt)+" · "+Math.round(lock.gs||0)+" kt"+(dtxt?" · "+dtxt:"")+". "+guide; }
+    if(performance.now()-lastEv>3000) cap.textContent="Lost the phone's motion sensors. Try closing and reopening the camera view."; }
+  cv.addEventListener("click",function(e){ var r=cv.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top, best=null, bd=40;
+    var bh=null; hits.forEach(function(h){ var d=Math.hypot(h.x-x,h.y-y), b=h.box, inBox=b&&x>=b[0]&&x<=b[0]+b[2]&&y>=b[1]&&y<=b[1]+b[3];
+      if(inBox) d=0; if(d<(lining?60:40)&&d<bd){ bd=d; bh=h; } });
+    if(!bh) return;
+    if(lining&&lastAim){ var it=bh.it, na=angd(lastAim.az,it.az0), ne=lastAim.el-it.el;
+      lining=false; lineUI();
+      if(Math.abs(na)>45||Math.abs(ne)>25){ say("That label is too far from the center ring to be the same plane. Try again with the plane in the ring."); return; }
+      dAz=na; dEl=ne; undoB.hidden=false;
+      say("Lined up with "+(bh.p.priv?"that plane":"the "+bh.p.name)+". Labels moved "+Math.abs(Math.round(na))+"° "+(na>=0?"right":"left")+(Math.abs(ne)>=1?" and "+Math.abs(Math.round(ne))+"° "+(ne>=0?"up":"down"):"")+".");
+      return; }
+    setLock(bh.p===lock?null:bh.p); });
+  function say(t){ note=t; noteUntil=performance.now()+4500; }
+  function lineUI(){ lineB.textContent=lining?"Cancel":"Line Up"; }
+  lineB.addEventListener("click",function(){ lining=!lining; lineUI(); });
+  undoB.addEventListener("click",function(){ dAz=0; dEl=0; undoB.hidden=true; lining=false; lineUI(); say("Line-up removed. Labels follow the compass again."); });
+  function listen(){ if("ondeviceorientationabsolute" in window) addEventListener("deviceorientationabsolute",onOri); addEventListener("deviceorientation",onOri); }
+  function unlisten(){ removeEventListener("deviceorientationabsolute",onOri); removeEventListener("deviceorientation",onOri); }
+  function open(){ if(on) return; on=true; R=null; offset=null; gotAbs=false; denied=false; lining=false; lineUI(); undoB.hidden=!(dAz||dEl); lastEv=performance.now();
+    box.hidden=false; document.body.classList.add("cam-on"); size();
+    var mine=myPos&&lookPos&&Math.abs(myPos.lat-lookPos.lat)<1e-6&&Math.abs(myPos.lon-lookPos.lon)<1e-6&&myPos.src==="gps";
+    fromEl.textContent=mine?"From your location.":"From "+(lookPos&&lookPos.auto&&home?"your home airport, "+code(home):"the spot you picked")+". Allow location for labels that match your view.";
+    // iPhones ask for motion access; it has to be asked from this tap
+    var D=window.DeviceOrientationEvent;
+    var motion=D&&typeof D.requestPermission==="function"?D.requestPermission().then(function(r){ if(r!=="granted") throw 0; }):Promise.resolve();
+    motion.then(listen).catch(function(){ denied=true; });
+    if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+      navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false}).then(function(s){ if(!on){ s.getTracks().forEach(function(t){ t.stop(); }); return; } stream=s; vid.srcObject=s; vid.play().catch(function(){}); box.classList.remove("nocam"); })
+        .catch(function(){ box.classList.add("nocam"); });
+    } else box.classList.add("nocam");
+    cancelAnimationFrame(raf); raf=requestAnimationFrame(draw); }
+  function close(){ if(!on) return; on=false; setLock(null); unlisten(); cancelAnimationFrame(raf);
+    if(stream){ stream.getTracks().forEach(function(t){ t.stop(); }); stream=null; } vid.srcObject=null;
+    box.hidden=true; document.body.classList.remove("cam-on"); }
+  document.getElementById("cam-done").addEventListener("click",close);
+  addEventListener("resize",function(){ if(on) size(); });
+  document.addEventListener("visibilitychange",function(){ if(document.hidden) close(); });
+  return {open:open,close:close,get on(){ return on; }};
 })();
 
 /* ---------------- Home airport UI ---------------- */

@@ -802,6 +802,10 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
   .v3-card{width:auto}
 }
 @media (pointer:coarse){ .v3-zm{display:none} }
+/* Beta: a quiet label on features still being refined (3D, camera view, sky view, lobby 3D). Small muted text, not a pill. */
+.beta{font-style:normal;font-weight:600;font-size:.66em;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-left:.55em;vertical-align:.12em;white-space:nowrap}
+.cam-top .beta,.sky-cap .beta{color:var(--muted)}
+.row .beta{font-size:1em;vertical-align:baseline;letter-spacing:inherit}
 /* Windows: one simple look, matching the 3D view's card. No stripe along the top; dark, blurred, a thin border.
    (The brand stripe stays at the top of the page.) */
 .card:before,.mcard:before,.panel:before,.a2hs:before,.pop:after,.about:after,#lb-ctl .lb-pan:after,.tour-card:after,.credits:after,.home-form:after{display:none!important}
@@ -837,6 +841,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
     <div class="v3-ctl">
       <button class="chip" id="v3-exit">2D Map</button>
       <button class="chip" id="v3-asp" aria-pressed="true">Airspace</button>
+      <button class="chip" id="v3-cld" aria-pressed="true">Clouds</button>
       <button class="chip" id="v3-jets" aria-pressed="false">Airliners</button>
       <button class="chip" id="v3-ex">Height ×6</button>
       <button class="chip" id="v3-flatv">Top Down</button>
@@ -848,7 +853,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
 <div id="cam" hidden>
   <video playsinline muted autoplay></video>
   <canvas aria-label="Camera view with plane labels" role="img"></canvas>
-  <div class="cam-top"><div><b>What's That Plane?</b><span id="cam-from"></span></div><button class="chip" id="cam-done">Done</button></div>
+  <div class="cam-top"><div><b>What's That Plane?<i class="beta">Beta</i></b><span id="cam-from"></span></div><button class="chip" id="cam-done">Done</button></div>
   <div class="cam-msg">Camera not available here. The labels still show where each plane is.</div>
   <div class="cam-bot"><div class="cam-lock" id="cam-lock" hidden><div class="cam-lock-t"><b id="cam-lock-n"></b><span id="cam-lock-d"></span></div><div class="cam-btns"><button class="chip" id="cam-lock-more">Details</button><button class="chip" id="cam-lock-x">Stop Following</button></div></div><div class="cam-btns"><button class="chip" id="cam-line">Line Up</button><button class="chip" id="cam-unline" hidden>Undo Line-Up</button></div><span id="cam-cap"></span><span class="cam-fine">Tap a plane to follow it. The video stays on your phone. For awareness only, not for flight planning.</span></div>
 </div>
@@ -884,7 +889,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
       <div class="pop" id="pop" role="menu">
         <div class="ptabs" role="tablist"><button role="tab" data-ptab="map" aria-selected="true">Map Layers</button><button role="tab" data-ptab="view" aria-selected="false">Display</button></div>
         <div class="ppane" data-pane="map">
-          <div class="row"><span>View</span><div class="group seg" role="group" aria-label="View"><button class="chip" id="view-flat" aria-pressed="true">2D</button><button class="chip" id="view-3d" aria-pressed="false">3D</button></div></div>
+          <div class="row"><span>View<i class="beta">3D in beta</i></span><div class="group seg" role="group" aria-label="View"><button class="chip" id="view-flat" aria-pressed="true">2D</button><button class="chip" id="view-3d" aria-pressed="false">3D</button></div></div>
           <div class="row"><span>Base Map</span><div class="group seg" role="group" aria-label="Base map"><button class="chip" id="base-dark" aria-pressed="true">Dark</button><button class="chip" id="sat-btn" aria-pressed="false">Satellite</button><button class="chip" id="chart-btn" aria-pressed="false">Sectional</button></div></div>
           <div class="row"><span>Weather</span><div class="toggles">
             <button class="chip" data-layer="clouds" aria-pressed="true">Clouds</button>
@@ -970,7 +975,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
       <li><b>Traffic</b> from <a href="https://adsb.lol" target="_blank" rel="noopener">adsb.lol</a>, with <a href="https://airplanes.live" target="_blank" rel="noopener">airplanes.live</a> as a backup: networks of volunteer ADS-B receivers.</li>
       <li><b>Weather reports and forecasts</b> from the <a href="https://aviationweather.gov" target="_blank" rel="noopener">NOAA Aviation Weather Center</a>.</li>
       <li><b>Clouds and radar</b> from NOAA satellite and NEXRAD imagery, served by the <a href="https://mesonet.agron.iastate.edu" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>.</li>
-      <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Terrain from NOAA.</li>
+      <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Terrain from NOAA. Runway positions in the 3D view from <a href="https://ourairports.com" target="_blank" rel="noopener">OurAirports</a> (public domain).</li>
     <li><b>Satellite map</b> from the <a href="https://www.usgs.gov/programs/national-geospatial-program/national-map" target="_blank" rel="noopener">USGS National Map</a> and NASA's <a href="https://earthobservatory.nasa.gov/features/BlueMarble" target="_blank" rel="noopener">Blue Marble</a>.</li>
       <li><b>Airline routes</b> from <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>, community route data that can be out of date.</li>
     </ul>
@@ -1013,7 +1018,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
     <li><b>Weather</b> from the <a href="https://aviationweather.gov" target="_blank" rel="noopener">NOAA Aviation Weather Center</a>.</li>
     <li><b>Clouds and radar</b> from NOAA satellite and NEXRAD imagery, served by the <a href="https://mesonet.agron.iastate.edu" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>. Terrain from NOAA.</li>
     <li><b>Airline routes</b> from <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>, community route data that can be out of date. Small-plane departures are worked out from what upwind saw near each field.</li>
-    <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>.</li>
+    <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Runway positions in the 3D view from <a href="https://ourairports.com" target="_blank" rel="noopener">OurAirports</a> (public domain).</li>
     <li><b>Fonts:</b> Calogen and Hanken Grotesk. QR codes by Kazuhiko Arase's qrcode-generator (MIT).</li>
   </ul>
   <p class="cnote">upwind is for fun and awareness only. It is not for navigation or flight planning; use current charts, NOTAMs and an official briefing.</p>
@@ -1037,7 +1042,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
 <div id="lb-ctl" aria-label="Display options">
   <div class="lb-pan" id="lb-pan">
     <div class="row"><span>On screen</span><div class="toggles"><button class="chip" data-lbo="catTop">Field Conditions</button><button class="chip" data-lbo="cond">Weather Details</button><button class="chip" data-lbo="cap">Captions</button><button class="chip" data-lbo="chart">Sectional Up Close</button><button class="chip" data-lbo="qr">QR Code</button></div></div>
-    <div class="row"><span>3D scenes</span><div class="toggles"><button class="chip" data-lb3="mix">Mix In</button><button class="chip" data-lb3="off">Off</button></div></div>
+    <div class="row"><span>3D scenes<i class="beta">Beta</i></span><div class="toggles"><button class="chip" data-lb3="mix">Mix In</button><button class="chip" data-lb3="off">Off</button></div></div>
     <div class="row"><span>Dim overnight</span><div class="toggles"><button class="chip" data-lbd="off">Off</button><button class="chip" data-lbd="22-6">10 PM to 6 AM</button><button class="chip" data-lbd="23-5">11 PM to 5 AM</button><button class="chip" data-lbd="0-6">Midnight to 6 AM</button></div></div>
     <div class="row"><span>Map color</span><div class="toggles"><button class="chip" data-lbt="season">Seasonal</button><button class="chip" data-lbt="warm">Warm</button><button class="chip" data-lbt="slate">Slate</button><button class="chip" data-lbt="forest">Forest</button><button class="chip" data-lbt="ink">Ink</button><button class="chip" data-lbt="sat">Satellite</button></div></div>
     <div class="row"><span>Light</span><div class="toggles"><button class="chip" data-lbl="live">Real Time</button><button class="chip" data-lbl="day">Day</button><button class="chip" data-lbl="dusk">Dusk</button><button class="chip" data-lbl="night">Night</button></div></div>
@@ -1817,8 +1822,8 @@ var BC=["232,105,44","242,163,58","244,226,198"];
 // reported track and keeps curving at the current turn rate, and position errors are blended out over 1.5 s.
 // Guesses never run more than 15 s past a report (8 s for turns), so a plane that levels off or rolls out settles quickly.
 function angd(a,b){ return ((a-b)%360+540)%360-180; }
-function smoothIn(p,a){
-  var now=Date.now()/1000, el=p._ta?now-p._ta:0;
+function smoothIn(p,a,tr){
+  var now=tr||Date.now()/1000, el=p._ta?now-p._ta:0;   // tr: when the position was reported, so climb and turn rates use real time between reports
   if(!p._ta||el>90){ p.lat=a.la; p.lon=a.lo; p.alt=a.a; if(a.k!=null) p.trk=a.k; p.vs=0; p.tr=0; p.cT=0; }
   else {
     if(el>2){ var v=(a.a-p._ra)/(el/60); if(Math.abs(v)<6000) p.vs=p.vs==null?v:p.vs*0.35+v*0.65;
@@ -3121,7 +3126,7 @@ var SKY=(function(){
   var el=document.createElement("div"); el.className="sky";
   el.innerHTML='<canvas aria-label="Sky view: planes by direction and height above the horizon" role="img"></canvas>'+
     '<div class="sky-cap"><span id="sky-st">North is up. The center is straight overhead, the edge is the horizon. Rings show degrees above the horizon.</span>'+
-    '<div class="sky-btns"><button class="chip" id="sky-cam">Camera View</button><button class="chip" id="sky-cmp" hidden aria-pressed="false">Use Phone Compass</button></div></div>';
+    '<i class="beta" style="margin:0">Sky view · Beta</i><div class="sky-btns"><button class="chip" id="sky-cam">Camera View</button><button class="chip" id="sky-cmp" hidden aria-pressed="false">Use Phone Compass</button></div></div>';
   var cv=el.querySelector("canvas"), c=cv.getContext("2d"), st=el.querySelector("#sky-st"), cmpB=el.querySelector("#sky-cmp");
   var S=0, dpr=1, last=0, heading=null, follow=false, hits=[];
   // phones and tablets only: it is meant to be held up to the sky
@@ -3409,14 +3414,29 @@ renderHome();
 })();
 
 /* ---------------- Live data ---------------- */
-function applyTraffic(ac){
+// Position timing: each report says how many seconds old its position is (sp), and the relay stamps when it built the
+// answer (now). The smallest gap seen between this device's clock and that stamp is the clock difference; anything
+// beyond it is how long the answer waited in the relay's cache. Each position is then carried forward along its track
+// to the present, so the next update lands close to where the plane is already drawn instead of pulling it back.
+var CLOCKGAP=null;
+function project(a,age){ if(!(age>0.3)||a.g==null||a.k==null) return a; var o={}; for(var k in a) o[k]=a[k];
+  var d=a.g*age/3600, r=a.k*Math.PI/180; o.la=a.la+Math.cos(r)*d/60; o.lo=a.lo+Math.sin(r)*d/60/Math.cos(a.la*Math.PI/180); return o; }
+function applyTraffic(ac,built){
   LIVE=true;
   var by={}; planes.forEach(function(p){ if(p.src&&p.src.h) by[p.src.h]=p; });
-  var seen={};
+  var seen={}, nowMs=Date.now(), wait=0;
+  if(typeof built==="number"){ var gap=nowMs-built; CLOCKGAP=CLOCKGAP==null?gap:Math.min(CLOCKGAP,gap); wait=Math.max(0,Math.min(12,(gap-CLOCKGAP)/1000)); }
   ac.filter(inBox).forEach(function(a){
+    var age=wait+(typeof a.sp==="number"?a.sp:0);
+    // a position over 45 seconds old, or one with no accuracy rating, isn't shown as live: the plane fades until a good one arrives
+    if(age>45||(a.q===0&&a.src==="adsb_icao")) return;
+    a=project(a,age); var tr=nowMs/1000-age;
     seen[a.h]=1; var p=by[a.h];
-    if(p){ if(a.t&&a.t!==p.t){ var ti=typeInfo(a); p.t=a.t; p.name=ti.n; p.kind=ti.k; p._shp=null; } p.src=a; p.priv=!!(a.f&12); if(p.priv){ p.reg=""; p.cs=privCs(a); } smoothIn(p,a); p.gs=Math.max(30,a.g||p.gs); p.gone=false; if(p.fade<0.2) p.fade=0.2; }
-    else { var np=makePlane(a); np.fade=0; np._ra=a.a; np._ta=Date.now()/1000; if(a.k!=null) np._rk=a.k; planes.push(np); }
+    // GPS altitude, when reported: height above the WGS84 ellipsoid, about 110 ft below sea level here, kept as an
+    // offset from the pressure altitude so it follows the same smoothing
+    var gd=typeof a.ag==="number"&&typeof a.a==="number"?a.ag+110-a.a:null;
+    if(p){ if(a.t&&a.t!==p.t){ var ti=typeInfo(a); p.t=a.t; p.name=ti.n; p.kind=ti.k; p._shp=null; } p.src=a; p.priv=!!(a.f&12); if(p.priv){ p.reg=""; p.cs=privCs(a); } smoothIn(p,a,tr); p.gs=Math.max(30,a.g||p.gs); p.gone=false; if(p.fade<0.2) p.fade=0.2; p._gd=gd; }
+    else { var np=makePlane(a); np.fade=0; np._ra=a.a; np._ta=tr; if(a.k!=null) np._rk=a.k; np._gd=gd; planes.push(np); }
   });
   planes.forEach(function(p){ if(p.src&&p.src.h&&!seen[p.src.h]) p.gone=true; });
   liveNote();
@@ -3439,9 +3459,9 @@ document.addEventListener("visibilitychange",function(){ if(!document.hidden) tr
 setInterval(function(){ var st=document.getElementById("stale"); if(st) st.classList.toggle("on",!!RELAY&&!document.hidden&&Date.now()-trafficOkAt>75000); },5000);
 function pollTraffic(){
   if(!RELAY) return;
-  fetch(RELAY.replace(/\/$/,"")+"/adsb",{cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(j){ liveFails=0; if(j.ac&&j.ac.length) trafficOkAt=Date.now(); applyTraffic(j.ac||[]); })
+  fetch(RELAY.replace(/\/$/,"")+"/adsb",{cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(j){ liveFails=0; if(j.ac&&j.ac.length) trafficOkAt=Date.now(); applyTraffic(j.ac||[],j.now); })
     .catch(function(){ liveFails++; if(liveFails===3&&!LIVE){ toast("Live traffic isn't reachable right now. Try again in a few minutes.",5000); liveNote(); } })
-    .then(function(){ later(pollTraffic,liveFails>5?60000:15000); });
+    .then(function(){ later(pollTraffic,liveFails>5?60000:10000); });
 }
 // Wait while the tab is hidden, so idle tabs don't use up the relay
 function later(fn,ms){ setTimeout(function(){ if(document.hidden){ document.addEventListener("visibilitychange",function once(){ if(!document.hidden){ document.removeEventListener("visibilitychange",once); fn(); } }); } else fn(); },ms); }
@@ -3766,6 +3786,52 @@ var V3=(function(){
     var apts=APTS.map(function(a){ var p=nm(a.lon,a.lat); return {a:a,id:a.icao||a.id,x:p[0],y:p[1],el:a.el||0,twr:!!a.twr}; });
     return G3={mi:rings(GEO.mi),lakes:rings(GEO.lakes),bord:rings(GEO.borders),asp:asp,apts:apts}; }
 
+  // ---- runways: both ends of each runway from OurAirports (public domain). Single-runway fields without coordinates are
+  // drawn through the airport point along the runway's numbered heading; other missing runways are left out, not guessed.
+  // [lat1,lon1,lat2,lon2,width ft,surface p=paved t=turf g=gravel] by airport id
+  var RWY={"08C":[[42.9401,-85.8099,42.9335,-85.7995,49,"p"]],"0C5":[[43.5816,-85.2806,43.5712,-85.2806,100,"t"]],"13C":[[43.452,-85.2714,43.4522,-85.2582,75,"p"]],"1D2":[[42.351,-83.4565,42.3447,-83.4561,75,"p"]],"24C":[[42.9533,-85.35125,42.95594,-85.34183,100,"t"],[42.956,-85.3488,42.9533,-85.3408,48,"p"],[42.955,-85.3441,42.9506,-85.3411,100,"t"]],"24M":[[43.24441,-85.71647,43.24499,-85.70693,100,"t"]],"26W":[[42.2109,-84.2334,42.2049,-84.2336,100,"t"]],"27C":[[43.6268,-85.2653,43.63,-85.2622,100,"t"],[43.6299,-85.2654,43.6299,-85.2577,100,"t"]],"29C":[[44.04924,-82.91489,44.04436,-82.91391,85,"t"]],"2C5":[[42.2525,-85.8563,42.2525,-85.8443,100,"t"]],"2M7":[[45.53469,-84.31126,45.52851,-84.30474,90,"t"]],"34G":[[41.9739,-83.9234,41.964,-83.9235,100,"t"]],"35C":[[43.1314,-85.5053,43.1253,-85.5053,100,"t"]],"35D":[[42.5309,-85.8305,42.5293,-85.8147,75,"p"],[42.5332,-85.8286,42.5298,-85.8249,150,"t"]],"38C":[[43.6125,-85.4925,43.6031,-85.4925,100,"t"]],"39G":[[43.03,-82.6733,43.0301,-82.6654,100,"t"]],"39T":[[43.06442,-84.49388,43.06518,-84.48452,50,"t"]],"39Z":[[43.1049,-86.12491,43.1053,-86.11769,70,"t"]],"3CM":[[43.544,-83.8998,43.5491,-83.8928,75,"p"],[43.5524,-83.8954,43.542,-83.8945,75,"p"]],"3DA":[[43.0569,-83.8094,43.0569,-83.8033,130,"t"],[43.0531,-83.8039,43.0462,-83.804,50,"p"]],"3GM":[[43.0341,-86.2034,43.0342,-86.1893,75,"p"],[43.0367,-86.2015,43.031,-86.2015,60,"p"]],"3NP":[[42.1714,-84.2632,42.1714,-84.2537,200,"t"],[42.1732,-84.2629,42.1671,-84.2587,160,"t"]],"3RC":[[44.4727,-84.5744,44.4727,-84.5604,75,"p"],[44.4797,-84.5674,44.4729,-84.5664,100,"t"]],"3S5":[[43.03513,-84.4392,43.03727,-84.4292,120,"t"]],"3TE":[[42.0247,-83.943,42.0249,-83.9363,100,"t"],[42.0289,-83.9391,42.0217,-83.939,75,"p"]],"3TR":[[41.8326,-86.2289,41.8401,-86.2221,50,"p"],[41.8402,-86.2291,41.8308,-86.2207,75,"p"]],"40C":[[42.1971,-86.2511,42.2039,-86.2486,200,"t"],[42.199,-86.2529,42.2001,-86.2474,200,"t"]],"41C":[[42.6896,-85.6478,42.6955,-85.6464,75,"t"],[42.6917,-85.6506,42.6917,-85.6439,100,"t"]],"41G":[[42.84,-84.4832,42.8406,-84.4751,100,"t"]],"42C":[[43.5623,-85.7772,43.5544,-85.7757,60,"p"]],"43G":[[42.1803,-83.5458,42.1744,-83.5456,160,"t"]],"44G":[[41.8551,-83.8755,41.8551,-83.866,92,"t"]],"45G":[[42.5665,-83.7821,42.5732,-83.7749,24,"p"]],"48D":[[43.8328,-84.7428,43.841,-84.7358,75,"p"],[43.8308,-84.7461,43.8315,-84.7366,75,"p"]],"49G":[[42.5806,-84.9083,42.5756,-84.9083,100,"t"]],"4D0":[[42.7753,-84.736,42.776,-84.7241,75,"p"],[42.7773,-84.7369,42.7703,-84.7369,120,"t"]],"4M0":[[44.69592,-85.91888,44.69648,-85.90912,100,"t"]],"4M4":[[43.12831,-84.38478,43.12889,-84.37782,50,"t"]],"4N0":[[42.29259,-85.75042,42.28521,-85.74958,125,"t"]],"4Y4":[[44.909,-84.883,44.916,-84.8698,40,"p"]],"4Y8":[[43.2005,-82.7579,43.204,-82.7498,65,"t"]],"4Y9":[[44.3077,-85.7878,44.3099,-85.7686,100,"t"]],"50D":[[46.0067,-88.2749,46.0138,-88.2719,145,"t"],[46.0114,-88.2804,46.0068,-88.2674,50,"p"]],"50G":[[43.1818,-84.1385,43.1818,-84.1308,150,"t"],[43.1878,-84.132,43.1818,-84.1323,150,"t"]],"51C":[[42.85266,-84.64909,42.85154,-84.64291,50,"t"]],"51G":[[43.145,-83.7985,43.141,-83.7939,140,"t"],[43.1458,-83.7982,43.1409,-83.7981,100,"t"]],"51M":[[44.67513,-84.12778,44.67467,-84.11622,75,"p"]],"52I":[[43.8469,-84.0163,43.8469,-84.0065,90,"t"]],"53W":[[43.5545,-84.9855,43.5545,-84.9716,105,"t"]],"55D":[[43.18064,-82.98941,43.18036,-82.97779,50,"t"]],"56C":[[43.07441,-85.27223,43.07699,-85.26477,100,"t"]],"57D":[[42.7379,-82.8962,42.7379,-82.8869,60,"p"],[42.7403,-82.8889,42.7343,-82.8889,123,"p"]],"5D5":[[45.1648,-85.5885,45.165,-85.5743,120,"t"],[45.1717,-85.5788,45.1649,-85.5751,150,"t"]],"5M6":[[44.13982,-84.44422,44.14098,-84.42978,60,"t"]],"5N7":[[43.09597,-86.10115,43.09843,-86.08805,100,"t"]],"5Y1":[[46.0358,-84.4266,46.0358,-84.4129,60,"p"]],"5Y2":[[44.3325,-84.7934,44.3258,-84.79,104,"t"]],"5Y7":[[46.3601,-86.6181,46.3491,-86.6181,120,"t"]],"60D":[[43.43878,-83.6376,43.43822,-83.621,60,"t"]],"60G":[[42.5834,-84.6564,42.5842,-84.6466,100,"t"]],"61D":[[42.4646,-85.6495,42.4716,-85.6483,100,"t"],[42.4675,-85.6521,42.4676,-85.6423,50,"p"]],"65G":[[42.7187,-84.0679,42.7186,-84.0565,110,"t"]],"66G":[[43.3139,-83.7144,43.3139,-83.705,100,"t"]],"68R":[[43.39913,-84.80604,43.39987,-84.79636,100,"t"]],"69G":[[42.4455,-84.0645,42.4387,-84.0642,100,"t"]],"6D6":[[43.1426,-85.2614,43.1417,-85.2457,75,"p"],[43.145,-85.2542,43.1402,-85.2547,200,"t"]],"6D9":[[44.3115,-83.4314,44.3142,-83.4133,75,"p"]],"6G8":[[42.0913,-84.2417,42.0988,-84.2399,100,"t"]],"6H4":[[42.1559,-84.3382,42.1556,-84.3304,55,"t"]],"6Y0":[[44.4583,-84.9968,44.4652,-84.9921,100,"t"],[44.4633,-85.0021,44.4633,-84.9921,100,"t"]],"6Y1":[[45.7668,-84.5106,45.7658,-84.497,75,"p"]],"6Y3":[[45.48038,-85.78613,45.48382,-85.77547,100,"t"]],"6Y4":[[46.05372,-87.26288,46.05048,-87.25372,100,"t"]],"6Y5":[[46.6919,-85.42644,46.6947,-85.41776,75,"t"]],"6Y6":[[44.3683,-84.4026,44.3648,-84.3928,120,"t"],[44.3685,-84.4024,44.3615,-84.4024,110,"t"]],"6Y8":[[45.7203,-85.5256,45.7205,-85.5157,30,"p"],[45.7265,-85.52,45.7169,-85.5202,140,"t"]],"6Y9":[[46.50924,-88.71092,46.50816,-88.70068,100,"t"]],"73G":[[43.07144,-86.03192,43.07376,-86.02728,75,"t"]],"75G":[[42.1985,-84.0309,42.1917,-84.0308,100,"t"]],"76G":[[42.7163,-82.5997,42.7235,-82.5935,60,"p"]],"77G":[[43.3087,-83.0921,43.3183,-83.0912,75,"p"],[43.3103,-83.0974,43.3104,-83.0832,75,"p"]],"7D3":[[43.8735,-85.8505,43.8787,-85.8427,100,"t"],[43.8754,-85.846,43.8747,-85.8316,75,"p"]],"7N4":[[42.083,-83.9862,42.0726,-83.9858,90,"t"]],"7Y2":[[44.5177,-85.983,44.5177,-85.9715,75,"p"],[44.519,-85.9739,44.5123,-85.9721,150,"t"]],"80D":[[44.0549,-84.817,44.0544,-84.8082,100,"t"],[44.0548,-84.8124,44.0472,-84.8126,50,"p"]],"83D":[[45.8897,-84.745,45.8936,-84.7311,75,"p"]],"8D4":[[43.1249,-85.6859,43.13,-85.6725,75,"p"]],"96G":[[43.3764,-82.8182,43.3764,-82.811,60,"t"]],"97G":[[42.99977,-84.59865,43.00023,-84.59295,100,"t"]],"98G":[[43.7279,-83.4655,43.7301,-83.4596,130,"t"],[43.7324,-83.4625,43.7264,-83.4619,50,"p"]],"9C8":[[43.892,-85.2865,43.8981,-85.2748,75,"p"]],"9D9":[[42.6656,-85.3525,42.6656,-85.3436,170,"t"],[42.6657,-85.3518,42.66,-85.3396,75,"p"],[42.6664,-85.3453,42.6594,-85.3456,200,"t"]],"9G2":[[42.8075,-83.7769,42.8077,-83.762,75,"p"]],"ACB":[[44.982,-85.2012,44.9951,-85.1955,100,"p"]],"ADG":[[41.8616,-84.0847,41.8709,-84.0712,100,"p"],[41.8723,-84.0786,41.8708,-84.0723,150,"t"]],"AMN":[[43.323,-84.696,43.323,-84.6772,75,"p"],[43.3252,-84.69,43.3164,-84.69,75,"p"]],"ANJ":[[46.4844,-84.3756,46.4741,-84.3612,100,"p"]],"APN":[[45.0649,-83.5614,45.0896,-83.5615,150,"p"],[45.076,-83.5667,45.083,-83.5499,100,"p"]],"ARB":[[42.2202,-83.7501,42.2258,-83.7396,75,"p"]],"AZO":[[42.2348,-85.5581,42.2415,-85.5491,100,"p"],[42.2339,-85.5581,42.2339,-85.5478,60,"p"],[42.2425,-85.552,42.2248,-85.5483,150,"p"]],"BAX":[[43.7786,-82.9891,43.7871,-82.9828,75,"p"],[43.785,-82.9876,43.7718,-82.9826,75,"p"]],"BEH":[[42.1279,-86.4368,42.1278,-86.418,100,"p"],[42.1327,-86.4338,42.126,-86.4237,60,"p"]],"BFA":[[45.1728,-84.9259,45.1588,-84.9222,100,"p"]],"BIV":[[42.7413,-86.1188,42.7444,-86.0959,100,"p"]],"BTL":[[42.2957,-85.266,42.3159,-85.241,150,"p"],[42.3142,-85.2546,42.3064,-85.2402,100,"p"]],"C04":[[43.6405,-86.3356,43.6429,-86.3228,75,"p"],[43.6439,-86.3322,43.6395,-86.3263,100,"t"]],"C20":[[41.9518,-86.3714,41.9565,-86.3681,180,"t"],[41.9534,-86.3728,41.9459,-86.3613,70,"p"]],"C43":[[42.76968,-84.9693,42.77032,-84.9607,100,"t"]],"C57":[[43.09586,-84.35312,43.09554,-84.34608,60,"t"]],"C88":[[43.13602,-84.22275,43.14218,-84.22225,118,"t"]],"C91":[[41.989,-86.1255,41.9937,-86.1203,100,"t"],[41.9937,-86.1391,41.9937,-86.1218,100,"p"]],"CAD":[[44.2729,-85.4308,44.2784,-85.4134,100,"p"],[44.2774,-85.411,44.2719,-85.411,150,"t"]],"CFS":[[43.454,-83.4537,43.4613,-83.441,75,"p"],[43.4626,-83.4457,43.4594,-83.4382,110,"t"]],"CIU":[[46.255,-84.4843,46.255,-84.4646,75,"p"],[46.2564,-84.4781,46.2393,-84.4639,150,"p"]],"CMX":[[47.1643,-88.4988,47.1699,-88.4795,100,"p"],[47.1753,-88.4989,47.1637,-88.4791,150,"p"]],"CVX":[[45.3036,-85.2712,45.3061,-85.2676,200,"t"],[45.3042,-85.2858,45.3053,-85.2682,75,"p"]],"D11":[[43.7165,-85.0076,43.7235,-84.998,125,"t"]],"D15":[[43.645,-84.9868,43.6439,-84.9772,50,"p"]],"D20":[[43.1125,-82.7917,43.1125,-82.7831,90,"t"]],"D90":[[44.9243,-85.0688,44.9231,-85.0611,120,"t"],[44.9308,-85.0686,44.922,-85.0686,140,"t"]],"D95":[[43.0653,-83.2744,43.0653,-83.2672,150,"t"]],"D98":[[42.8018,-82.9746,42.7909,-82.9739,75,"p"]],"D99":[[42.8002,-82.66434,42.8012,-82.65526,100,"t"]],"DET":[[42.418,-83.0162,42.4068,-83.005,100,"p"]],"DRM":[[46.0069,-83.7397,46.0139,-83.7411,150,"t"],[46.007,-83.7539,46.0103,-83.7389,75,"p"]],"DTW":[[42.2078,-83.3512,42.2283,-83.3361,150,"p"],[42.1956,-83.3518,42.2197,-83.3341,150,"p"],[42.2022,-83.384,42.2262,-83.3663,150,"p"],[42.2023,-83.3713,42.2312,-83.35,200,"p"],[42.217,-83.3632,42.2175,-83.331,150,"p"],[42.199,-83.3617,42.1995,-83.3304,150,"p"]],"DUH":[[41.7355,-83.6646,41.7363,-83.6462,50,"p"]],"E53":[[43.8455,-83.0515,43.847,-83.0421,65,"t"]],"ERY":[[46.3042,-85.4568,46.3108,-85.4504,150,"t"],[46.3157,-85.4678,46.3116,-85.4519,75,"p"]],"ESC":[[45.7184,-87.0867,45.7321,-87.0864,100,"p"],[45.7208,-87.112,45.7205,-87.0865,150,"p"]],"FFX":[[43.428,-85.9964,43.4458,-85.9966,100,"p"],[43.4439,-85.9984,43.4437,-85.9852,75,"p"]],"FKS":[[44.6294,-86.2059,44.621,-86.1958,75,"p"]],"FNT":[[42.969,-83.7598,42.9696,-83.7329,150,"p"],[42.9727,-83.7435,42.9512,-83.743,150,"p"]],"FPK":[[42.57,-84.8137,42.579,-84.8091,75,"p"],[42.5759,-84.8158,42.571,-84.8103,95,"t"]],"GDW":[[43.9717,-84.4829,43.9723,-84.465,75,"p"],[43.9714,-84.4786,43.9649,-84.4756,150,"t"]],"GLR":[[45.0145,-84.717,45.0145,-84.6916,150,"p"],[45.0156,-84.702,45.0074,-84.702,75,"p"]],"GOV":[[44.6792,-84.7348,44.6887,-84.721,150,"p"],[44.6817,-84.7364,44.6718,-84.723,150,"p"]],"GRR":[[42.8888,-85.5402,42.8909,-85.5218,100,"p"],[42.8766,-85.5422,42.8808,-85.5053,150,"p"],[42.8895,-85.5193,42.8665,-85.5145,150,"p"]],"H80":[[44.3639,-83.7671,44.3655,-83.7582,90,"t"]],"HAI":[[41.956,-85.5954,41.9613,-85.5884,60,"p"],[41.9604,-85.6012,41.9605,-85.5865,75,"p"]],"HTL":[[44.3612,-84.6762,44.3614,-84.661,75,"p"],[44.3603,-84.6778,44.3542,-84.6778,100,"t"]],"HYX":[[43.4296,-83.8659,43.4353,-83.8583,60,"p"],[43.4339,-83.8719,43.4339,-83.8531,100,"p"]],"IMT":[[45.8105,-88.1151,45.8282,-88.1117,150,"p"],[45.8202,-88.122,45.8132,-88.1109,75,"p"]],"IRS":[[41.806,-85.4408,41.8202,-85.4409,100,"p"],[41.8112,-85.4414,41.8161,-85.4307,75,"p"]],"ISQ":[[45.9706,-86.1706,45.9774,-86.1707,50,"p"],[45.975,-86.1823,45.9749,-86.1626,100,"p"]],"IWD":[[46.5276,-90.1443,46.5275,-90.1184,100,"p"]],"JXN":[[42.2561,-84.4667,42.2653,-84.4513,100,"p"],[42.2616,-84.4646,42.2551,-84.4552,100,"p"]],"JYM":[[41.9216,-84.5931,41.9209,-84.5784,100,"p"]],"LAN":[[42.7732,-84.601,42.7814,-84.5862,120,"p"],[42.7819,-84.585,42.7818,-84.5716,75,"p"],[42.7782,-84.6011,42.778,-84.5741,150,"p"]],"LDM":[[43.9592,-86.413,43.9688,-86.4126,75,"p"],[43.9593,-86.4135,43.9637,-86.3955,75,"p"]],"LWA":[[42.3479,-86.26,42.3574,-86.2478,75,"p"],[42.3522,-86.2627,42.3461,-86.2537,190,"t"]],"M61":[[46.34821,-87.78868,46.34219,-87.78832,100,"t"]],"M86":[[42.471,-86.1288,42.471,-86.1225,60,"t"]],"M99":[[43.06086,-84.5527,43.06154,-84.5441,60,"t"]],"MBL":[[44.2728,-86.2548,44.2724,-86.2338,100,"p"]],"MBS":[[43.5268,-84.0892,43.5422,-84.0676,150,"p"],[43.5372,-84.0895,43.5247,-84.0726,150,"p"]],"MCD":[[45.8637,-84.644,45.8662,-84.6307,75,"p"]],"MGN":[[45.4261,-84.9217,45.4249,-84.9056,75,"p"]],"MI1":[[43.74944,-84.81404,43.75436,-84.81356,100,"t"]],"MKG":[[43.1616,-86.2509,43.1715,-86.2306,150,"p"],[43.1769,-86.2399,43.1668,-86.2272,150,"p"]],"MNM":[[45.1232,-87.6444,45.1373,-87.6325,100,"p"],[45.1278,-87.645,45.1171,-87.6323,100,"p"]],"MOP":[[43.6203,-84.7467,43.624,-84.7387,160,"t"],[43.6215,-84.7443,43.6213,-84.7254,100,"p"]],"N98":[[45.209,-84.9976,45.2085,-84.9828,75,"p"]],"OEB":[[41.931,-85.0517,41.939,-85.0446,75,"p"],[41.9295,-85.0641,41.936,-85.0465,75,"p"],[41.9364,-85.053,41.9301,-85.0503,190,"t"]],"OGM":[[46.8501,-89.3691,46.8409,-89.3651,75,"p"]],"ONZ":[[42.0934,-83.1624,42.1048,-83.1534,100,"p"],[42.105,-83.1673,42.0932,-83.1636,75,"p"]],"OSC":[[44.443,-83.4133,44.4601,-83.3748,200,"p"]],"OZW":[[42.6336,-83.9896,42.6253,-83.9748,100,"p"]],"PHN":[[42.9046,-82.5353,42.9159,-82.5241,100,"p"],[42.9123,-82.5352,42.9114,-82.5203,75,"p"]],"PLN":[[45.5674,-84.8028,45.5779,-84.7879,150,"p"],[45.5758,-84.8069,45.5632,-84.7888,150,"p"]],"PTK":[[42.6662,-83.4319,42.6668,-83.4133,100,"p"],[42.6647,-83.4331,42.6653,-83.4101,150,"p"],[42.6671,-83.4084,42.662,-83.4082,75,"p"]],"PZQ":[[45.4069,-83.8209,45.4073,-83.8049,75,"p"]],"RMY":[[42.2517,-84.9619,42.2506,-84.949,75,"p"]],"RNP":[[42.992,-84.1437,42.9956,-84.1358,130,"t"],[42.9943,-84.1468,42.9917,-84.1311,75,"p"],[42.9957,-84.1369,42.9886,-84.1362,260,"t"]],"RQB":[[43.7245,-85.5165,43.7245,-85.5003,75,"p"],[43.7226,-85.5002,43.7167,-85.4941,75,"p"]],"SAW":[[46.3369,-87.3992,46.3704,-87.3915,150,"p"]],"SJX":[[45.6918,-85.5694,45.696,-85.5639,120,"t"],[45.6915,-85.5777,45.6915,-85.5609,75,"p"],[45.6953,-85.568,45.6892,-85.5584,120,"t"]],"SLH":[[45.6542,-84.5272,45.6542,-84.5116,75,"p"],[45.6546,-84.5198,45.6504,-84.518,60,"t"]],"TEW":[[42.5658,-84.4306,42.5658,-84.4158,75,"p"]],"TTF":[[41.9336,-83.4382,41.9462,-83.4312,100,"p"]],"TVC":[[44.7412,-85.5904,44.74,-85.5654,150,"p"],[44.7503,-85.5877,44.7355,-85.5877,150,"p"]],"VLL":[[42.5429,-83.1845,42.543,-83.1713,60,"p"]],"W87":[[42.0169,-83.3791,42.0168,-83.372,60,"t"],[42.022,-83.3762,42.0151,-83.3779,60,"t"]],"Y30":[[45.52772,-84.55732,45.53448,-84.55668,90,"t"]],"Y31":[[44.2447,-84.1893,44.2449,-84.1703,100,"p"]],"Y47":[[42.5018,-83.6292,42.5045,-83.6182,40,"p"]],"Y65":[[45.4089,-84.6058,45.4078,-84.5942,50,"p"]],"Y70":[[42.9379,-85.0711,42.9378,-85.055,75,"p"],[42.944,-85.0581,42.9323,-85.0578,340,"t"]],"Y73":[[46.0776,-88.63,46.0722,-88.6286,40,"p"]],"Y83":[[43.457,-82.8461,43.4571,-82.8344,75,"p"]],"Y87":[[44.7911,-86.0076,44.792,-85.9989,150,"t"],[44.79,-86.005,44.7828,-86.0025,50,"p"]],"Y88":[[44.6039,-85.7635,44.6088,-85.7553,170,"t"],[44.6085,-85.7583,44.6029,-85.7562,170,"t"]],"Y89":[[44.7262,-85.2097,44.7242,-85.1965,75,"p"]],"Y91":[[44.3206,-85.1755,44.3206,-85.1606,160,"t"],[44.3246,-85.1739,44.3175,-85.1739,150,"t"]],"Y93":[[44.9969,-84.1375,45.0025,-84.1291,60,"p"],[45.003,-84.1383,44.9973,-84.1288,100,"t"]],"Y94":[[45.1305,-85.1181,45.1302,-85.1055,50,"p"]],"Y95":[[45.0795,-83.9394,45.0873,-83.9322,60,"p"],[45.0872,-83.9409,45.0795,-83.9396,150,"t"]],"Y98":[[46.6164,-85.9219,46.6242,-85.9106,150,"t"],[46.624,-85.9202,46.6184,-85.9133,100,"t"]],"YIP":[[42.2306,-83.5399,42.2448,-83.5196,150,"p"],[42.244,-83.5433,42.2445,-83.5164,100,"p"]],"Z98":[[42.8123,-85.9305,42.8221,-85.9256,60,"p"]]}, RWG=null;
+  function runways(){ if(RWG) return RWG; RWG=[]; APTS.forEach(function(a){ (RWY[a.id]||[]).forEach(function(r){ var p=nm(r[1],r[0]), q=nm(r[3],r[2]);
+      RWG.push({x1:p[0],y1:p[1],x2:q[0],y2:q[1],w:r[4],s:r[5],el:a.el||0}); }); }); return RWG; }
+
+  // ---- cloud layers: each reporting field's cloud layers (heights in reports are above the field) drawn as soft,
+  // see-through discs at field elevation + layer height, with the same height exaggeration as everything else
+  var showCld=true, CLD=null, cldRef=null, ELEV={}; APTS.forEach(function(a){ ELEV[a.id]=a.el||0; });
+  var COVA={FEW:0.05,SCT:0.09,BKN:0.15,OVC:0.2,VV:0.2}, COVN={FEW:"Few",SCT:"Scattered",BKN:"Broken",OVC:"Overcast",VV:"Obscured"};
+  function clouds(){ if(cldRef===STN&&CLD) return CLD; cldRef=STN; CLD=[];
+    (STN||[]).forEach(function(st){ if(!st.raw||st.lat==null) return; var el=ELEV[st.id]!=null?ELEV[st.id]:700, c=nm(st.lon,st.lat);
+      // every layer in the report, lowest first: FEW/SCT/BKN/OVC/VV with height in hundreds of feet
+      var m, re=/\b(FEW|SCT|BKN|OVC|VV)(\d{3})\b/g, n=0; while((m=re.exec(st.raw))&&n<3){ n++;
+        var agl=+m[2]*100; if(agl>20000) continue;
+        CLD.push(puffs({id:st.id,cx:c[0],cy:c[1],msl:el+agl,agl:agl,cov:m[1],a:COVA[m[1]]})); } });
+    return CLD; }
+  // A layer is many puffs. Coverage sets how many and how spread out: a few separate ones for FEW, patches for SCT,
+  // a dense deck for BKN/OVC. Positions come from a seed made of the field and layer, so they hold still between frames.
+  var PUFN={FEW:4,SCT:8,BKN:14,OVC:20,VV:20};
+  function puffs(c){ var h=0, key=c.id+c.cov+c.agl; for(var i=0;i<key.length;i++) h=(h*31+key.charCodeAt(i))>>>0;
+    function rnd(){ h=(h*1664525+1013904223)>>>0; return h/4294967296; }
+    var n=PUFN[c.cov]||8, deck=c.cov==="BKN"||c.cov==="OVC"||c.cov==="VV", R0=deck?10:8; c.p=[];
+    for(var k=0;k<n;k++){ var a=rnd()*Math.PI*2, r=R0*Math.sqrt(rnd())*(deck?1:0.9);
+      c.p.push([Math.cos(a)*r,Math.sin(a)*r,(rnd()-0.5)*300,(deck?2.1:1.5)+rnd()*(deck?1.8:1.3),rnd()<0.5]); }
+    return c; }
+  // The puff itself, drawn once: soft lobes in a cumulus outline, brighter on top with a gray underside
+  var PUFF=null;
+  function puffSprite(){ if(PUFF) return PUFF; var S=160, pc=document.createElement("canvas"); pc.width=pc.height=S; var x=pc.getContext("2d");
+    [[80,96,46],[50,102,32],[112,100,34],[64,76,34],[98,74,30],[80,60,26],[30,108,20],[132,108,20]].forEach(function(l){
+      var gr=x.createRadialGradient(l[0],l[1]-l[2]*0.35,l[2]*0.1,l[0],l[1],l[2]); gr.addColorStop(0,"rgba(240,236,228,.9)"); gr.addColorStop(0.55,"rgba(232,228,220,.62)"); gr.addColorStop(1,"rgba(225,221,214,0)");
+      x.fillStyle=gr; x.beginPath(); x.arc(l[0],l[1],l[2],0,7); x.fill(); });
+    x.globalCompositeOperation="source-atop"; var sh=x.createLinearGradient(0,52,0,138); sh.addColorStop(0,"rgba(255,255,255,0)"); sh.addColorStop(0.55,"rgba(140,138,136,.28)"); sh.addColorStop(1,"rgba(70,70,74,.62)");
+    x.fillStyle=sh; x.fillRect(0,0,S,S); return PUFF=pc; }
+  var CRING=[]; for(var ci=0;ci<24;ci++){ var ca=ci/24*Math.PI*2; CRING.push([Math.cos(ca),Math.sin(ca)]); }
+  // A layer's puffs, far ones first. Round from above, flatter from the side; dimmer at night.
+  var PUFA={FEW:0.46,SCT:0.48,BKN:0.44,OVC:0.42,VV:0.38};
+  function drawCloud(c){ var z0=c.msl*FT*EX, sp=puffSprite(), k=0.5+0.5*R.sp, night=0.45+0.55*Math.max(0,Math.min(1,light.day)), L=[];
+    c.p.forEach(function(p){ var C=Cs(c.cx+p[0],c.cy+p[1],z0+p[2]*FT*EX); if(C[2]<NEAR) return; L.push([C,p]); });
+    L.sort(function(A,B){ return B[0][2]-A[0][2]; });
+    g.save(); g.globalAlpha=(PUFA[c.cov]||0.65)*night;
+    L.forEach(function(e){ var C=e[0], p=e[1], o=Sc(C), w=p[3]*R.f/C[2]*2; if(w<3||o[0]<-w||o[0]>vw+w||o[1]<-w||o[1]>vh+w) return;
+      var hgt=w*k; if(p[4]){ g.save(); g.translate(o[0],o[1]); g.scale(-1,1); g.drawImage(sp,-w/2,-hgt*0.62,w,hgt); g.restore(); } else g.drawImage(sp,o[0]-w/2,o[1]-hgt*0.62,w,hgt); });
+    g.restore(); }
+
   // ---- altimeter settings from the current weather reports
   var wxRef=null, WXS=[];
   function stations(){ if(wxRef===METAR) return WXS; wxRef=METAR; WXS=[];
@@ -3774,7 +3840,10 @@ var V3=(function(){
   function corr(p){ var now=Date.now();
     if(!p._v3||now-p._v3.t>20000||p._v3.w!==wxRef){ var best=null,bd=80; stations().forEach(function(s){ var d=Math.hypot((s[2]-p.lon)*KX,(s[1]-p.lat)*60); if(d<bd){ bd=d; best=s; } });
       p._v3={t:now,w:wxRef,s:best,d:best?Math.round((best[3]-29.92)*1000):0}; }
-    var c=p._v3; return (p.alt>0&&p.alt<18000&&c.s)?c:null; }
+    if(!(p.alt>0&&p.alt<18000)) return null;
+    // the plane's own GPS altitude wins when it reports one (and it is within reason of the pressure altitude)
+    if(p._gd!=null&&Math.abs(p._gd)<1500) return {d:Math.round(p._gd),gps:true};
+    var c=p._v3; return c.s?c:null; }
   function trueAlt(p){ var c=corr(p); return c?p.alt+c.d:p.alt; }
 
   // ---- camera
@@ -3928,6 +3997,13 @@ var V3=(function(){
     drawRelief();
     g.beginPath(); G.bord.forEach(function(r){ path(r,0,false); }); g.strokeStyle="rgba(236,231,222,.16)"; g.lineWidth=1; g.stroke();
     var font=getComputedStyle(document.body).fontFamily;
+    // Runways, only when the camera is close enough to see them, true to width when near
+    runways().forEach(function(r){ var z=r.el*FT*EX, A=Cs(r.x1,r.y1,z), B=Cs(r.x2,r.y2,z); if(A[2]<NEAR||B[2]<NEAR||Math.min(A[2],B[2])>cam.dist*1.6) return;
+      var a=Sc(A), b=Sc(B); if(Math.max(a[0],b[0])<0||Math.min(a[0],b[0])>vw||Math.max(a[1],b[1])<0||Math.min(a[1],b[1])>vh) return;
+      g.lineWidth=Math.max(1.2,Math.min(14,r.w/6076*R.f/((A[2]+B[2])/2))); g.lineCap="butt";
+      if(r.s==="p"){ g.setLineDash([]); g.strokeStyle="rgba(236,231,222,.58)"; } else { g.setLineDash([5,4]); g.strokeStyle=r.s==="g"?"rgba(196,186,166,.5)":"rgba(160,178,128,.5)"; }
+      g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.stroke(); });
+    g.setLineDash([]);
     // Airports: every field gets its code (as on the 2D map) once you're close enough; towered fields first, then the
     // nearest, never overlapping. The home airport is marked the same way as in 2D: amber, and pulsing in the lobby.
     var albl=[], aput=[], fz=lob3?Math.round(Math.max(13,Math.min(18,vh/52))):11, hm=null;
@@ -3946,12 +4022,21 @@ var V3=(function(){
       g.fillStyle=a.twr?"rgba(236,231,222,.72)":"rgba(236,231,222,.52)"; g.shadowColor="rgba(0,0,0,.85)"; g.shadowBlur=4; g.fillText(a.id,q[0]+l.s+6,q[1]+fz*0.35); g.shadowBlur=0; });
     var items=[]; LBL=[]; TAGS=[];
     if(showAsp) G.asp.forEach(function(a){ var q=P(a.cx,a.cy,(a.l+a.u)/2*FT*EX); if(q) items.push({d:q[2]+40,a:a}); });
+    var CL=[]; if(showCld) clouds().forEach(function(c){ var q=P(c.cx,c.cy,c.msl*FT*EX); if(q&&q[2]<cam.dist*3.5){ items.push({d:q[2]+12,c:c}); if(q[2]<cam.dist*1.3&&cam.dist<55) CL.push({q:q,c:c}); } });
     ITEMS=[];
     planes.forEach(function(p){ if(p.orb||(p.gone&&!(p.fade>0.05))) return; var jet=isJet(p); if(jet&&!layers.jets&&pick3!==p) return;
       var w0=nm(p.lon,p.lat), alt=trueAlt(p), z=alt*FT*EX, q=P(w0[0],w0[1],z); if(!q) return;
       var it={d:q[2],p:p,q:q,x:w0[0],y:w0[1],z:z,alt:alt,jet:jet}; items.push(it); ITEMS.push(it); });
     items.sort(function(a,b){ return b.d-a.d; });
-    items.forEach(function(it){ if(it.a) drawAsp(it.a); else drawPlane(it); });
+    items.forEach(function(it){ if(it.a) drawAsp(it.a); else if(it.c) drawCloud(it.c); else drawPlane(it); });
+    // cloud labels up close, in the report's own terms (height above the field), nearest first and never overlapping
+    // one label per field: its lowest reported layer
+    var low={}; CL.forEach(function(l){ var k=l.c.id; if(!low[k]||l.c.agl<low[k].c.agl) low[k]=l; }); CL=Object.keys(low).map(function(k){ return low[k]; });
+    if(CL.length){ var cput=[]; g.font="500 "+(lob3?13:10.5)+"px "+font; g.textAlign="center";
+      CL.sort(function(a,b){ return a.q[2]-b.q[2]; }).slice(0,10).forEach(function(l){ var t=COVN[l.c.cov]+" "+l.c.agl.toLocaleString()+" ft", w=g.measureText(t).width, bx=[l.q[0]-w/2-4,l.q[1]-9,w+8,14];
+        if(cput.some(function(b){ return bx[0]<b[0]+b[2]&&bx[0]+bx[2]>b[0]&&bx[1]<b[1]+b[3]&&bx[1]+bx[3]>b[1]; })) return; cput.push(bx);
+        g.fillStyle="rgba(13,13,12,.45)"; g.fillRect(bx[0],bx[1],bx[2],bx[3]); g.fillStyle="rgba(236,234,228,.78)"; g.fillText(t,l.q[0],l.q[1]+2); });
+      g.textAlign="start"; }
     drawLabels();
     if(hy>-200){ var fz=g.createLinearGradient(0,hy-40,0,hy+vh*0.22); fz.addColorStop(0,"rgba(13,13,12,0)"); fz.addColorStop(.25,"rgba(26,22,19,.85)"); fz.addColorStop(1,"rgba(26,22,19,0)"); g.fillStyle=fz; g.fillRect(0,hy-40,vw,vh*0.22+40); }
     showCard(); updDial(); }
@@ -3967,7 +4052,7 @@ var V3=(function(){
     var f=card3.children;
     f[0].textContent=name; f[1].textContent=p.priv?"":p.name;
     f[2].textContent=(c?"About "+r10(p.alt+c.d)+" ft MSL":(p.alt>=18000?"FL"+Math.round(p.alt/100):Math.round(p.alt).toLocaleString()+" ft"))+" · "+Math.round(p.gs||0)+" kt · heading "+Math.round(p.trk||0)+"°";
-    f[3].textContent=c?"Reported "+Math.round(p.alt).toLocaleString()+" ft, corrected with "+c.s[0]+" altimeter "+c.s[3].toFixed(2):"";
+    f[3].textContent=!c?"":c.gps?"From the plane's GPS altitude. Reported pressure altitude "+(Math.round(p.alt/25)*25).toLocaleString()+" ft.":"Reported "+Math.round(p.alt).toLocaleString()+" ft, corrected with "+c.s[0]+" altimeter "+c.s[3].toFixed(2);
     if(vw<760){ card3.style.left="16px"; card3.style.right="16px"; card3.style.top="calc(84px + env(safe-area-inset-top, 0px))"; }
     else { var x=it.q[0]+it.r+20, y=it.q[1]-24; if(x+280>vw) x=it.q[0]-it.r-300; card3.style.right="auto"; card3.style.left=Math.max(16,x)+"px"; card3.style.top=Math.max(84,Math.min(vh-220,y))+"px"; }
     card3.classList.add("on"); }
@@ -4038,11 +4123,12 @@ var V3=(function(){
   btn("v3-out",function(){ flyTo(look({dist:clampD(cam.dist*1.6)}),350); });
   btn("v3-exit",function(){ exit(); });
   btn("v3-asp",function(){ showAsp=!showAsp; this.setAttribute("aria-pressed",showAsp); dirty=true; });
+  btn("v3-cld",function(){ showCld=!showCld; this.setAttribute("aria-pressed",showCld); dirty=true; });
   btn("v3-jets",function(){ layers.jets=!layers.jets; this.setAttribute("aria-pressed",layers.jets); var c=document.querySelector('[data-layer="jets"]'); if(c) c.setAttribute("aria-pressed",layers.jets); dirty=true; });
   btn("v3-ex",function(){ exI=(exI+1)%EXS.length; EX=EXS[exI]; this.textContent="Height ×"+EX; note(); dirty=true; });
   btn("v3-flatv",function(){ var top=cam.pitch>80; flyTo(look({pitch:top?42:90,bear:top?cam.bear:0}),1100); this.textContent=top?"Top Down":"Tilt"; });
   btn("v3-reset",function(){ flyTo(START||HOMEV,1300); document.getElementById("v3-flatv").textContent="Top Down"; });
-  function note(){ document.getElementById("v3-note").textContent="Heights drawn ×"+EX+" so they read. Below 18,000 ft, altitudes are corrected with the nearest airport's altimeter setting."; }
+  function note(){ document.getElementById("v3-note").textContent="3D view, in beta. Heights drawn ×"+EX+" so they read. Below 18,000 ft, altitudes use each plane's GPS altitude when it reports one, otherwise the nearest airport's altimeter setting. Clouds from each field's latest report, shown above that field."; }
 
   // ---- Lobby: a hands-off 3D segment around the field, faded in and out from the flat map
   // Straight overhead with north up, at the same spot and scale as the flat map right now, so the hand-off is seamless

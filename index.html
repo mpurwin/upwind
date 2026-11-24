@@ -36,7 +36,7 @@
 <script>try{if(sessionStorage.getItem("upwind-xfer"))document.documentElement.classList.add("xfer")}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;900&display=swap" rel="stylesheet">
 <style>
 @font-face{font-family:"Calogen Exp";src:url("fonts/calogen-exp-italic.woff2") format("woff2");font-weight:700;font-style:italic;font-display:swap}
 :root{--ink:#0d0d0c;--bone:#ece7de;--muted:#a39d92;--dim:#6a665e;--s1:#e8692c;--s2:#f2a33a;--s3:#f4e2c6;--sans:"Hanken Grotesk",system-ui,sans-serif;--display:"Hanken Grotesk",system-ui,sans-serif}
@@ -206,7 +206,7 @@ body.replay :is(.hud .stats,.hud .sum,.ticker,.mcard,.stale,.a2hs,.foot){opacity
   body.replay .foot{opacity:0;pointer-events:none}
 }
 /* About sits over a clean map: every window, card and control underneath steps out of view */
-body.about-open :is(.topright,.panel,.a2hs,.card,.toast,.credits,.mcard,.follow,.tour-block,.tour-spot,.tour-card){visibility:hidden!important;pointer-events:none!important}
+body.about-open :is(.topright,.panel,.a2hs,.card,.toast,.credits,.mcard,.follow,.tour2){visibility:hidden!important;pointer-events:none!important}
 @media (max-width:760px){#aboutL{font-size:16px}#aboutL .ahead{padding:24px 22px 36px}}
 #aboutL .pill{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 18px;border-radius:999px;border:1px solid rgba(236,231,222,.22);background:rgba(20,19,17,.6);color:var(--bone);font:500 .9rem var(--sans);text-decoration:none;cursor:pointer;transition:border-color .25s,color .25s}
 #aboutL .pill:hover{border-color:var(--s2);color:var(--s2)}
@@ -505,39 +505,48 @@ body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transp
 @media (max-width:760px){body.hud-min .vig{background:linear-gradient(to bottom,rgba(13,13,12,.9) 0,transparent 22%),linear-gradient(to top,rgba(13,13,12,.94) 10%,transparent 32%)}}
 
 /* Walkthrough */
-.tour-block{position:fixed;inset:0;z-index:60;display:none}
-.tour-block.on{display:block}
-.tour-spot{position:fixed;z-index:61;border-radius:14px;box-shadow:0 0 0 9999px rgba(8,8,7,.66);pointer-events:none;transition:all .5s cubic-bezier(.4,0,.2,1);opacity:0}
-.tour-spot.on{opacity:1}
-.tour-spot:after{content:"";position:absolute;inset:-4px;border-radius:16px;border:1.5px solid rgba(244,226,198,.55)}
-.tour-spot.none:after{display:none}
-.tour-card{position:fixed;z-index:62;width:264px;background:rgba(30,29,26,.42);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);border:1px solid rgba(236,231,222,.2);box-shadow:0 12px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06);border-radius:12px;padding:16px 16px 12px;overflow:hidden;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s,left .5s cubic-bezier(.4,0,.2,1),top .5s cubic-bezier(.4,0,.2,1)}
-.tour-card{pointer-events:none}
-.tour-card.on{opacity:1;transform:none;pointer-events:auto}
-.tour-card .ln{display:none}
-.tour-card.fly .ln{animation:tourLine .9s cubic-bezier(.3,.6,.3,1) forwards}
-@keyframes tourLine{to{width:100%}}
-.tour-card h3{font-family:var(--display);font-style:normal;font-weight:900;letter-spacing:-.03em;font-size:1.15rem;line-height:1.1}
-.tour-card p{color:#e2dccf;font-size:.85rem;line-height:1.45;margin-top:6px}
-.tour-card .row{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px}
-.tour-card .count{font-size:.74rem;color:var(--dim);font-variant-numeric:tabular-nums}
-.tour-card .acts2{display:flex;align-items:center;gap:4px}
-.tour-card .skip{background:none;border:0;color:var(--muted);font:500 .8rem var(--sans);cursor:pointer;padding:6px 8px}
-.tour-card .skip:hover{color:var(--bone)}
-.tour-card .nx{background:none;border:0;color:var(--s2);font:600 .84rem var(--sans);cursor:pointer;padding:6px 2px 6px 8px}
-.tour-card .nx:hover{color:var(--bone)}
-.tour-card .go{background:var(--bone);color:var(--ink);border:0;border-radius:999px;font:600 .82rem var(--sans);padding:7px 14px;cursor:pointer}
-.tour-card .go:hover{background:var(--s2)}
-.tkey{display:grid;gap:6px;margin-top:10px}
-.tkey div{display:flex;align-items:center;gap:8px;font-size:.82rem;color:#cfc9be}
-.tkey i{width:16px;height:3px;border-radius:2px;flex:none}
-.tour-card .hin{display:flex;gap:6px;margin-top:10px}
-.tour-card .hin input{flex:1;min-width:0;font:500 .9rem var(--sans);padding:7px 10px;border-radius:8px;border:1px solid rgba(236,231,222,.25);background:rgba(236,231,222,.06);color:var(--bone);text-transform:uppercase}
-.tour-card .hin input:focus{outline:none;border-color:var(--s2)}
-.tour-card .hin button{background:var(--bone);color:var(--ink);border:0;border-radius:8px;font:600 .8rem var(--sans);padding:0 12px;cursor:pointer}
-.tour-card .hmsg{font-size:.76rem;color:var(--muted);margin-top:6px;min-height:1em}
-@media (max-width:760px){.tour-card{width:auto;left:16px!important;right:16px}}
-@media (prefers-reduced-motion:reduce){.tour-card.fly .ln{animation:none;width:100%}}
+/* Tour: a caption bar over the live map (bottom left on computers, top on phones) with a progress strip */
+.tour2{position:fixed;left:32px;bottom:calc(104px + env(safe-area-inset-bottom,0px));width:min(440px,calc(100vw - 64px));z-index:62;background:rgba(22,21,19,.74);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);border:1px solid rgba(236,231,222,.14);border-radius:16px;padding:12px 12px 13px 16px;color:var(--bone);box-shadow:0 14px 44px rgba(0,0,0,.45);opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .4s,transform .4s cubic-bezier(.3,.6,.3,1)}
+.tour2.on{opacity:1;transform:none;pointer-events:auto}
+.tour2 .tp{display:flex;gap:4px;margin:0 4px 11px 0}
+.tour2 .tp i{flex:1;height:2px;border-radius:2px;background:rgba(236,231,222,.16);overflow:hidden}
+.tour2 .tp i b{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--s1),var(--s2))}
+.tour2 .tp i.done b,.tour2.wait .tp i.cur b{width:100%}
+.tour2 .tp i.cur b{animation:tfill var(--d,6s) linear forwards}
+.tour2.wait .tp i.cur b{animation:none}
+.tour2.paused .tp i.cur b{animation-play-state:paused}
+@keyframes tfill{from{width:0}to{width:100%}}
+.tour2 .tb{display:flex;gap:12px;align-items:flex-end;justify-content:space-between}
+.tour2 .tt{flex:1;min-width:0;cursor:pointer;animation:tin .45s cubic-bezier(.3,.6,.3,1)}
+.tour2.intro .tt,.tour2.end .tt{cursor:default}
+@keyframes tin{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.tour2 h3{font-family:var(--display);font-style:normal;font-weight:900;letter-spacing:-.03em;font-size:1.1rem;line-height:1.15;margin:0}
+.tour2 p{color:#e2dccf;font-size:.85rem;line-height:1.45;margin:5px 0 0}
+.tour2 .ta{display:flex;gap:5px;align-items:center;flex:none}
+.tour2 .ib{width:30px;height:30px;border-radius:50%;border:1px solid rgba(236,231,222,.2);background:none;color:var(--bone);font:400 1.05rem/1 var(--sans);cursor:pointer;display:grid;place-items:center;padding:0 0 2px}
+.tour2 .ib:hover{border-color:var(--bone)}
+.tour2 .skip{background:none;border:0;color:var(--muted);font:500 .8rem var(--sans);cursor:pointer;padding:6px 8px}
+.tour2 .skip:hover{color:var(--bone)}
+.tour2 .go{background:var(--bone);color:var(--ink);border:0;border-radius:999px;font:600 .82rem var(--sans);padding:8px 15px;cursor:pointer;white-space:nowrap}
+.tour2 .go:hover{background:var(--s2)}
+.tour2 .tkey{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:.8rem;color:#e2dccf}
+.tour2 .tkey span{display:inline-flex;align-items:center;gap:6px;opacity:.45;transition:opacity .3s}
+.tour2 .tkey span.on{opacity:1}
+.tour2 .tkey i{width:9px;height:9px;border-radius:50%}
+.tour2 .hin{display:flex;gap:6px;margin-top:10px}
+.tour2 .hin input{flex:1;min-width:0;font:500 .9rem var(--sans);padding:7px 10px;border-radius:8px;border:1px solid rgba(236,231,222,.25);background:rgba(236,231,222,.06);color:var(--bone)}
+.tour2 .hin input:focus{outline:none;border-color:var(--s2)}
+.tour2 .hin button{background:none;color:var(--bone);border:1px solid rgba(236,231,222,.35);border-radius:8px;font:600 .8rem var(--sans);padding:0 12px;cursor:pointer}
+.tour2 .hmsg{font-size:.76rem;color:var(--muted);margin-top:6px}
+body.touring .ticker,body.touring .a2hs,body.touring .v3-key{opacity:0!important;pointer-events:none!important}
+@media (max-width:760px){
+  .tour2{left:16px;right:16px;width:auto;bottom:auto;top:calc(12px + env(safe-area-inset-top,0px));transform:translateY(-14px)}
+  body.touring .hud{opacity:0;pointer-events:none}
+  .tour2.intro .tb,.tour2.end .tb{flex-direction:column;align-items:stretch;gap:10px}
+  .tour2.intro .ta,.tour2.end .ta{justify-content:flex-end}
+  body.touring .v3-card{visibility:hidden}
+}
+@media (prefers-reduced-motion:reduce){.tour2,.tour2 .tt{transition:none;animation:none}}
 
 /* Glass, used by every floating panel */
 .card,.panel,.mcard,.pop,.home-form,.credits,.toast{background:rgba(30,29,26,.46)!important;backdrop-filter:blur(22px) saturate(1.4)!important;-webkit-backdrop-filter:blur(22px) saturate(1.4)!important;border:1px solid rgba(236,231,222,.2)!important;box-shadow:0 12px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06)}
@@ -762,7 +771,23 @@ body.no-ticker .ticker{display:none}
 #c-3d{display:none;z-index:4;touch-action:none;cursor:grab}
 #c-3d.drag{cursor:grabbing}
 body.v3d #c-3d,body.v3d-lobby #c-3d{display:block}
-body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*:not(.wmrow),body.v3d .card,body.v3d .mcard,body.v3d .a2hs{display:none!important}
+body.v3d .vig,body.v3d .mcard,body.v3d .a2hs{display:none!important}
+/* 3D keeps the 2D screen (headline, top buttons, ticker, bottom bar); its own controls sit beside them */
+body.v3d .v3-scrim.b{height:300px}
+@media (min-width:761px){
+  body.v3d .v3-foot{display:contents}
+  body.v3d .v3-key{position:absolute;left:32px;bottom:170px;max-width:46ch}
+  body.v3d .v3-key .alt,body.v3d .v3-key .aw{display:none}
+  body.v3d .v3-ctl{position:absolute;right:32px;bottom:84px}
+  body.v3d .v3-nav{top:44%}
+}
+@media (max-width:760px){
+  body.v3d .v3-foot{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  body.v3d .v3-key .long{display:none}
+  body.v3d .ticker{bottom:calc(212px + env(safe-area-inset-bottom,0px))}
+  body.v3d .v3-nav{bottom:auto;top:40%}
+  body.v3d .v3-hint{top:auto;bottom:calc(240px + env(safe-area-inset-bottom,0px))}
+}
 #v3{position:fixed;inset:0;z-index:5;pointer-events:none}
 .v3-scrim{position:absolute;left:0;right:0;top:0;height:120px;background:linear-gradient(rgba(13,13,12,.85),rgba(13,13,12,0))}
 .v3-scrim.b{top:auto;bottom:0;height:170px;background:linear-gradient(rgba(13,13,12,0),rgba(13,13,12,.8))}
@@ -791,6 +816,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
 .v3-card .t,.v3-card .m{color:var(--muted)}
 .v3-card .m{font-size:.76rem}
 .v3-card .chip{align-self:flex-start;margin-top:8px}
+.v3-card .acts3{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.v3-card .acts3 .chip{margin-top:0}
 @media (max-width:760px){
   .v3-foot{left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));flex-direction:column;align-items:stretch;gap:12px}
   .v3-key{padding:0 20px;font-size:.72rem}
@@ -802,10 +828,26 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
   .v3-card{width:auto}
 }
 @media (pointer:coarse){ .v3-zm{display:none} }
-/* Beta: a quiet label on features still being refined (3D, camera view, sky view, lobby 3D). Small muted text, not a pill. */
-.beta{font-style:normal;font-weight:600;font-size:.66em;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-left:.55em;vertical-align:.12em;white-space:nowrap}
-.cam-top .beta,.sky-cap .beta{color:var(--muted)}
-.row .beta{font-size:1em;vertical-align:baseline;letter-spacing:inherit}
+/* Beta: a thin outlined tag beside the upwind logo, shown only while in a feature still being refined
+   (3D, sky view, lobby 3D scenes). The camera view covers the logo, so it carries the tag beside its own title. */
+.btag{display:none;align-items:center;font:300 9px/1 "Hanken Grotesk",sans-serif;font-style:normal;letter-spacing:.2em;text-indent:.2em;color:var(--bone);opacity:.8;border:1px solid rgba(239,230,214,.55);border-radius:2px;padding:3px 5px 3px;margin-left:8px;vertical-align:middle;white-space:nowrap;pointer-events:none}
+body.v3d .wmrow .btag,body:has(.mcard.on .sky) .wmrow .btag,body.v3d-lobby .lb-mark .btag,.cam-top .btag{display:inline-flex}
+.wmrow .wm+.btag{margin-left:-4px}
+#lobby .lb-mark .btag{font-size:max(9px,.6vw);margin-left:.8em}
+/* TFR card: same look as the other windows */
+.tcard{position:fixed;right:32px;top:76px;width:330px;max-height:calc(100vh - 160px);overflow-y:auto;z-index:9;background:rgba(13,13,12,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(236,231,222,.14);border-radius:14px;padding:18px 20px 16px;opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .3s,transform .3s;color:var(--bone)}
+.tcard.on{opacity:1;transform:none;pointer-events:auto}
+.tcard .x{position:absolute;right:12px;top:10px;background:none;border:0;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1}
+.tcard .k{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#e5534b;font-weight:600;padding-right:22px}
+.tcard b{display:block;font-size:1.25rem;font-weight:600;margin-top:4px}
+.tcard .st{color:#e5534b;font-size:.86rem;margin-top:2px}
+.tcard dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin-top:12px;font-size:.86rem}
+.tcard dt{color:var(--muted)}
+.tcard dd{margin:0}
+.tcard p{font-size:.84rem;color:#cfc9be;margin-top:10px;line-height:1.45}
+.tcard a{display:inline-block;margin-top:12px;color:var(--s2);font-size:.86rem}
+.tcard .fine{font-size:.74rem;color:var(--muted)}
+@media (max-width:760px){ .tcard{left:12px;right:12px;width:auto;top:auto;bottom:12px;max-height:60svh} }
 /* Windows: one simple look, matching the 3D view's card. No stripe along the top; dark, blurred, a thin border.
    (The brand stripe stays at the top of the page.) */
 .card:before,.mcard:before,.panel:before,.a2hs:before,.pop:after,.about:after,#lb-ctl .lb-pan:after,.tour-card:after,.credits:after,.home-form:after{display:none!important}
@@ -833,10 +875,10 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
   </div>
   <div class="v3-foot">
     <div class="v3-key">
-      <div class="leg"><span><i style="background:var(--s1)"></i>Under 5,000 ft</span><span><i style="background:var(--s2)"></i>5,000 to 18,000</span><span><i style="background:var(--s3)"></i>Above 18,000</span></div>
-      <div class="leg"><span><i style="background:#689cf8"></i>Class B</span><span><i style="background:#c487b8"></i>Class C</span><span><i style="background:#8096b6"></i>Class D</span></div>
+      <div class="leg alt"><span><i style="background:var(--s1)"></i>Under 5,000 ft</span><span><i style="background:var(--s2)"></i>5,000 to 18,000</span><span><i style="background:var(--s3)"></i>Above 18,000</span></div>
+      <div class="leg"><span><i style="background:#689cf8"></i>Class B</span><span><i style="background:#c487b8"></i>Class C</span><span><i style="background:#8096b6"></i>Class D</span><span><i style="background:#e5534b"></i>TFR</span></div>
       <div id="v3-note"></div>
-      <div>For awareness only, not for flight planning.</div>
+      <div class="aw">For awareness only, not for flight planning.</div>
     </div>
     <div class="v3-ctl">
       <button class="chip" id="v3-exit">2D Map</button>
@@ -853,14 +895,14 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
 <div id="cam" hidden>
   <video playsinline muted autoplay></video>
   <canvas aria-label="Camera view with plane labels" role="img"></canvas>
-  <div class="cam-top"><div><b>What's That Plane?<i class="beta">Beta</i></b><span id="cam-from"></span></div><button class="chip" id="cam-done">Done</button></div>
+  <div class="cam-top"><div><b>What's That Plane?<i class="btag" aria-label="Beta">BETA</i></b><span id="cam-from"></span></div><button class="chip" id="cam-done">Done</button></div>
   <div class="cam-msg">Camera not available here. The labels still show where each plane is.</div>
   <div class="cam-bot"><div class="cam-lock" id="cam-lock" hidden><div class="cam-lock-t"><b id="cam-lock-n"></b><span id="cam-lock-d"></span></div><div class="cam-btns"><button class="chip" id="cam-lock-more">Details</button><button class="chip" id="cam-lock-x">Stop Following</button></div></div><div class="cam-btns"><button class="chip" id="cam-line">Line Up</button><button class="chip" id="cam-unline" hidden>Undo Line-Up</button></div><span id="cam-cap"></span><span class="cam-fine">Tap a plane to follow it. The video stays on your phone. For awareness only, not for flight planning.</span></div>
 </div>
 <div class="topstripe" aria-hidden="true"><i></i><i></i><i></i></div>
 
 <div class="hud">
-  <div class="wmrow"><a class="wm" href="#" id="wm" aria-haspopup="true" aria-expanded="false">upwind</a>
+  <div class="wmrow"><a class="wm" href="#" id="wm" aria-haspopup="true" aria-expanded="false">upwind</a><i class="btag" aria-label="Beta">BETA</i>
     <div class="about" id="about" role="menu"><button id="about-page">About upwind</button><button id="tour-again">Take the Tour</button><button id="credits-menu">Data &amp; Credits</button><a id="feedback-menu" hidden href="#">Send Feedback</a></div></div>
   <h1 id="h-title">Over Michigan.</h1>
   <p class="sum" id="h-sum"></p>
@@ -889,7 +931,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
       <div class="pop" id="pop" role="menu">
         <div class="ptabs" role="tablist"><button role="tab" data-ptab="map" aria-selected="true">Map Layers</button><button role="tab" data-ptab="view" aria-selected="false">Display</button></div>
         <div class="ppane" data-pane="map">
-          <div class="row"><span>View<i class="beta">3D in beta</i></span><div class="group seg" role="group" aria-label="View"><button class="chip" id="view-flat" aria-pressed="true">2D</button><button class="chip" id="view-3d" aria-pressed="false">3D</button></div></div>
+          <div class="row"><span>View</span><div class="group seg" role="group" aria-label="View"><button class="chip" id="view-flat" aria-pressed="true">2D</button><button class="chip" id="view-3d" aria-pressed="false">3D</button></div></div>
           <div class="row"><span>Base Map</span><div class="group seg" role="group" aria-label="Base map"><button class="chip" id="base-dark" aria-pressed="true">Dark</button><button class="chip" id="sat-btn" aria-pressed="false">Satellite</button><button class="chip" id="chart-btn" aria-pressed="false">Sectional</button></div></div>
           <div class="row"><span>Weather</span><div class="toggles">
             <button class="chip" data-layer="clouds" aria-pressed="true">Clouds</button>
@@ -906,6 +948,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
           <div class="row"><span>Airports</span><div class="toggles">
             <button class="chip" data-layer="airspace" aria-pressed="true">Airspace</button>
             <button class="chip" data-layer="beacons" aria-pressed="true">Beacons</button>
+            <button class="chip" data-layer="tfr" aria-pressed="true">TFRs</button>
           </div></div>
         </div>
         <div class="ppane" data-pane="view" hidden>
@@ -975,7 +1018,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
       <li><b>Traffic</b> from <a href="https://adsb.lol" target="_blank" rel="noopener">adsb.lol</a>, with <a href="https://airplanes.live" target="_blank" rel="noopener">airplanes.live</a> as a backup: networks of volunteer ADS-B receivers.</li>
       <li><b>Weather reports and forecasts</b> from the <a href="https://aviationweather.gov" target="_blank" rel="noopener">NOAA Aviation Weather Center</a>.</li>
       <li><b>Clouds and radar</b> from NOAA satellite and NEXRAD imagery, served by the <a href="https://mesonet.agron.iastate.edu" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>.</li>
-      <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Terrain from NOAA. Runway positions in the 3D view from <a href="https://ourairports.com" target="_blank" rel="noopener">OurAirports</a> (public domain).</li>
+      <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Terrain from NOAA. Runway positions in the 3D view from <a href="https://ourairports.com" target="_blank" rel="noopener">OurAirports</a> (public domain). Temporary flight restrictions from the <a href="https://tfr.faa.gov" target="_blank" rel="noopener">FAA</a>.</li>
     <li><b>Satellite map</b> from the <a href="https://www.usgs.gov/programs/national-geospatial-program/national-map" target="_blank" rel="noopener">USGS National Map</a> and NASA's <a href="https://earthobservatory.nasa.gov/features/BlueMarble" target="_blank" rel="noopener">Blue Marble</a>.</li>
       <li><b>Airline routes</b> from <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>, community route data that can be out of date.</li>
     </ul>
@@ -1018,7 +1061,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
     <li><b>Weather</b> from the <a href="https://aviationweather.gov" target="_blank" rel="noopener">NOAA Aviation Weather Center</a>.</li>
     <li><b>Clouds and radar</b> from NOAA satellite and NEXRAD imagery, served by the <a href="https://mesonet.agron.iastate.edu" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>. Terrain from NOAA.</li>
     <li><b>Airline routes</b> from <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>, community route data that can be out of date. Small-plane departures are worked out from what upwind saw near each field.</li>
-    <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Runway positions in the 3D view from <a href="https://ourairports.com" target="_blank" rel="noopener">OurAirports</a> (public domain).</li>
+    <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Runway positions in the 3D view from <a href="https://ourairports.com" target="_blank" rel="noopener">OurAirports</a> (public domain). Temporary flight restrictions from the <a href="https://tfr.faa.gov" target="_blank" rel="noopener">FAA</a>.</li>
     <li><b>Fonts:</b> Calogen and Hanken Grotesk. QR codes by Kazuhiko Arase's qrcode-generator (MIT).</li>
   </ul>
   <p class="cnote">upwind is for fun and awareness only. It is not for navigation or flight planning; use current charts, NOTAMs and an official briefing.</p>
@@ -1028,13 +1071,10 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
 <div class="mcard" id="mcard" aria-live="polite"></div>
 <div class="follow" id="follow"><i></i><span id="follow-t"></span><button id="follow-stop">Stop</button></div>
 
-<div class="tour-block" id="tour-block"></div>
-<div class="tour-spot" id="tour-spot"></div>
-<div class="tour-card" id="tour-card" role="dialog" aria-live="polite"></div>
 <div id="grain" aria-hidden="true"></div>
 <div id="lobby" aria-live="polite">
   <div class="lb-top"><div class="lb-krow"><span class="lb-k" id="lb-k"></span><b class="lb-tcat" id="lb-tcat"></b></div><div class="lb-name" id="lb-name"></div></div>
-  <div class="lb-mark"><span class="wm">upwind</span><div class="lb-qr" id="lb-qr" aria-label="Scan for upwind on your phone"><div class="qr" id="lb-qr-img"></div><span>Live on your phone</span></div></div>
+  <div class="lb-mark"><span class="wm">upwind</span><i class="btag" aria-label="Beta">BETA</i><div class="lb-qr" id="lb-qr" aria-label="Scan for upwind on your phone"><div class="qr" id="lb-qr-img"></div><span>Live on your phone</span></div></div>
   <div class="lb-dim" id="lb-dim" aria-hidden="true"></div>
   <div class="lb-cond"><div class="lb-cat" id="lb-cat"></div><dl class="lb-grid" id="lb-grid"></dl></div>
   <div class="lb-scene" id="lb-scene"><div class="lb-k" id="lb-sk"></div><div class="lb-line" id="lb-sl"></div><div class="lb-sub" id="lb-ss"></div></div>
@@ -1042,7 +1082,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
 <div id="lb-ctl" aria-label="Display options">
   <div class="lb-pan" id="lb-pan">
     <div class="row"><span>On screen</span><div class="toggles"><button class="chip" data-lbo="catTop">Field Conditions</button><button class="chip" data-lbo="cond">Weather Details</button><button class="chip" data-lbo="cap">Captions</button><button class="chip" data-lbo="chart">Sectional Up Close</button><button class="chip" data-lbo="qr">QR Code</button></div></div>
-    <div class="row"><span>3D scenes<i class="beta">Beta</i></span><div class="toggles"><button class="chip" data-lb3="mix">Mix In</button><button class="chip" data-lb3="off">Off</button></div></div>
+    <div class="row"><span>3D scenes</span><div class="toggles"><button class="chip" data-lb3="mix">Mix In</button><button class="chip" data-lb3="off">Off</button></div></div>
     <div class="row"><span>Dim overnight</span><div class="toggles"><button class="chip" data-lbd="off">Off</button><button class="chip" data-lbd="22-6">10 PM to 6 AM</button><button class="chip" data-lbd="23-5">11 PM to 5 AM</button><button class="chip" data-lbd="0-6">Midnight to 6 AM</button></div></div>
     <div class="row"><span>Map color</span><div class="toggles"><button class="chip" data-lbt="season">Seasonal</button><button class="chip" data-lbt="warm">Warm</button><button class="chip" data-lbt="slate">Slate</button><button class="chip" data-lbt="forest">Forest</button><button class="chip" data-lbt="ink">Ink</button><button class="chip" data-lbt="sat">Satellite</button></div></div>
     <div class="row"><span>Light</span><div class="toggles"><button class="chip" data-lbl="live">Real Time</button><button class="chip" data-lbl="day">Day</button><button class="chip" data-lbl="dusk">Dusk</button><button class="chip" data-lbl="night">Night</button></div></div>
@@ -1076,6 +1116,13 @@ var SPEED=1, BASE_SPEED=1;          // replay multiplier
 // Live data relay (a free Cloudflare Worker). Leave empty to use the sample sky.
 var RELAY="https://upwind-relay.maxpurwin.workers.dev";
 try{ var qr=new URLSearchParams(location.search).get("relay"); if(qr) RELAY=qr; }catch(e){}
+/* Usage counts: how many visits use each feature, so updates follow what people actually use. Only the feature's name
+   and phone or computer are sent, once per feature per visit. No cookies, IDs or stored identifiers, and browsers set
+   to Do Not Track or Global Privacy Control send nothing. */
+var USED={};
+function used(ev){ if(USED[ev]||!RELAY||(typeof TOURING!=="undefined"&&TOURING&&!/^tour/.test(ev))) return; USED[ev]=1;
+  try{ if(PREVIEW||(LOBBY&&ev!=="lobby")||(typeof TOURING!=="undefined"&&TOURING&&!/^tour/.test(ev))||navigator.globalPrivacyControl||navigator.doNotTrack==="1"||!navigator.sendBeacon) return;
+    navigator.sendBeacon(RELAY.replace(/\/$/,"")+"/hit?e="+encodeURIComponent(ev)+"&d="+(mobile?"p":"c")); }catch(e){} }
 var LIVE=false, liveWxAt=null;
 var SNAP_DATE=new Date("2026-11-13T20:46:04Z");
 var SURF={ASPH:"paved",CONC:"paved",TURF:"turf",GRVL:"gravel",WATER:"water",DIRT:"dirt",GRAS:"turf"};
@@ -1149,7 +1196,7 @@ var home=null; try{ var hs=localStorage.getItem("upwind-home"); if(hs&&A[hs]) ho
 function aptVisible(a){ var k=T.k; if(a===home||(sel&&sel.a===a)) return true; if(mobile) return (a.tier===1&&k>=1.3)||(a.tier===2&&k>=3.2)||k>=5; return a.tier===1||(a.tier===2&&k>=1.7)||k>=2.8; }
 function code(a){ return a.icao||a.id; }
 
-var layers={paths:false,wind:false,clouds:true,jets:false,precip:true,places:false,beacons:true,conds:true,tails:true,ticker:true,airspace:true};
+var layers={paths:false,wind:false,clouds:true,jets:false,precip:true,places:false,beacons:true,conds:true,tails:true,ticker:true,airspace:true,tfr:true};
 try{ var lp=JSON.parse(localStorage.getItem("upwind-layers")||"null"); if(lp) Object.keys(layers).forEach(function(k){ if(typeof lp[k]==="boolean") layers[k]=lp[k]; }); }catch(e){}
 function saveLayers(){ try{ localStorage.setItem("upwind-layers",JSON.stringify(layers)); }catch(e){} }
 var seasonPick="live";
@@ -2072,7 +2119,7 @@ function drawPlanes(set,t){
       g.save(); g.fillStyle="rgba(18,16,13,"+(0.92*ha)+")"; g.strokeStyle=g.fillStyle;
       if(shp==="heli"){ g.beginPath(); g.arc(q[0],q[1],s*1.2,0,7); g.fill(); } else { g.lineWidth=Math.max(3.2,s*0.34); g.lineJoin="round"; shapeGlyph(g,q[0],q[1],rot,s,shp,true); }
       g.restore(); }
-    g.fillStyle="rgba("+BC[band(p.alt)]+","+(chart?p.fade*(p.mi||isSel?1:0.7):p.fade*(jet&&!isSel?0.55:1)*(p.mi||isSel?1:0.35))+")"; g.strokeStyle=g.fillStyle;
+    g.fillStyle="rgba("+BC[band(p.alt)]+","+(chart?p.fade*(p.mi||isSel?1:0.7):p.fade*(jet&&!isSel?0.55:1)*(p.mi||isSel?1:0.35))*(tourBand<0||band(p.alt)===tourBand?1:0.15)+")"; g.strokeStyle=g.fillStyle;
     if(shp==="heli") heliGlyph(g,q[0],q[1],rot,s,t); else shapeGlyph(g,q[0],q[1],rot,s,shp);
     // Tail number tag once zoomed in
     var tag=p.reg||p.cs; if(tag&&layers.tails&&(T.k>=4||isSel)&&(!jet||isSel||T.k>=7)&&(p.mi||isSel)){
@@ -2111,6 +2158,7 @@ function frame(now){
   if(mapDirty) drawMap();
   stepWind(dt);
   g.setTransform(DPR,0,0,DPR,0,0); g.clearRect(0,0,W,H);
+  drawTfr2d();
   drawAirports(clock);
   var ga=planes.filter(function(p){return !isJet(p);}), jets=planes.filter(function(p){return isJet(p);});
   drawPrecip(dt,clock);
@@ -2177,7 +2225,7 @@ cTop.addEventListener("click",function(e){
     var hh=hit(e.clientX,e.clientY); if(hh&&hh.p){ openPlane(hh.p); return; }
     if(!lookPos){ var ll=proj.invert([(e.clientX-T.x)/T.k,(e.clientY-T.y)/T.k]); if(ll){ myPos={lat:ll[1],lon:ll[0],src:"tap"}; setLook(ll[1],ll[0]); } }
     return; }
-  var h=hit(e.clientX,e.clientY); if(!h){ closeCard(); return; } if(h.home) flyToLL(home.lat,home.lon,Math.max(T.k,2.4)); else if(h.p) openPlane(h.p); else if(h.spot) openSpot(h.spot); else if(h.st) openStation(h.st); else openAirport(h.a); });
+  var h=hit(e.clientX,e.clientY); if(!h){ var tf=tfrAt(e.clientX,e.clientY); if(tf){ closeCard(); openTfr(tf); return; } closeCard(); closeTfr(); return; } if(h.home) flyToLL(home.lat,home.lon,Math.max(T.k,2.4)); else if(h.p) openPlane(h.p); else if(h.spot) openSpot(h.spot); else if(h.st) openStation(h.st); else openAirport(h.a); });
 // What's Overhead: look from somewhere else on purpose, with press-and-hold (phones) or double-click (computers)
 var lookHeld=false, holdT=null, holdXY=null;
 function lookFromScreen(x,y){ var ll=proj.invert([(x-T.x)/T.k,(y-T.y)/T.k]); if(ll){ setLook(ll[1],ll[0]); if(navigator.vibrate) try{ navigator.vibrate(12); }catch(e){} } }
@@ -2202,6 +2250,7 @@ function where(p){
 }
 // Only one window at a time: opening any card, panel or menu closes the rest
 function closeOthers(keep){
+  if(keep!=="tfr"&&typeof tfrCard!=="undefined") tfrCard.classList.remove("on");
   if(typeof aptW!=="undefined"&&aptW.classList.contains("on")&&keep!=="apt"&&(keep!=="card"||mobile)) closeAptW();
   if(keep!=="card"&&card.classList.contains("on")) closeCard();
   if(keep!=="panel"&&typeof panel!=="undefined"&&panel.classList.contains("on")) closePanel();
@@ -2251,7 +2300,7 @@ function rpFill(){ var mn=+rpRange.min, mx=+rpRange.max, f=mx>mn?(RP.t-mn)/(mx-m
   var tip=document.getElementById("rp-tip"), w=rpRange.clientWidth, x=7+f*(w-14), hw=tip.offsetWidth/2; tip.style.left=Math.max(hw,Math.min(w-hw,x))+"px"; }
 var rpBar=document.getElementById("rpBar"), rpRange=document.getElementById("rp-range"), rpTime=document.getElementById("rp-time"), rpN=document.getElementById("rp-n"), rpPlay=document.getElementById("rp-play");
 function rpClock(m){ var d=RPD.d; return d?new Date(d.from+m*60000).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}):"—"; }
-function startReplay(){
+function startReplay(){ used("replay");
   closeOthers(""); if(follow) stopFollow(); if(card.classList.contains("on")) closeCard();
   rpBar.hidden=false; document.body.classList.add("replay"); RP.on=true; rpTime.textContent="Loading"; rpN.textContent="";
   getPaths(2,function(d){
@@ -2289,8 +2338,9 @@ rpS.addEventListener("click",function(e){ e.stopPropagation(); var on=!rpM.class
 rpM.querySelectorAll("[data-rps]").forEach(function(b){ b.addEventListener("click",function(e){ e.stopPropagation(); RP.speed=+b.dataset.rps; rpS.textContent=b.textContent; rpM.querySelectorAll("[data-rps]").forEach(function(x){ x.setAttribute("aria-checked",x===b); }); rpM.classList.remove("on"); rpS.setAttribute("aria-expanded",false); }); });
 document.addEventListener("click",function(e){ if(!e.target.closest(".rp-spd")){ rpM.classList.remove("on"); rpS.setAttribute("aria-expanded",false); } });
 addEventListener("keydown",function(e){ if(e.key==="Escape"&&RP.on) stopReplay(); });
-function openPlane(p){
+function openPlane(p){ used("plane");
   if(RP.on) return;
+  if(typeof V3!=="undefined"&&V3&&V3.on){ V3.pick(p); return; }   // in 3D, the 3D view shows the plane
   closeOthers("card");
   if(mode!=="sky") document.body.classList.add("mcard-hide");
   sel={p:p,h:[]}; card.classList.add("float"); body._k=null; loadPast(p); updPlaneCard(p); card.classList.add("on"); sound.target(p); placeCard(true);
@@ -2542,13 +2592,13 @@ function awCenter(a,dur){
   if(follow) stopFollow();
   d3.select(cTop).transition().duration(dur||1300).ease(d3.easeCubicInOut).call(zoom.transform,d3.zoomIdentity.translate(cx-b[0]*k,cy-b[1]*k).scale(k));
 }
-function openAptW(a){
+function openAptW(a){ used("airport"); if(typeof V3!=="undefined"&&V3&&V3.on&&a&&a.lat!=null) V3.goTo(a.lat,a.lon);
   var same=awA===a&&aptW.classList.contains("on");
   closeOthers("apt"); if(card.classList.contains("on")) closeCard();
   awA=a; sel=null; if(!same){ awStats=undefined; aptW.scrollTop=0; }
   awRender(); aptW.classList.add("on"); aptW.setAttribute("aria-hidden","false"); document.body.classList.add("aptw-open");
   if(!awPrevT) awPrevT=T; awCenter(a);
-  try{ if(awUrl===null) awUrl=location.search; history.replaceState(null,"","./?apt="+encodeURIComponent(code(a))); }catch(e){}
+  try{ if(awUrl===null) awUrl=location.search; history.replaceState(null,"","./?apt="+encodeURIComponent(code(a))+(typeof V3!=="undefined"&&V3&&V3.on?"&view=3d":"")); }catch(e){}
   var want=a, gave=false;
   aptStatsFor(a,function(st){ if(awA!==want) return; gave=true; awStats=st; awRender(); });
   setTimeout(function(){ if(awA===want&&!gave&&awStats===undefined){ awStats=null; awRender(); } },6000);
@@ -2663,7 +2713,7 @@ addEventListener("keydown",function(e){ if(e.key==="Escape"){ closeCard(); if(fo
 
 /* Follow */
 var fb=document.getElementById("follow");
-function startFollow(p){ follow=p; document.body.classList.add("following"); fb.classList.add("on"); document.getElementById("follow-t").textContent="Riding along with "+(p.cs||p.name); updPlaneCard(p); sound.target(p); }
+function startFollow(p){ used("ride"); if(typeof V3!=="undefined"&&V3&&V3.on){ V3.ride(p); return; } follow=p; document.body.classList.add("following"); fb.classList.add("on"); document.getElementById("follow-t").textContent="Riding along with "+(p.cs||p.name); updPlaneCard(p); sound.target(p); }
 function stopFollow(){ var p=follow; follow=null; document.body.classList.remove("following"); fb.classList.remove("on"); if(sel&&sel.p) updPlaneCard(sel.p); d3.select(cTop).transition().duration(1400).ease(d3.easeCubicInOut).call(zoom.transform,d3.zoomIdentity); }
 document.getElementById("follow-stop").addEventListener("click",stopFollow);
 function followStep(dt){
@@ -2828,6 +2878,7 @@ function renderPlaces(){
 }
 function flyToLL(lat,lon,k,cb,center,dur){
   if(follow) stopFollow();
+  if(typeof V3!=="undefined"&&V3&&V3.on) V3.goTo(lat,lon);
   var b=proj([lon,lat]), po=panel.classList.contains("on"), cx=mobile?W/2:((po||mode!=="sky")?(W-420)/2+80:W*0.62), cy=mobile?H*(mode!=="sky"?0.36:0.56):H/2;
   d3.select(cTop).transition().duration(dur||1600).ease(d3.easeCubicInOut).call(zoom.transform,d3.zoomIdentity.translate(cx-b[0]*k,cy-b[1]*k).scale(k)).on("end",function(){ if(cb) cb(); });
   if(mobile) closePanel();
@@ -2895,7 +2946,7 @@ function renderWeek(){
   pbody.querySelectorAll("li[data-id]").forEach(function(li){ li.addEventListener("click",function(){ flyTo(A[li.dataset.id]); }); });
 }
 function renderPanel(){ if(tab!=="places"&&tab!=="week"&&tab!=="heat") tab="week"; mapDirty=true; document.querySelectorAll(".panel [data-tab]").forEach(function(b){ b.setAttribute("aria-selected",b.dataset.tab===tab); }); if(tab==="heat") renderHeat(); else if(tab==="places") renderPlaces(); else if(tab==="cross") renderCross(); else renderWeek(); }
-function openPanel(){ closeOthers("panel"); renderPanel(); panel.classList.add("on"); document.body.classList.add("panel-open"); }
+function openPanel(){ used("explore"); closeOthers("panel"); renderPanel(); panel.classList.add("on"); document.body.classList.add("panel-open"); }
 function closePanel(){ mapDirty=true; panel.classList.remove("on"); document.body.classList.remove("panel-open"); }
 document.getElementById("open-panel").addEventListener("click",openPanel);
 document.getElementById("panel-x").addEventListener("click",closePanel);
@@ -2969,7 +3020,7 @@ document.getElementById("snd").addEventListener("click",function(){ var v=!sound
 
 /* ---------------- Modes: Sky, Plan a trip, Look up ---------------- */
 var mode="sky", mcard=document.getElementById("mcard"), cruise=110, trip=null, lookPos=null, lookT=0, myPos=null;
-function setMode(m){
+function setMode(m,at){ if(m==="look") used("overhead");
   if(m==="plan"&&!home){ toast("Set your home airport first, then plan from there."); openHomeForm(); return; }
   mode=m; document.body.classList.remove("mode-sky","mode-plan","mode-look"); document.body.classList.add("mode-"+m);
   var lb=document.getElementById("look-btn"); if(lb) lb.setAttribute("aria-pressed",m==="look");
@@ -2978,6 +3029,7 @@ function setMode(m){
   if(m==="sky"){ mcard.classList.remove("on"); lookPos=null; return; }
   if(m==="plan"){ renderPlan(); flyToLL(home.lat,home.lon,reachZoom()); }
   if(m==="look"){ SPEED=1; lookPos=null;
+    if(at){ setLook(at.lat,at.lon,!!(at.home&&home)); return; }
     if(myPos) setLook(myPos.lat,myPos.lon); else if(home){ setLook(home.lat,home.lon,true); } else renderLookAsk();
     if(navigator.geolocation){ try{ navigator.geolocation.getCurrentPosition(function(pos){ var la=pos.coords.latitude, lo=pos.coords.longitude; if(la>41.5&&la<47.6&&lo>-90.6&&lo<-82.2){ myPos={lat:la,lon:lo,src:"gps"}; if(mode==="look"&&(!lookPos||lookPos.auto)) setLook(la,lo); } },function(){},{timeout:6000,maximumAge:600000}); }catch(e){} }
   }
@@ -3126,7 +3178,7 @@ var SKY=(function(){
   var el=document.createElement("div"); el.className="sky";
   el.innerHTML='<canvas aria-label="Sky view: planes by direction and height above the horizon" role="img"></canvas>'+
     '<div class="sky-cap"><span id="sky-st">North is up. The center is straight overhead, the edge is the horizon. Rings show degrees above the horizon.</span>'+
-    '<i class="beta" style="margin:0">Sky view · Beta</i><div class="sky-btns"><button class="chip" id="sky-cam">Camera View</button><button class="chip" id="sky-cmp" hidden aria-pressed="false">Use Phone Compass</button></div></div>';
+    '<div class="sky-btns"><button class="chip" id="sky-cam">Camera View</button><button class="chip" id="sky-cmp" hidden aria-pressed="false">Use Phone Compass</button></div></div>';
   var cv=el.querySelector("canvas"), c=cv.getContext("2d"), st=el.querySelector("#sky-st"), cmpB=el.querySelector("#sky-cmp");
   var S=0, dpr=1, last=0, heading=null, follow=false, hits=[];
   // phones and tablets only: it is meant to be held up to the sky
@@ -3355,7 +3407,7 @@ var CAM=(function(){
   undoB.addEventListener("click",function(){ dAz=0; dEl=0; undoB.hidden=true; lining=false; lineUI(); say("Line-up removed. Labels follow the compass again."); });
   function listen(){ if("ondeviceorientationabsolute" in window) addEventListener("deviceorientationabsolute",onOri); addEventListener("deviceorientation",onOri); }
   function unlisten(){ removeEventListener("deviceorientationabsolute",onOri); removeEventListener("deviceorientation",onOri); }
-  function open(){ if(on) return; on=true; R=null; offset=null; gotAbs=false; denied=false; lining=false; lineUI(); undoB.hidden=!(dAz||dEl); lastEv=performance.now();
+  function open(){ if(on) return; used("camera"); on=true; R=null; offset=null; gotAbs=false; denied=false; lining=false; lineUI(); undoB.hidden=!(dAz||dEl); lastEv=performance.now();
     box.hidden=false; document.body.classList.add("cam-on"); size();
     var mine=myPos&&lookPos&&Math.abs(myPos.lat-lookPos.lat)<1e-6&&Math.abs(myPos.lon-lookPos.lon)<1e-6&&myPos.src==="gps";
     fromEl.textContent=mine?"From your location.":"From "+(lookPos&&lookPos.auto&&home?"your home airport, "+code(home):"the spot you picked")+". Allow location for labels that match your view.";
@@ -3376,6 +3428,50 @@ var CAM=(function(){
   document.addEventListener("visibilitychange",function(){ if(document.hidden) close(); });
   return {open:open,close:close,get on(){ return on; }};
 })();
+
+/* ---------------- Temporary flight restrictions ----------------
+   From the FAA via the relay (/tfr): each area's outline, times, floor and ceiling. Shown while active, and dashed when
+   starting within 48 hours. Facts from the official notice only; the card points to the FAA page for the full text. */
+var TFRS=[], TFRC="229,83,75";
+var TFR_KIND={"SECURITY":"Security","VIP":"VIP movement","HAZARDS":"Hazard","SPACE OPERATIONS":"Space operations","SPECIAL":"Special event","AIR SHOWS/SPORTS":"Air show or sports event","EMERGENCY":"Emergency","91.145":"Air show or sports event"};
+function tfrTime(s,tz){ if(!s) return null; var t=Date.parse(s+(tz==="UTC"||!tz?"Z":"")); return isNaN(t)?null:t; }
+function tfrStatus(t,now){ if(t.from==null) return "active"; if(now>=t.from&&(t.to==null||now<t.to)) return "active"; if(t.from>now&&t.from-now<48*36e5) return "soon"; return null; }
+function loadTfr(){ if(!RELAY) return;
+  fetch(RELAY.replace(/\/$/,"")+"/tfr").then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(!j||!Array.isArray(j.tfr)) return;
+    TFRS=j.tfr.map(function(t){ var o={id:t.id,title:t.title||"",type:t.type||"",city:t.city,purpose:t.purpose,text:t.text,lo:t.lo||0,loRef:t.loRef,hi:t.hi,hiRef:t.hiRef,
+      from:tfrTime(t.from,t.tz),to:tfrTime(t.to,t.tz),rings:t.rings||[]}; return o; }).filter(function(t){ return t.rings.length&&!/^UAS\b|DRONE/i.test(t.type); }); mapDirty=true; }).catch(function(){}); }
+loadTfr(); setInterval(loadTfr,15*60000);
+function shownTfrs(){ if(!layers.tfr) return []; var now=Date.now(); return TFRS.filter(function(t){ return (t._st=tfrStatus(t,now)); }); }
+// 2D: red outline, filled lightly while active; dashed when coming up
+function drawTfr2d(){ var L=shownTfrs(); if(!L.length) return;
+  L.forEach(function(t){ var act=t._st==="active";
+    g.beginPath(); t.rings.forEach(function(r){ r.forEach(function(c,i){ var q=scr(c[0],c[1]); if(i) g.lineTo(q[0],q[1]); else g.moveTo(q[0],q[1]); }); g.closePath(); });
+    g.fillStyle="rgba("+TFRC+","+(act?0.12:0.05)+")"; g.fill("evenodd");
+    g.setLineDash(act?[]:[6,5]); g.lineWidth=act?1.8:1.4; g.strokeStyle="rgba("+TFRC+","+(act?0.95:0.75)+")"; g.stroke(); g.setLineDash([]);
+    var c=t.rings[0], x=0,y=0; c.forEach(function(p){ x+=p[0]; y+=p[1]; }); var q=scr(x/c.length,y/c.length);
+    g.font="700 10px Hanken Grotesk, sans-serif"; g.textAlign="center"; g.fillStyle="rgba("+TFRC+",1)"; g.shadowColor="rgba(0,0,0,.85)"; g.shadowBlur=4;
+    g.fillText(act?"TFR":"TFR SOON",q[0],q[1]+3); g.shadowBlur=0; g.textAlign="start"; }); }
+function inRing(lon,lat,r){ var ins=false; for(var i=0,j=r.length-1;i<r.length;j=i++){ var xi=r[i][0],yi=r[i][1],xj=r[j][0],yj=r[j][1]; if((yi>lat)!==(yj>lat)&&lon<(xj-xi)*(lat-yi)/(yj-yi)+xi) ins=!ins; } return ins; }
+function tfrAtLL(lon,lat){ var L=shownTfrs(); for(var i=0;i<L.length;i++){ if(L[i].rings.some(function(r){ return inRing(lon,lat,r); })) return L[i]; } return null; }
+function tfrAt(x,y){ var ll=proj.invert([(x-T.x)/T.k,(y-T.y)/T.k]); return ll?tfrAtLL(ll[0],ll[1]):null; }
+// floor and ceiling in feet above sea level, for 3D (above-ground values use the nearest field's elevation)
+function tfrMSL(t){ var c=t.rings[0], x=0,y=0; c.forEach(function(p){ x+=p[0]; y+=p[1]; }); var n=nearestApts(y/c.length,x/c.length,1)[0], gEl=n&&n.nm<25?n.a.el||0:700;
+  return {lo:t.lo+(t.loRef==="HEI"?gEl:0), hi:t.hi==null?18000:Math.min(18000,t.hi+(t.hiRef==="HEI"?gEl:0))}; }
+function tfrAlt(v,ref,top){ if(v==null) return top?"no upper limit":"the surface"; if(!v&&!top) return "the surface"; return v.toLocaleString()+" ft "+(ref==="HEI"?"above ground":"MSL"); }
+var tfrCard=document.createElement("div"); tfrCard.className="tcard"; tfrCard.id="tfr-card"; tfrCard.setAttribute("role","dialog"); tfrCard.setAttribute("aria-label","Temporary flight restriction"); document.body.appendChild(tfrCard);
+function openTfr(t){ used("tfr"); if(typeof closeOthers==="function") closeOthers("tfr");
+  var fmt=function(ms){ return new Date(ms).toLocaleString("en-US",{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZone:"America/Detroit",timeZoneName:"short"}); };
+  var now=Date.now(), st=tfrStatus(t,now), when=t.from?fmt(t.from)+(t.to?" to "+fmt(t.to):""):"See the official notice for times";
+  var lead=st==="active"?"Active now":t.from?"Starts in "+(t.from-now<36e5*20?Math.max(1,Math.round((t.from-now)/36e5))+" hr":Math.round((t.from-now)/864e5*10)/10+" days"):"";
+  var place=t.title.split(",").slice(0,2).join(",").trim()||t.city||"Restricted area", kind=TFR_KIND[t.type]||t.type||"Restriction";
+  tfrCard.innerHTML='<button class="x" aria-label="Close">×</button><span class="k">Temporary Flight Restriction · '+esc(kind)+'</span><b>'+esc(place)+'</b>'+
+    '<p class="st">'+esc(lead)+'</p><dl><dt>When</dt><dd>'+esc(when)+'</dd><dt>Altitudes</dt><dd>From '+esc(tfrAlt(t.lo,t.loRef,false))+' to '+esc(tfrAlt(t.hi,t.hiRef,true))+'</dd>'+
+    (t.purpose?'<dt>Purpose</dt><dd>'+esc(t.purpose)+'</dd>':'')+'</dl>'+
+    '<a href="https://tfr.faa.gov/tfr3/?page=detail_'+encodeURIComponent(t.id.replace("/","_"))+'" target="_blank" rel="noopener">Official notice: FDC '+esc(t.id)+'</a>'+
+    '<p class="fine">Check official sources before flight. For awareness only, not for flight planning.</p>';
+  tfrCard.querySelector(".x").onclick=closeTfr; tfrCard.classList.add("on"); }
+function closeTfr(){ tfrCard.classList.remove("on"); }
+addEventListener("keydown",function(e){ if(e.key==="Escape") closeTfr(); });
 
 /* ---------------- Home airport UI ---------------- */
 var hp=document.getElementById("home-pill"), hf=document.getElementById("home-form"), hin=document.getElementById("home-in"), hmsg=document.getElementById("home-msg");
@@ -3482,74 +3578,112 @@ hudBtn.addEventListener("click",function(e){ e.preventDefault(); setHudMin(!docu
 try{ if(localStorage.getItem("upwind-hud")==="min") setHudMin(true,true); }catch(e){}
 
 /* ---------------- Walkthrough ---------------- */
+/* ---------------- Tour: a short live demo ----------------
+   Instead of pointing at buttons, it runs the main features on a real plane in the air right now: altitude colors,
+   the plane's card, Ride Along, 3D, an airport window and What's Overhead. Each stop plays for a few seconds and moves
+   on by itself (tap the bar to go on, ‹ to go back, × to leave). Touching the map ends it quietly: that's the point.
+   Quiet sky: no made-up planes; it shows an airport, 3D and What's Overhead instead. Reduced motion: no auto-advance
+   and no 3D. Explore, Map Settings and the − button get a one-line tip the first time they're used instead. */
+var TOURING=false, tourBand=-1;
 var tour=(function(){
-  var blk=document.getElementById("tour-block"), spot=document.getElementById("tour-spot"), cardT=document.getElementById("tour-card"), i=0, on=false;
-  var PLANE='<svg width="22" height="22" viewBox="-14 -14 28 28" aria-hidden="true"><path transform="rotate(90)" fill="#f4e2c6" d="M0,-13 C1.6,-13 2.3,-9 2.3,-5 L13,2 L13,5 L2.3,2 L1.6,9 L5.5,12 L5.5,14 L0,12.5 L-5.5,14 L-5.5,12 L-1.6,9 L-2.3,2 L-13,5 L-13,2 L-2.3,-5 C-2.3,-9 -1.6,-13 0,-13 Z"/></svg>';
-  var STEPS=[
-    {t:null,h:"Welcome to upwind.",p:"Michigan's Sky, Live. Built for general aviation: small planes, local airports and the weather around them.",cta:"Take the Tour",intro:true},
-    {t:".legend",h:"Colors Show Altitude.",key:true},
-    {t:"map",h:"Tap Anything.",p:"Planes show what they are and where they're headed. Airports show conditions, runways and frequencies."},
-    {t:"#home-pill",h:"Set Your Home Airport.",p:"It stays on the map, and distances are measured from it.",home:true},
-    {t:"#open-panel",h:"Explore.",p:"This week's busiest fields, places worth flying over, and where Michigan pilots fly most."},
-    {t:"#look-btn",h:"What's Overhead.",p:"Tap where you are to see what's about to fly over you. Tap again to go back to the map."},
-    {t:"#scene-btn",h:"Map Settings.",p:"Map layers: sectional, weather, traffic, airspace. Display: your numbers, Worth knowing and map color."},
-    {t:"#hud-toggle",h:"More Map.",p:"Tap − to tuck the headline away. The numbers stay."},
-    {t:null,h:"Enjoy the Sky.",p:"Tap the upwind logo anytime for this tour, credits and more.",last:true}
-  ];
-  function rectOf(sel){
-    if(sel==="map"){ var cx=mobile?W/2:W*0.62, cy=mobile?H*0.55:H*0.5, r=mobile?Math.min(W*0.42,150):Math.min(W*0.2,220); return {left:cx-r,top:cy-r,width:r*2,height:r*2,round:true}; }
-    var el=document.querySelector(sel); if(!el) return null; var r=el.getBoundingClientRect(); if(!r.width) return null; return {left:r.left-8,top:r.top-8,width:r.width+16,height:r.height+16};
-  }
-  function place(){
-    var st=STEPS[i], r=st.t?rectOf(st.t):null;
-    if(r){ spot.classList.remove("none"); spot.style.left=r.left+"px"; spot.style.top=r.top+"px"; spot.style.width=r.width+"px"; spot.style.height=r.height+"px"; spot.style.borderRadius=r.round?"50%":"14px"; }
-    else { spot.classList.add("none"); spot.style.left=W/2+"px"; spot.style.top=H/2+"px"; spot.style.width="0px"; spot.style.height="0px"; }
-    var cw=mobile?W-24:290, ch=cardT.offsetHeight||200, gap=18, m=12, x, y;
-    if(!r){ x=(W-cw)/2; y=(H-ch)/2; }
-    else {
-      // Try below, above, right, left of the highlighted thing, and keep the first spot that doesn't cover it
-      var cx=r.left+r.width/2, cy=r.top+r.height/2, C=[
-        [cx-cw/2, r.top+r.height+gap],
-        [cx-cw/2, r.top-ch-gap],
-        [r.left+r.width+gap, cy-ch/2],
-        [r.left-cw-gap, cy-ch/2]
-      ];
-      if(mobile) C=C.slice(0,2).map(function(c){ return [12,c[1]]; });
-      function fits(c){ return c[0]>=m&&c[1]>=m&&c[0]+cw<=W-m&&c[1]+ch<=H-m; }
-      function clamp(c){ return [Math.min(W-cw-m,Math.max(m,c[0])),Math.min(H-ch-m,Math.max(m,c[1]))]; }
-      function hits(c){ return !(c[0]+cw<r.left-6||c[0]>r.left+r.width+6||c[1]+ch<r.top-6||c[1]>r.top+r.height+6); }
-      var pick=null;
-      for(var k=0;k<C.length&&!pick;k++){ if(fits(C[k])) pick=C[k]; }
-      for(var k2=0;k2<C.length&&!pick;k2++){ var cc=clamp(C[k2]); if(!hits(cc)) pick=cc; }
-      if(!pick){ pick=clamp([cy>H/2?m:W-cw-m, cy>H/2?m:H-ch-m]); }
-      x=pick[0]; y=pick[1];
+  var bar=document.createElement("div"); bar.className="tour2"; bar.setAttribute("role","dialog"); bar.setAttribute("aria-label","Tour"); bar.setAttribute("aria-live","polite"); document.body.appendChild(bar);
+  var RM=false; try{ RM=matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){}
+  var on=false, i=0, stops=[], tmr=null, t0=0, left=0, P=null, AP=null, T0=null, bandT=null, later=[];
+  function v3(){ return typeof V3!=="undefined"&&V3; }
+  function inMI(){ return planes.filter(function(p){ return p.fade>0.2&&nearMI(p); }); }
+  function alive(p){ return p&&!p.gone&&planes.indexOf(p)>=0; }
+  function an(w){ return /^[aeiou]/i.test(w)?"an ":"a "; }
+  // An interesting small plane: a known type with a tail number, low enough to see, over Michigan, with company nearby
+  function pickPlane(){
+    var L=inMI(), best=null, bs=-1e9;
+    L.forEach(function(p){ if(p.gone||isJet(p)||p.alt<700||p.alt>11000||p.gs<55) return;
+      var sc=(SMALL[p.kind]?4:0)+(TYPES[p.t]?3:0)+(p.reg||p.cs?2:0)-(p.priv?2:0)+(geoInMI([p.lon,p.lat])?2:0)+(p.alt<6000?1:0);
+      sc+=Math.min(4,L.filter(function(q){ return q!==p&&Math.abs(q.lat-p.lat)<0.5&&Math.abs(q.lon-p.lon)<0.7; }).length)*0.5;
+      if(sc>bs){ bs=sc; best=p; } });
+    return best; }
+  // The airport for the airport stop: the nearest field with a tower or a long runway (they report weather)
+  function pickApt(lat,lon){ var c=APTS.filter(function(a){ return a.twr||a.rw.some(function(r){ return r[1]>=5000; }); }), b=null, bd=1e9;
+    c.forEach(function(a){ var d=Math.pow(a.lat-lat,2)+Math.pow((a.lon-lon)*Math.cos(lat*Math.PI/180),2); if(d<bd){ bd=d; b=a; } }); return b; }
+  function planeLine(p){ var id=p.priv?"A private aircraft":(p.reg||p.cs||""), nm=p.name&&!/^(An Aircraft|Private Aircraft)$/.test(p.name)?p.name:"";
+    var what=nm?(id?id+", "+an(nm)+nm:nm.charAt(0).toUpperCase()+nm.slice(1)):(id||"A small plane");
+    return what+" at "+fmtAlt(p.alt)+" "+where(p).txt+"."; }
+  // Put the map back to a plain state, keeping only what the next stop builds on
+  function clean(keep){ keep=keep||{};
+    tourBand=-1; clearInterval(bandT); mapDirty=true;
+    var V=v3(); if(V&&V.orbit) V.orbit(false);
+    if(mode!=="sky") setMode("sky");
+    if(!keep.v3&&V&&V.on) V.exit();
+    if(!keep.follow&&follow) stopFollow();
+    if(!keep.card&&card.classList.contains("on")) closeCard();
+    if(aptW.classList.contains("on")) closeAptW(); }
+  function later2(fn,ms){ later.push(setTimeout(function(){ if(on) fn(); },ms)); }
+  function KEY(){ return '<span class="tkey">'+["Under 5,000 ft","5,000 to 18,000","Above 18,000"].map(function(t,k){ return '<span data-b="'+k+'"><i style="background:var(--s'+(k+1)+')"></i>'+t+'</span>'; }).join("")+'</span>'; }
+  function build(){
+    var n=inMI().length, quiet=!P, V=v3(), can3=V&&!V.slow&&!RM, ll=home||AP;
+    var S=[{intro:true,h:"Welcome to upwind.",p:quiet?(n?"Quiet sky right now: "+n+" plane"+(n===1?"":"s")+" over Michigan. Take a 30-second look around?":"No planes showing over Michigan right now. Take a 30-second look around?"):n+" planes over Michigan right now. Take a 45-second look?"}];
+    if(!quiet){
+      S.push({k:"colors",h:"Color is altitude.",p:KEY(),d:6500,run:function(){ clean(); flyToLL(P.lat,P.lon,2.4,null,true,RM?1:1600);
+        var b=0; function step(){ tourBand=b%3; mapDirty=true; bar.querySelectorAll(".tkey [data-b]").forEach(function(x){ x.classList.toggle("on",+x.dataset.b===tourBand); }); b++; }
+        later2(function(){ step(); bandT=setInterval(step,1500); },1300); }});
+      S.push({k:"plane",h:function(){ return planeLine(P); },p:"Tap any plane or airport for details like these.",d:7000,run:function(){ clean(); flyToLL(P.lat,P.lon,6,function(){ if(on&&stops[i].k==="plane"&&alive(P)) openPlane(P); },true,RM?1:1500); }});
+      S.push({k:"ride",h:"Ride Along.",p:"Keeps a plane centered as it flies. It's on every plane's card.",d:6500,run:function(){ clean({card:1}); if(!card.classList.contains("on")||!sel||sel.p!==P) openPlane(P); startFollow(P); }});
+      if(can3) S.push({k:"3d",h:"3D.",p:"The same live sky, with height. Drag to turn and tilt.",d:8500,run:function(){ clean({card:1,follow:1}); if(!follow) startFollow(P);
+        if(!V.on) V.enter(); else V.ride(P); later2(function(){ if(V.on&&alive(P)) V.ride(P); },1300); later2(function(){ if(V.orbit) V.orbit(true); },2700); }});
     }
-    cardT.style.left=x+"px"; cardT.style.top=y+"px";
-  }
+    S.push({k:"apt",h:function(){ return code(AP)+" · "+AP.t; },p:"Every airport has a window like this: weather, runways, frequencies and the traffic nearby.",d:7500,run:function(){ var was=V&&V.on; clean(); later2(function(){ openAptW(AP); },was?700:0); }});
+    if(quiet&&can3) S.push({k:"3d",h:"3D.",p:"The same live sky, with height. Drag to turn and tilt.",d:8000,run:function(){ clean(); if(!V.on) V.enter(); later2(function(){ V.goTo(AP.lat,AP.lon); },900); later2(function(){ if(V.orbit) V.orbit(true); },2200); }});
+    S.push({k:"look",h:"What's Overhead.",p:"What's about to fly over a spot"+(home?", here "+code(home):"")+". Tap it anytime, then tap where you are.",d:7500,run:function(){ var was=V&&V.on; clean(); later2(function(){ setMode("look",{lat:ll.lat,lon:ll.lon,home:ll===home}); },was?700:0); }});
+    S.push({end:true,h:"Your turn.",p:"The tour is under the upwind logo anytime.",run:function(){ clean(); if(T0) d3.select(cTop).transition().duration(RM?1:1400).ease(d3.easeCubicInOut).call(zoom.transform,T0); }});
+    return S; }
   function render(){
-    var st=STEPS[i];
-    var n=STEPS.length-1;
-    cardT.innerHTML='<div class="ln"></div><h3>'+st.h+'</h3>'+(st.p?'<p>'+st.p+'</p>':'')+
-      (st.key?'<div class="tkey"><div><i style="background:var(--s1)"></i>Under 5,000 ft</div><div><i style="background:var(--s2)"></i>5,000 to 18,000 ft</div><div><i style="background:var(--s3)"></i>Above 18,000 ft</div></div>':'')+
-      (st.home?'<form class="hin" id="tour-home" autocomplete="off"><input id="tour-home-in" list="home-list" placeholder="KARB" spellcheck="false" value="'+(home?esc(code(home)):"")+'"><button type="submit">Set</button></form><p class="hmsg" id="tour-hmsg">'+(home?"Home is "+esc(code(home))+".":"Optional.")+'</p>':'')+
-      '<div class="row"><span class="count">'+(st.intro||st.last?"":i+" of "+(n-1))+'</span><div class="acts2">'+
-      (st.intro?'<button class="skip" data-t="skip">Skip</button><button class="go" data-t="next">'+st.cta+'</button>':
-       st.last?'<button class="go" data-t="next">Done</button>':'<button class="skip" data-t="skip">Skip</button><button class="nx" data-t="next">Next →</button>')+
-      '</div></div>';
-    cardT.classList.remove("fly"); void cardT.offsetWidth; cardT.classList.add("fly");
-    place();
-    var f=document.getElementById("tour-home");
-    if(f) f.addEventListener("submit",function(e){ e.preventDefault(); var a=findApt(document.getElementById("tour-home-in").value); var m=document.getElementById("tour-hmsg"); if(!a){ m.textContent="Couldn't find that one. Try a code like KARB."; return; } setHome(a); m.textContent="Home set to "+code(a)+"."; setTimeout(next,700); });
+    var st=stops[i], h=typeof st.h==="function"?st.h():st.h, auto=st.d&&!RM, n=stops.length;
+    var seg=""; for(var k=1;k<n;k++) seg+='<i class="'+(k<i?"done":k===i?"cur":"")+'"><b></b></i>';
+    var acts=st.intro?'<button class="skip" data-t="end">I\'ll Explore</button><button class="go" data-t="next">Show Me</button>':
+      st.end?'<button class="go" data-t="end">Done</button>':
+      '<button class="ib" data-t="back" aria-label="Back">‹</button><button class="ib" data-t="next" aria-label="Next">›</button><button class="ib" data-t="end" aria-label="Close the tour">×</button>';
+    var home2=st.end?'<form class="hin" id="tour-home" autocomplete="off"><input id="tour-home-in" list="home-list" placeholder="Home airport, like KARB" spellcheck="false" aria-label="Home airport" value="'+(home?esc(code(home)):"")+'"><button type="submit">Set</button></form><p class="hmsg" id="tour-hmsg">'+(home?"Home is "+esc(code(home))+".":"Optional. It stays on the map, and distances are measured from it.")+'</p>':"";
+    bar.className="tour2 on"+(st.intro?" intro":"")+(st.end?" end":"")+(auto?"":" wait");
+    bar.style.setProperty("--d",(st.d||0)+"ms");
+    bar.innerHTML=(st.intro?"":'<div class="tp">'+seg+'</div>')+'<div class="tb"><div class="tt"><h3>'+esc(h)+'</h3>'+(st.p.charAt(0)==="<"?st.p:'<p>'+esc(st.p)+'</p>')+home2+'</div><div class="ta">'+acts+'</div></div>';
+    var f=bar.querySelector("#tour-home");
+    if(f) f.addEventListener("submit",function(e){ e.preventDefault(); var a=findApt(bar.querySelector("#tour-home-in").value), m=bar.querySelector("#tour-hmsg"); if(!a){ m.textContent="Couldn't find that one. Try a code like KARB."; return; } setHome(a); m.textContent="Home set to "+code(a)+"."; });
   }
-  function next(){ if(i>=STEPS.length-1){ end(); return; } i++; render(); }
-  function start(){ if(on) return; on=true; i=0; closeCard(); closePanel(); pop.classList.remove("on"); document.body.classList.remove("menu-open"); blk.classList.add("on"); spot.classList.add("on"); cardT.classList.add("on"); render(); }
-  function end(){ on=false; blk.classList.remove("on"); spot.classList.remove("on"); cardT.classList.remove("on"); try{ localStorage.setItem("upwind-tour","done"); }catch(e){} }
-  cardT.addEventListener("click",function(e){ var b=e.target.closest("[data-t]"); if(!b) return; if(b.dataset.t==="next") next(); else end(); });
-  addEventListener("keydown",function(e){ if(!on) return; if(e.key==="Escape") end(); if(e.key==="ArrowRight"||e.key==="Enter"&&e.target.tagName!=="INPUT") next(); });
-  addEventListener("resize",function(){ if(on) place(); });
+  function go(k){ later.forEach(clearTimeout); later=[]; clearTimeout(tmr); tmr=null; i=k; var st=stops[i];
+    if((st.k==="plane"||st.k==="ride"||st.k==="3d")&&P&&!alive(P)){ P=pickPlane(); if(!P){ for(var j=i;j<stops.length;j++) if(stops[j].k==="apt"){ go(j); return; } } }
+    render(); if(st.run) st.run(); if(st.d&&!RM){ left=st.d; resume(); } }
+  function resume(){ if(!on||!left||tmr) return; t0=Date.now(); tmr=setTimeout(function(){ tmr=null; left=0; next(); },left); bar.classList.remove("paused"); }
+  function hold(){ if(!tmr) return; clearTimeout(tmr); tmr=null; left=Math.max(0,left-(Date.now()-t0)); bar.classList.add("paused"); }
+  function next(){ if(i>=stops.length-1){ end(); return; } go(i+1); }
+  function back(){ if(i>1) go(i-1); }
+  function start(){ if(on) return; used("tour"); closeOthers(); pop.classList.remove("on"); document.body.classList.remove("menu-open");
+    P=pickPlane(); AP=P?pickApt(P.lat,P.lon):(home||findApt("ARB")); if(!AP) AP=findApt("ARB"); T0=T;
+    on=true; TOURING=true; document.body.classList.add("touring"); stops=build(); go(0); }
+  // how: "explore" leaves the map as it is; anything else puts it back
+  function end(how){ if(!on) return; if(how==="explore") used("tour-explore"); else if(i<stops.length-1) used("tour-stop-"+i); else used("tour-done");
+    later.forEach(clearTimeout); later=[]; clearTimeout(tmr); tmr=null; left=0; clearInterval(bandT); tourBand=-1; mapDirty=true;
+    var V=v3(); if(V&&V.orbit) V.orbit(false);
+    if(how!=="explore"&&i>0&&!stops[i].end){ clean(); if(T0) d3.select(cTop).transition().duration(1200).ease(d3.easeCubicInOut).call(zoom.transform,T0); }
+    on=false; TOURING=false; document.body.classList.remove("touring"); bar.classList.remove("on"); try{ localStorage.setItem("upwind-tour","done"); }catch(e){} }
+  bar.addEventListener("click",function(e){ var b=e.target.closest("[data-t]");
+    if(b){ e.stopPropagation(); if(b.dataset.t==="next") next(); else if(b.dataset.t==="back") back(); else end(); return; }
+    if(e.target.closest(".tt")&&!stops[i].intro&&!stops[i].end&&!e.target.closest("form")) next(); });
+  // Touching the map (2D or 3D) means they're exploring: the tour steps aside
+  document.addEventListener("pointerdown",function(e){ if(!on||stops[i].intro||stops[i].end||bar.contains(e.target)) return; if(e.target.closest&&e.target.closest("#c-top,#v3")) end("explore"); },true);
+  addEventListener("keydown",function(e){ if(!on||e.target.tagName==="INPUT") return; if(e.key==="Escape") end(); else if(e.key==="ArrowRight"||e.key==="Enter") next(); else if(e.key==="ArrowLeft") back(); });
+  document.addEventListener("visibilitychange",function(){ if(!on) return; if(document.hidden) hold(); else resume(); });
   function seen(){ try{ return localStorage.getItem("upwind-tour")==="done"; }catch(e){ return true; } }
-  return {start:start,end:end,seen:seen};
+  // First visit: wait until planes are on the map, then a moment more, and only if they haven't started using it
+  function auto(){ var w=0; (function chk(){ if(on) return; var busy=document.querySelector(".card.on,.panel.on,#aptW.on,.pop.on")||(v3()&&v3().on)||mode!=="sky";
+      if(busy) return; if(planes.length||w>=12000) setTimeout(function(){ if(!document.querySelector(".card.on,.panel.on,#aptW.on,.pop.on")&&!(v3()&&v3().on)) start(); },1800); else { w+=500; setTimeout(chk,500); } })(); }
+  return {start:start,end:end,seen:seen,auto:auto,get on(){ return on; }};
 })();
+/* First-time tips: a one-line note the first time Explore, Map Settings or the − button is used */
+var TIPS={}; try{ TIPS=JSON.parse(localStorage.getItem("upwind-tips")||"{}")||{}; }catch(e){}
+function tip(k,msg){ if(TIPS[k]||TOURING||LOBBY) return; TIPS[k]=1; try{ localStorage.setItem("upwind-tips",JSON.stringify(TIPS)); }catch(e){} setTimeout(function(){ toast(msg,5200); },450); }
+document.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest("#open-panel,#scene-btn,#hud-toggle"); if(!b) return;
+  if(b.id==="open-panel") tip("explore","Tip: tap any field or place in Explore to fly there.");
+  else if(b.id==="scene-btn") tip("settings","Tip: layers and display choices are saved on this device.");
+  else if(b.getAttribute("aria-expanded")==="true") tip("hud","Tip: the headline is tucked away. Tap + to bring it back."); },true);
 document.getElementById("tour-again").addEventListener("click",function(e){ e.stopPropagation(); pop.classList.remove("on"); document.body.classList.remove("menu-open"); tour.start(); });
 
 /* ---------------- Credits, feedback, analytics ---------------- */
@@ -3911,6 +4045,15 @@ var V3=(function(){
       if(cam.dist<70){ var bi=-1,bd=1e9; for(i=0;i<r.length;i++){ var cz=Cs(r[i][0],r[i][1],zu); if(cz[2]>NEAR&&cz[2]<bd){ bd=cz[2]; bi=i; } }
         if(bi>=0){ var lp=Sc(Cs(r[bi][0],r[bi][1],zu)); if(lp[0]>-20&&lp[0]<vw+20&&lp[1]>60&&lp[1]<vh) LBL.push({x:lp[0],y:lp[1],d:bd,c:c,top:Math.round(a.u/100),bot:a.l>0?Math.round(a.l/100):"SFC",cls:a.c}); } }
     }); }
+  // a TFR as a red volume between its floor and ceiling; dashed when it starts later
+  function drawTfr3(t,m){ var zl=m.lo*FT*EX, zu=m.hi*FT*EX, act=t._st==="active", col="rgba("+TFRC+",";
+    t._r3.forEach(function(r){ var i; g.beginPath();
+      for(i=0;i<r.length-1;i++){ var p0=P(r[i][0],r[i][1],zl),p1=P(r[i+1][0],r[i+1][1],zl),p2=P(r[i+1][0],r[i+1][1],zu),p3=P(r[i][0],r[i][1],zu); if(!p0||!p1||!p2||!p3) continue; g.moveTo(p0[0],p0[1]); g.lineTo(p1[0],p1[1]); g.lineTo(p2[0],p2[1]); g.lineTo(p3[0],p3[1]); g.closePath(); }
+      g.fillStyle=col+(act?0.07:0.03)+")"; g.fill();
+      g.beginPath(); path(r,zu,true); g.fillStyle=col+(act?0.1:0.04)+")"; g.fill(); g.setLineDash(act?[]:[5,4]); g.lineWidth=1.5; g.strokeStyle=col+(act?0.9:0.7)+")"; g.stroke();
+      g.beginPath(); path(r,zl,true); g.lineWidth=1; g.strokeStyle=col+0.5+")"; g.stroke(); g.setLineDash([]);
+      var bi=-1,bd=1e9; for(i=0;i<r.length;i++){ var cz=Cs(r[i][0],r[i][1],zu); if(cz[2]>NEAR&&cz[2]<bd){ bd=cz[2]; bi=i; } }
+      if(bi>=0){ var lp=Sc(Cs(r[bi][0],r[bi][1],zu)); if(lp[0]>-20&&lp[0]<vw+20&&lp[1]>60&&lp[1]<vh) LBL.push({x:lp[0],y:lp[1],d:bd-1000,c:[229,83,75],top:act?"TFR":"TFR SOON",cls:"D"}); } }); }
   function drawLabels(){ var placed=[]; LBL.sort(function(a,b){ return a.d-b.d; });
     g.font="600 10.5px "+getComputedStyle(document.body).fontFamily; g.textAlign="center"; g.textBaseline="middle";
     LBL.forEach(function(l){ var w=26,h=l.cls==="D"?16:28, x=l.x-w/2, y=l.y-h-4;
@@ -3987,13 +4130,30 @@ var V3=(function(){
       TAGS.push(bx); g.fillStyle="rgba(13,13,12,.6)"; g.fillRect(tx-4,ty-fs+1,tw+8,fs+5); g.fillStyle="#ece7de"; g.fillText(tag,tx,ty); } }
 
   var ITEMS=[];
+  // ---- time of day: the same sun as the flat map (real time, or the lobby's chosen light). Muted, so the planes stay the brightest thing.
+  var TOD={top:["#0b0b0d","#1f2b38"],hor:["#17161a","#4c5965"],land:["#221e19","#3a332a"],lake:["#151c26","#2a3b4c"],base:["#18160f","#2e2a23"]};
+  function todCol(k){ return lerp(TOD[k][0],TOD[k][1],light.day); }
+  var STARS=null; function stars(){ if(STARS) return STARS; STARS=[]; var h=7; for(var i=0;i<170;i++){ h=(h*16807)%2147483647; var a=h/2147483647*360; h=(h*16807)%2147483647; var e=Math.pow(h/2147483647,1.6)*60+1.5; h=(h*16807)%2147483647; STARS.push([a,e,0.25+0.75*h/2147483647]); } return STARS; }
+  var lightT=0; function todTick(now){ if(mood==="live"&&now-lightT>30000){ lightT=now; updLight(); } }
+  function drawSky(hy){ var rad=Math.PI/180, hor=todCol("hor");
+    var sky=g.createLinearGradient(0,0,0,hy); sky.addColorStop(0,todCol("top")); sky.addColorStop(1,hor); g.fillStyle=sky; g.fillRect(0,0,vw,hy);
+    // stars at night, fixed to the sky so they turn with the view
+    if(light.night>0.35){ var st=stars(), al=(light.night-0.35)/0.65; g.fillStyle="#ece7de";
+      st.forEach(function(s){ var rel=((s[0]-cam.bear+540)%360)-180; if(Math.abs(rel)>75) return; var x=R.cx+R.f*Math.tan(rel*rad), y=hy-R.f*Math.tan(s[1]*rad)/Math.cos(rel*rad);
+        if(y<0||y>hy-6||x<0||x>vw) return; g.globalAlpha=al*s[2]*0.7; g.fillRect(x,y,s[2]>0.8?1.6:1.1,s[2]>0.8?1.6:1.1); }); g.globalAlpha=1; }
+    // the sun's glow on the horizon: warm and wide near sunrise and sunset, faint at midday
+    var rel=((light.az-cam.bear+540)%360)-180, glow=Math.max(light.gold,0.25*light.day)*(light.alt>-8?1:0);
+    if(glow>0.02&&Math.abs(rel)<100){ var sx=R.cx+R.f*Math.tan(Math.max(-80,Math.min(80,rel))*rad), sy=hy-Math.max(0,R.f*Math.tan(Math.max(0,light.alt)*rad)), r=Math.max(vw,vh)*0.75;
+      var gr=g.createRadialGradient(sx,sy,0,sx,sy,r); gr.addColorStop(0,"rgba(242,163,58,"+(0.42*glow).toFixed(3)+")"); gr.addColorStop(0.35,"rgba(232,105,44,"+(0.14*glow).toFixed(3)+")"); gr.addColorStop(1,"rgba(232,105,44,0)");
+      g.fillStyle=gr; g.fillRect(0,0,vw,hy);
+      if(light.alt>-0.8&&light.alt<20&&Math.abs(rel)<70&&sy>4){ g.fillStyle="rgba(250,214,160,"+(0.55+0.3*light.gold).toFixed(2)+")"; g.beginPath(); g.arc(sx,sy,Math.max(3,R.f*0.0046),0,7); g.fill(); } } }
   function draw(){ setup(); var G=geo();
     g.setTransform(dpr,0,0,dpr,0,0);
     var hy=R.cp>0.01?R.cy-R.f*R.sp/R.cp:-1e4;
-    g.fillStyle="#1b1814"; g.fillRect(0,0,vw,vh);
-    if(hy>0){ var sky=g.createLinearGradient(0,0,0,hy); sky.addColorStop(0,"#0d0d0c"); sky.addColorStop(1,"#1a1613"); g.fillStyle=sky; g.fillRect(0,0,vw,hy); }
-    g.beginPath(); G.mi.forEach(function(r){ path(r,0,true); }); g.fillStyle="#2a241d"; g.fill();
-    g.beginPath(); G.lakes.forEach(function(r){ path(r,0,true); }); g.fillStyle="#1d2733"; g.fill("evenodd"); g.lineWidth=0.8; g.strokeStyle="rgba(120,150,185,.18)"; g.stroke();
+    g.fillStyle=todCol("base"); g.fillRect(0,0,vw,vh);
+    if(hy>0) drawSky(hy);
+    g.beginPath(); G.mi.forEach(function(r){ path(r,0,true); }); g.fillStyle=todCol("land"); g.fill();
+    g.beginPath(); G.lakes.forEach(function(r){ path(r,0,true); }); g.fillStyle=todCol("lake"); g.fill("evenodd"); g.lineWidth=0.8; g.strokeStyle="rgba(120,150,185,.18)"; g.stroke();
     drawRelief();
     g.beginPath(); G.bord.forEach(function(r){ path(r,0,false); }); g.strokeStyle="rgba(236,231,222,.16)"; g.lineWidth=1; g.stroke();
     var font=getComputedStyle(document.body).fontFamily;
@@ -4022,13 +4182,15 @@ var V3=(function(){
       g.fillStyle=a.twr?"rgba(236,231,222,.72)":"rgba(236,231,222,.52)"; g.shadowColor="rgba(0,0,0,.85)"; g.shadowBlur=4; g.fillText(a.id,q[0]+l.s+6,q[1]+fz*0.35); g.shadowBlur=0; });
     var items=[]; LBL=[]; TAGS=[];
     if(showAsp) G.asp.forEach(function(a){ var q=P(a.cx,a.cy,(a.l+a.u)/2*FT*EX); if(q) items.push({d:q[2]+40,a:a}); });
+    shownTfrs().forEach(function(t){ if(!t._r3) t._r3=t.rings.map(function(r){ return r.map(function(c){ return nm(c[0],c[1]); }); });
+      var m=tfrMSL(t), r0=t._r3[0], cx=0,cy=0; r0.forEach(function(p){ cx+=p[0]; cy+=p[1]; }); var q=P(cx/r0.length,cy/r0.length,(m.lo+m.hi)/2*FT*EX); if(q) items.push({d:q[2]+40,tf:t,m:m}); });
     var CL=[]; if(showCld) clouds().forEach(function(c){ var q=P(c.cx,c.cy,c.msl*FT*EX); if(q&&q[2]<cam.dist*3.5){ items.push({d:q[2]+12,c:c}); if(q[2]<cam.dist*1.3&&cam.dist<55) CL.push({q:q,c:c}); } });
     ITEMS=[];
     planes.forEach(function(p){ if(p.orb||(p.gone&&!(p.fade>0.05))) return; var jet=isJet(p); if(jet&&!layers.jets&&pick3!==p) return;
       var w0=nm(p.lon,p.lat), alt=trueAlt(p), z=alt*FT*EX, q=P(w0[0],w0[1],z); if(!q) return;
       var it={d:q[2],p:p,q:q,x:w0[0],y:w0[1],z:z,alt:alt,jet:jet}; items.push(it); ITEMS.push(it); });
     items.sort(function(a,b){ return b.d-a.d; });
-    items.forEach(function(it){ if(it.a) drawAsp(it.a); else if(it.c) drawCloud(it.c); else drawPlane(it); });
+    items.forEach(function(it){ if(it.a) drawAsp(it.a); else if(it.c) drawCloud(it.c); else if(it.tf) drawTfr3(it.tf,it.m); else drawPlane(it); });
     // cloud labels up close, in the report's own terms (height above the field), nearest first and never overlapping
     // one label per field: its lowest reported layer
     var low={}; CL.forEach(function(l){ var k=l.c.id; if(!low[k]||l.c.agl<low[k].c.agl) low[k]=l; }); CL=Object.keys(low).map(function(k){ return low[k]; });
@@ -4038,17 +4200,31 @@ var V3=(function(){
         g.fillStyle="rgba(13,13,12,.45)"; g.fillRect(bx[0],bx[1],bx[2],bx[3]); g.fillStyle="rgba(236,234,228,.78)"; g.fillText(t,l.q[0],l.q[1]+2); });
       g.textAlign="start"; }
     drawLabels();
-    if(hy>-200){ var fz=g.createLinearGradient(0,hy-40,0,hy+vh*0.22); fz.addColorStop(0,"rgba(13,13,12,0)"); fz.addColorStop(.25,"rgba(26,22,19,.85)"); fz.addColorStop(1,"rgba(26,22,19,0)"); g.fillStyle=fz; g.fillRect(0,hy-40,vw,vh*0.22+40); }
+    if(hy>-200){ var fz=g.createLinearGradient(0,hy-40,0,hy+vh*0.22); var hz=d3.rgb(todCol("hor")), hc=hz.r+","+hz.g+","+hz.b; fz.addColorStop(0,"rgba("+hc+",0)"); fz.addColorStop(.25,"rgba("+hc+",.85)"); fz.addColorStop(1,"rgba("+hc+",0)"); g.fillStyle=fz; g.fillRect(0,hy-40,vw,vh*0.22+40); }
     showCard(); updDial(); }
 
   // ---- the 3D view's own small plane card
   function r10(v){ return (Math.round(v/10)*10).toLocaleString(); }
+  // ---- Ride Along: the camera stays with one plane, behind it and a little above, turning as it turns.
+  // Drag still turns and tilts the view (it eases back behind the plane a few seconds later); zoom sets how close.
+  var ride=null;
+  function rideStart(p){ ride=p; pick3=p; loadPast(p); var q=nm(p.lon,p.lat);
+    flyTo(look({tx:q[0],ty:q[1],tz:trueAlt(p)*FT*EX,bear:p.trk!=null?p.trk:cam.bear,pitch:24,dist:Math.min(cam.dist,isJet(p)?9:5.5)}),1400); dirty=true; }
+  var orbitOn=false;
+  function rideStop(){ ride=null; dirty=true; }
+  function rideStep(){ var p=ride; if(p.gone||planes.indexOf(p)<0){ rideStop(); return; }
+    var q=nm(p.lon,p.lat), z=trueAlt(p)*FT*EX, k=0.2;
+    cam.tx+=(q[0]-cam.tx)*k; cam.ty+=(q[1]-cam.ty)*k; cam.tz+=(z-cam.tz)*k;
+    if(!orbitOn&&p.trk!=null&&performance.now()-busy>4000){ var db=((p.trk-cam.bear+540)%360)-180; cam.bear+=db*0.03; }
+    dirty=true; }
   function showCard(){ var it=pick3&&ITEMS.find(function(x){ return x.p===pick3; });
     if(!it||it.q[0]<0||it.q[0]>vw||it.q[1]<0||it.q[1]>vh){ card3.classList.remove("on"); return; }
     var p=pick3, c=corr(p), name=p.priv?"Private Aircraft":(p.reg||p.cs||p.name);
     // built once per plane; only the text changes after that, so the button stays put under a click
-    if(card3._p!==p){ card3._p=p; card3.innerHTML="<b></b><span class=\"t\"></span><span class=\"a\"></span><span class=\"m\"></span><button class=\"chip\" id=\"v3-flat\">Show on 2D Map</button>";
-      document.getElementById("v3-flat").onclick=function(){ var pp=pick3; exit(); if(pp) openPlane(pp); }; }
+    if(card3._p!==p){ card3._p=p; card3.innerHTML="<b></b><span class=\"t\"></span><span class=\"a\"></span><span class=\"m\"></span><div class=\"acts3\"><button class=\"chip\" id=\"v3-ride\"></button><button class=\"chip\" id=\"v3-flat\">Show on 2D Map</button></div>";
+      document.getElementById("v3-ride").onclick=function(){ if(ride===pick3) rideStop(); else if(pick3) rideStart(pick3); };
+      document.getElementById("v3-flat").onclick=function(){ var pp=pick3; ride=null; exit(); if(pp) openPlane(pp); }; }
+    var rb=document.getElementById("v3-ride"), rt=ride===p?"Stop Riding Along":"Ride Along"; if(rb.textContent!==rt){ rb.textContent=rt; rb.setAttribute("aria-pressed",ride===p); }
     var f=card3.children;
     f[0].textContent=name; f[1].textContent=p.priv?"":p.name;
     f[2].textContent=(c?"About "+r10(p.alt+c.d)+" ft MSL":(p.alt>=18000?"FL"+Math.round(p.alt/100):Math.round(p.alt).toLocaleString()+" ft"))+" · "+Math.round(p.gs||0)+" kt · heading "+Math.round(p.trk||0)+"°";
@@ -4097,13 +4273,14 @@ var V3=(function(){
   cv.addEventListener("gesturechange",function(e){ e.preventDefault(); cam.bear-=((e.rotation||0)-gRot); gRot=e.rotation||0; dirty=true; });
   function tapAt(x,y){ var best=null,bd=22;
     ITEMS.forEach(function(it){ var d=Math.hypot(it.q[0]-x,it.q[1]-y); if(d<bd){ bd=d; best=it; } });
-    if(best){ pick3=best.p; loadPast(best.p); flyTo(look({tx:best.x,ty:best.y,tz:best.z,dist:Math.min(cam.dist,6)}),1300); dirty=true; return; }
-    pick3=null; card3.classList.remove("on");
+    if(best){ if(ride&&best.p!==ride) ride=null; pick3=best.p; loadPast(best.p); flyTo(look({tx:best.x,ty:best.y,tz:best.z,dist:Math.min(cam.dist,6)}),1300); dirty=true; return; }
+    if(!ride){ pick3=null; card3.classList.remove("on"); }
+    var gp=ground(x,y); if(gp){ var tfh=tfrAtLL(gp[0]/KX+LON0,gp[1]/60+LAT0); if(tfh){ openTfr(tfh); dirty=true; return; } }
     var ba=null; bd=16; geo().apts.forEach(function(a){ if(!a.q) return; var d=Math.hypot(a.q[0]-x,a.q[1]-y); if(d<bd){ bd=d; ba=a; } });
     if(ba) flyTo(look({tx:ba.x,ty:ba.y,tz:0,dist:Math.min(cam.dist,28)}),1100);
     dirty=true; }
   addEventListener("keydown",function(e){ if(!on||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; var k=e.key, cx=vw/2, cy=vh*0.6, st=60;
-    if(k==="Escape"){ if(pick3){ pick3=null; card3.classList.remove("on"); dirty=true; } else exit(); return; }
+    if(k==="Escape"){ if(ride){ rideStop(); return; } if(pick3){ pick3=null; card3.classList.remove("on"); dirty=true; } else exit(); return; }
     if(e.shiftKey){ if(k==="ArrowLeft") cam.bear+=6; else if(k==="ArrowRight") cam.bear-=6; else if(k==="ArrowUp") cam.pitch=clampP(cam.pitch-4); else if(k==="ArrowDown") cam.pitch=clampP(cam.pitch+4); else return; }
     else if(k==="ArrowLeft") panBy(cx,cy,cx+st,cy); else if(k==="ArrowRight") panBy(cx,cy,cx-st,cy); else if(k==="ArrowUp") panBy(cx,cy,cx,cy+st); else if(k==="ArrowDown") panBy(cx,cy,cx,cy-st);
     else if(k==="+"||k==="=") zoomAt(1/1.25,cx,cy); else if(k==="-"||k==="_") zoomAt(1.25,cx,cy); else return;
@@ -4128,7 +4305,7 @@ var V3=(function(){
   btn("v3-ex",function(){ exI=(exI+1)%EXS.length; EX=EXS[exI]; this.textContent="Height ×"+EX; note(); dirty=true; });
   btn("v3-flatv",function(){ var top=cam.pitch>80; flyTo(look({pitch:top?42:90,bear:top?cam.bear:0}),1100); this.textContent=top?"Top Down":"Tilt"; });
   btn("v3-reset",function(){ flyTo(START||HOMEV,1300); document.getElementById("v3-flatv").textContent="Top Down"; });
-  function note(){ document.getElementById("v3-note").textContent="3D view, in beta. Heights drawn ×"+EX+" so they read. Below 18,000 ft, altitudes use each plane's GPS altitude when it reports one, otherwise the nearest airport's altimeter setting. Clouds from each field's latest report, shown above that field."; }
+  function note(){ document.getElementById("v3-note").innerHTML="3D view. Heights drawn ×"+EX+" so they read.<span class=\"long\"> Below 18,000 ft, altitudes use each plane's GPS altitude when it reports one, otherwise the nearest airport's altimeter setting. Clouds from each field's latest report, shown above that field.</span>"; }
 
   // ---- Lobby: a hands-off 3D segment around the field, faded in and out from the flat map
   // Straight overhead with north up, at the same spot and scale as the flat map right now, so the hand-off is seamless
@@ -4175,7 +4352,7 @@ var V3=(function(){
   function lobbyStep(now){ var t=now-LB.t0;
     if(t>=LB.ms-1500&&!LB.fading){ LB.fading=true; blending=true; cv.style.opacity=0; setTimeout(lobbyStop,1500); }
     Object.assign(cam,lobbyPose(Math.min(t,LB.ms))); dirty=true; }
-  function lobbyStop(){ if(!LB) return; var L=LB; LB=null; on=false; lob3=false; blending=false; pick3=null;
+  function lobbyStop(){ if(!LB) return; ride=null; var L=LB; LB=null; on=false; lob3=false; blending=false; pick3=null;
     document.body.classList.remove("v3d-lobby"); cv.style.opacity=""; cv.style.transition=""; mapDirty=true;
     if(L.opt.done) L.opt.done(); }
 
@@ -4183,7 +4360,7 @@ var V3=(function(){
   function size(){ var r=cv.getBoundingClientRect(); vw=Math.round(r.width)||innerWidth; vh=Math.round(r.height)||innerHeight; dpr=lob3?1:Math.min(2,devicePixelRatio||1); cv.width=vw*dpr; cv.height=vh*dpr; dirty=true; }   // lobby screens draw at 1x: TVs and streaming sticks
   addEventListener("resize",function(){ if(on) size(); });
   function setToggle(){ var f=document.getElementById("view-flat"), t=document.getElementById("view-3d"); if(f) f.setAttribute("aria-pressed",!on); if(t) t.setAttribute("aria-pressed",on); }
-  function enter(){ if(on||LOBBY) return; closeOthers(); if(RP.on) stopReplay(); if(follow) stopFollow();
+  function enter(){ if(on||LOBBY) return; used("3d"); closeOthers(); if(RP.on) stopReplay(); var rf=follow; if(follow) stopFollow();
     // over the home airport when one is set, otherwise over the middle of the flat map, about as far out as it was
     var c=home&&home.lat!=null?[home.lon,home.lat]:proj.invert([(W/2-T.x)/T.k,(H*0.55-T.y)/T.k]);
     if(!c) c=[-84.9,43.9];   // the middle of Michigan
@@ -4193,10 +4370,13 @@ var V3=(function(){
     on=true; document.body.classList.add("v3d"); document.getElementById("v3").hidden=false; size(); setToggle(); note();
     document.getElementById("v3-jets").setAttribute("aria-pressed",layers.jets);
     if(matchMedia("(pointer:coarse)").matches) hint.textContent="Drag to turn and tilt · Two fingers to move and zoom"; hint.classList.remove("gone"); clearTimeout(enter.t); enter.t=setTimeout(hideHint,7000);
-    try{ var u=new URL(location.href); u.searchParams.set("view","3d"); history.replaceState(null,"",u); }catch(e){} }
-  function exit(){ if(!on) return; on=false; document.body.classList.remove("v3d"); document.getElementById("v3").hidden=true; card3.classList.remove("on"); pick3=null; setToggle(); mapDirty=true;
-    try{ var u=new URL(location.href); u.searchParams.delete("view"); history.replaceState(null,"",u); }catch(e){} }
-  function frame(now){ if(!on) return; if(!(vw>0&&vh>0)){ size(); if(!(vw>0&&vh>0)) return; } if(LB) lobbyStep(now); else if(anim){ anim(now); dirty=true; }
+    try{ var u=new URL(location.href); u.searchParams.set("view","3d"); history.replaceState(null,"",u); }catch(e){}
+    if(rf&&!rf.gone) rideStart(rf); }
+  function exit(){ if(!on) return; var rp=ride; ride=null; on=false; document.body.classList.remove("v3d"); document.getElementById("v3").hidden=true; card3.classList.remove("on"); pick3=null; setToggle(); mapDirty=true;
+    try{ var u=new URL(location.href); u.searchParams.delete("view"); history.replaceState(null,"",u); }catch(e){}
+    if(rp&&!rp.gone&&typeof startFollow==="function") startFollow(rp); }
+  function frame(now){ if(!on) return; if(!(vw>0&&vh>0)){ size(); if(!(vw>0&&vh>0)) return; } todTick(now); if(LB) lobbyStep(now); else if(anim){ anim(now); dirty=true; } else if(ride) rideStep();
+    if(orbitOn&&!anim&&!LB){ cam.bear=(cam.bear+0.09)%360; dirty=true; }
     // planes keep moving, so redraw about 16 times a second at rest and every frame while the view is moving
     // (in the lobby, at most 30 times a second)
     var minGap=lob3?33:0, idle=lob3?33:(now-busy<400?0:60);
@@ -4205,7 +4385,9 @@ var V3=(function(){
       // a screen that can't keep up goes back to the flat map, and the lobby stays flat for the rest of the day
       if(lob3&&++frames>20&&ema>45&&!slow){ slow=true; try{ localStorage.setItem("upwind-lobby3d-slow",String(Date.now())); }catch(e){}
         if(LB){ LB.fading=true; cv.style.transition="opacity .3s"; cv.style.opacity=0; setTimeout(lobbyStop,300); } } } }
-  return {get on(){ return on; },get blending(){ return blending; },get slow(){ return slow; },get lobbyOn(){ return !!LB; },enter:enter,exit:exit,frame:frame,cam:cam,trueAlt:trueAlt,lobbyRun:lobbyRun};
+  function pickPlane(p){ if(!on||!p) return; if(ride&&ride!==p) ride=null; pick3=p; loadPast(p); var q=nm(p.lon,p.lat); flyTo(look({tx:q[0],ty:q[1],tz:trueAlt(p)*FT*EX,dist:Math.min(cam.dist,6)}),1300); dirty=true; }
+  function goTo(lat,lon){ if(!on) return; ride=null; var q=nm(lon,lat); flyTo(look({tx:q[0],ty:q[1],tz:0,dist:Math.min(cam.dist,40)}),1200); }
+  return {get on(){ return on; },get blending(){ return blending; },get slow(){ return slow; },get lobbyOn(){ return !!LB; },enter:enter,exit:exit,pick:pickPlane,goTo:goTo,ride:function(p){ if(on&&p&&!LB) rideStart(p); },frame:frame,cam:cam,trueAlt:trueAlt,lobbyRun:lobbyRun,orbit:function(v){ orbitOn=!!v; }};
 })();
 (function(){ var f=document.getElementById("view-flat"), t=document.getElementById("view-3d");
   if(f) f.addEventListener("click",function(){ V3.exit(); });
@@ -4213,7 +4395,9 @@ var V3=(function(){
   try{ if(new URLSearchParams(location.search).get("view")==="3d"&&!LOBBY) setTimeout(function(){ V3.enter(); },400); }catch(e){} })();
 
 window.upwindSky={spot:function(){ var r=lobbySpot(); return r?r.k+" "+r.line:"null"; },near:function(){ var a=lob.apt; return planes.filter(function(p){return d3.geoDistance([a.lon,a.lat],[p.lon,p.lat])*3440.065<20;}).map(function(p){return [p.t,p.kind,p.alt,Math.round(p.gs),p.fade,!!p.gone,!!TYPES[p.t]].join("/");}); },nbr:function(){ return NBR().map(stCode).join(" "); },look:function(la,lo,k){ flyToLL(la,lo,k); },st:function(){ openStation(NBR()[0]); },zf:function(){ return Math.log2(2*Math.PI*proj.scale()*T.k/256)+Math.log2(DPR); },lobbyNext:function(){lobbyNext();},tour:function(){tour.start();},shapes:function(c){ var cv=document.createElement('canvas'); cv.width=900; cv.height=200; var x=cv.getContext('2d'); x.fillStyle='#0d0d0c'; x.fillRect(0,0,900,200); ['single','twin','bizjet','airliner','widebody'].forEach(function(k,i){ x.fillStyle=['#e8692c','#e8692c','#f2a33a','#f4e2c6','#f4e2c6'][i]; shapeGlyph(x,90+i*170,100,0,SHAPE_SIZE[k]*12,k); }); x.strokeStyle='#e8692c'; x.fillStyle='#e8692c'; return cv.toDataURL(); },mode:setMode,look:function(la,lo){setLook(la,lo);},trip:function(id){ trip={dest:{lat:A[id].lat,lon:A[id].lon,name:code(A[id])+' '+A[id].t,apt:A[id]}}; renderTrip(); },setHome:function(id){setHome(A[id]);},openLake:function(){ var p=planes.filter(function(p){return SMALL[p.kind]&&!p.orb&&where(p).lake;})[0]; if(p) openPlane(p); return p&&p.name; },openSpot:function(i){openSpot(SPOTS[i]);},openAirport:function(id){openAirport(A[id]);},planeAtScreen:function(x,y){ var p=planes.filter(function(p){return p.fade>0.5&&SMALL[p.kind];})[0]; if(!p) return null; var b=proj([p.lon,p.lat]); var t=d3.zoomIdentity.translate(x-b[0]*T.k,y-b[1]*T.k).scale(T.k); d3.select(cTop).call(zoom.transform,t); setTimeout(function(){ openPlane(p); },300); return p.cs||p.reg; },openPlaneAt:function(i,jet){ var L=planes.filter(function(p){ var q=scr(p.lon,p.lat); return p.fade>0.5&&q[0]>W*0.2&&q[0]<W*0.8&&q[1]>H*0.3&&q[1]<H*0.8&&(jet?isAirline(p):SMALL[p.kind]); }); var p=L[i||0]; if(p) openPlane(p); return p&&(p.cs||p.name); },openPanel:openPanel,tab:function(t){tab=t;renderPanel();}};
-if(LOBBY) lobbyInit();
+if(LOBBY){ used("lobby"); lobbyInit(); } else used("visit");
+// Buttons whose own handlers stop the click from bubbling, so these are caught on the way down
+document.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest("#scene-btn,#home-pill,#tour-again"); if(b) used({"scene-btn":"settings","home-pill":"home","tour-again":"tour-again"}[b.id]); },true);
 pollSat();
 pollStats();
 pollFlights(); setInterval(pollFlights,120000);
@@ -4251,9 +4435,9 @@ if(innerWidth<=760&&!LOBBY){ document.body.classList.add("tick-wait"); setTimeou
   if(standalone||done||LOBBY||n<3||innerWidth>760) return;
   var ios=/iP(hone|ad|od)/.test(navigator.userAgent);
   how.textContent=ios?"Tap the Share button, then Add to Home Screen.":"Open your browser menu, then Add to Home screen.";
-  setTimeout(function(){ if(document.querySelector(".card.on,.pop.on,.panel.on,.tour-card.on")) return; el.classList.add("on"); document.body.classList.add("a2hs-on"); setTimeout(hide,20000); },22000);
+  setTimeout(function(){ if(document.querySelector(".card.on,.pop.on,.panel.on,.tour2.on")) return; el.classList.add("on"); document.body.classList.add("a2hs-on"); setTimeout(hide,20000); },22000);
 })();
-function endSplash(){ if(document.body.classList.contains("tick-wait")) setTimeout(function(){ document.body.classList.remove("tick-wait"); },10000); clearTimeout(spT); cancelAnimationFrame(spRaf); if(!splash.classList.contains("gone")){ if(LOBBY) setTimeout(lobbyNext,600); else if(deep.apt||deep.plane) setTimeout(runDeep,400); else if(!tour.seen()) setTimeout(tour.start,900); } splash.classList.add("gone"); splash.classList.remove("on","split"); splash.querySelectorAll(".half").forEach(function(h){h.remove();}); }
+function endSplash(){ if(document.body.classList.contains("tick-wait")) setTimeout(function(){ document.body.classList.remove("tick-wait"); },10000); clearTimeout(spT); cancelAnimationFrame(spRaf); if(!splash.classList.contains("gone")){ if(LOBBY) setTimeout(lobbyNext,600); else if(deep.apt||deep.plane) setTimeout(runDeep,400); else if(!tour.seen()) tour.auto(); } splash.classList.add("gone"); splash.classList.remove("on","split"); splash.querySelectorAll(".half").forEach(function(h){h.remove();}); }
 function playSplash(){
   clearTimeout(spT); cancelAnimationFrame(spRaf);
   var still=matchMedia("(prefers-reduced-motion:reduce)").matches;

@@ -802,6 +802,14 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
   .v3-card{width:auto}
 }
 @media (pointer:coarse){ .v3-zm{display:none} }
+/* Windows: one simple look, matching the 3D view's card. No stripe along the top; dark, blurred, a thin border.
+   (The brand stripe stays at the top of the page.) */
+.card:before,.mcard:before,.panel:before,.a2hs:before,.pop:after,.about:after,#lb-ctl .lb-pan:after,.tour-card:after,.credits:after,.home-form:after{display:none!important}
+#aptW .aw-st{display:none}
+.card,.mcard,.panel,.pop,.credits,.home-form,.about{border-radius:14px;border:1px solid rgba(236,231,222,.14);background:rgba(13,13,12,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.pop{padding-top:14px!important}.about{padding-top:6px!important}.home-form{padding-top:12px!important}.credits{padding-top:18px!important}.tour-card{padding-top:16px!important}
+/* What's Overhead on phones: a bottom sheet that leaves the map and your pin in view (it scrolls inside) */
+@media (max-width:760px){ .mcard{max-height:40svh} }
 </style>
 </head>
 <body>
@@ -827,7 +835,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
       <div>For awareness only, not for flight planning.</div>
     </div>
     <div class="v3-ctl">
-      <button class="chip" id="v3-exit">Flat Map</button>
+      <button class="chip" id="v3-exit">2D Map</button>
       <button class="chip" id="v3-asp" aria-pressed="true">Airspace</button>
       <button class="chip" id="v3-jets" aria-pressed="false">Airliners</button>
       <button class="chip" id="v3-ex">Height ×6</button>
@@ -876,7 +884,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
       <div class="pop" id="pop" role="menu">
         <div class="ptabs" role="tablist"><button role="tab" data-ptab="map" aria-selected="true">Map Layers</button><button role="tab" data-ptab="view" aria-selected="false">Display</button></div>
         <div class="ppane" data-pane="map">
-          <div class="row"><span>View</span><div class="group seg" role="group" aria-label="View"><button class="chip" id="view-flat" aria-pressed="true">Flat</button><button class="chip" id="view-3d" aria-pressed="false">3D</button></div></div>
+          <div class="row"><span>View</span><div class="group seg" role="group" aria-label="View"><button class="chip" id="view-flat" aria-pressed="true">2D</button><button class="chip" id="view-3d" aria-pressed="false">3D</button></div></div>
           <div class="row"><span>Base Map</span><div class="group seg" role="group" aria-label="Base map"><button class="chip" id="base-dark" aria-pressed="true">Dark</button><button class="chip" id="sat-btn" aria-pressed="false">Satellite</button><button class="chip" id="chart-btn" aria-pressed="false">Sectional</button></div></div>
           <div class="row"><span>Weather</span><div class="toggles">
             <button class="chip" data-layer="clouds" aria-pressed="true">Clouds</button>
@@ -3129,7 +3137,7 @@ var SKY=(function(){
   function rad(elv){ return 1-Math.sqrt(Math.max(0,Math.min(90,elv))/90); }
   function xy(az,elv){ var R=S/2-20, r=R*rad(elv), a=(az-(follow&&heading!=null?heading:0))*Math.PI/180; return [S/2+Math.sin(a)*r, S/2-Math.cos(a)*r]; }
   function draw(){ if(!lookPos||!slot()) return;
-    var w=Math.round(el.clientWidth)||240, want=Math.min(w,mobile?200:250); dpr=Math.min(2,devicePixelRatio||1);
+    var w=Math.round(el.clientWidth)||240, want=Math.min(w,mobile?168:250); dpr=Math.min(2,devicePixelRatio||1);
     if(S!==want){ S=want; cv.width=S*dpr; cv.height=S*dpr; cv.style.width=cv.style.height=S+"px"; }
     c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,S,S);
     var R=S/2-20, cx=S/2, cy=S/2, rot=follow&&heading!=null?heading:0, font=getComputedStyle(document.body).fontFamily;
@@ -3941,7 +3949,7 @@ var V3=(function(){
     if(!it||it.q[0]<0||it.q[0]>vw||it.q[1]<0||it.q[1]>vh){ card3.classList.remove("on"); return; }
     var p=pick3, c=corr(p), name=p.priv?"Private Aircraft":(p.reg||p.cs||p.name);
     // built once per plane; only the text changes after that, so the button stays put under a click
-    if(card3._p!==p){ card3._p=p; card3.innerHTML="<b></b><span class=\"t\"></span><span class=\"a\"></span><span class=\"m\"></span><button class=\"chip\" id=\"v3-flat\">Show on Flat Map</button>";
+    if(card3._p!==p){ card3._p=p; card3.innerHTML="<b></b><span class=\"t\"></span><span class=\"a\"></span><span class=\"m\"></span><button class=\"chip\" id=\"v3-flat\">Show on 2D Map</button>";
       document.getElementById("v3-flat").onclick=function(){ var pp=pick3; exit(); if(pp) openPlane(pp); }; }
     var f=card3.children;
     f[0].textContent=name; f[1].textContent=p.priv?"":p.name;

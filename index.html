@@ -1292,16 +1292,27 @@ function getTile(z,x,y){
   im.onerror=function(){ t.bad=true; tileBad++; if(tileBad===8&&!tileOK) toast("The FAA chart can't load in this preview. It will work once the site is on its own hosting.",6500); };
   im.src=TILE+k; return t;
 }
+// The lon/lat box the screen covers. The map projection curves, so the corners alone miss the middle of the top
+// and bottom edges (that left an empty strip along the top); edge points are sampled too.
+function viewBox2(){ var lo0=1e9,lo1=-1e9,la0=1e9,la1=-1e9;
+  for(var i=0;i<=4;i++) for(var j=0;j<=4;j++){ if(i%4&&j%4) continue; var ll=proj.invert([(W*i/4-T.x)/T.k,(H*j/4-T.y)/T.k]); if(!ll) continue;
+    if(ll[0]<lo0) lo0=ll[0]; if(ll[0]>lo1) lo1=ll[0]; if(ll[1]<la0) la0=ll[1]; if(ll[1]>la1) la1=ll[1]; }
+  return {lo0:lo0,lo1:lo1,la0:la0,la1:la1}; }
+// Web map tile range for a box at zoom z, stepping down a level while it would take more than max tiles
+// (big, sharp screens need many; above the limit the old code drew nothing at all)
+function tileRange(b,z,zmin,max){ var r;
+  for(;;){ var n=Math.pow(2,z), tx=function(lo){ return Math.floor((lo+180)/360*n); }, ty=function(la){ var q=la*Math.PI/180; return Math.floor((1-Math.log(Math.tan(q)+1/Math.cos(q))/Math.PI)/2*n); };
+    r={z:z,n:n,x0:tx(b.lo0),x1:tx(b.lo1),y0:ty(b.la1),y1:ty(b.la0)};
+    if((r.x1-r.x0+1)*(r.y1-r.y0+1)<=max||z<=zmin) return r; z--; } }
 function drawChart(){
-  var s=proj.scale()*T.k, zf=Math.log2(2*Math.PI*s/256)+Math.log2(DPR), z=Math.max(8,Math.min(12,Math.ceil(zf-0.3))), n=Math.pow(2,z);
+  // The FAA chart service has tiles for zoom levels 8 to 12 only
+  var s=proj.scale()*T.k, zf=Math.log2(2*Math.PI*s/256)+Math.log2(DPR);
   gMap.imageSmoothingEnabled=true; gMap.imageSmoothingQuality="high";
-  var nw=proj.invert([(0-T.x)/T.k,(0-T.y)/T.k]), se=proj.invert([(W-T.x)/T.k,(H-T.y)/T.k]);
-  function tx(lon){ return Math.floor((lon+180)/360*n); }
-  function ty(lat){ var r=lat*Math.PI/180; return Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n); }
-  function lon(x){ return x/n*360-180; } function lat(y){ var v=Math.PI-2*Math.PI*y/n; return 180/Math.PI*Math.atan(0.5*(Math.exp(v)-Math.exp(-v))); }
-  var x0=tx(nw[0]), x1=tx(se[0]), y0=ty(nw[1]), y1=ty(se[1]);
-  if((x1-x0+1)*(y1-y0+1)>400) return;
+  var v=viewBox2(); v.lo0=Math.max(v.lo0,-95.5); v.lo1=Math.min(v.lo1,-76); v.la0=Math.max(v.la0,39); v.la1=Math.min(v.la1,50.5);   // Michigan and well past its edges
   gMap.setTransform(DPR,0,0,DPR,0,0);
+  if(v.lo0<v.lo1&&v.la0<v.la1){
+  var R=tileRange(v,Math.max(8,Math.min(12,Math.ceil(zf-0.3))),8,360), z=R.z, n=R.n, x0=R.x0, x1=R.x1, y0=R.y0, y1=R.y1;
+  function lon(x){ return x/n*360-180; } function lat(y){ var q=Math.PI-2*Math.PI*y/n; return 180/Math.PI*Math.atan(0.5*(Math.exp(q)-Math.exp(-q))); }
   for(var x=x0;x<=x1;x++) for(var y=y0;y<=y1;y++){
     var a=proj([lon(x),lat(y)]), b=proj([lon(x+1),lat(y+1)]);
     var dx=a[0]*T.k+T.x, dy=a[1]*T.k+T.y, dw=(b[0]-a[0])*T.k+0.6, dh=(b[1]-a[1])*T.k+0.6;
@@ -1313,6 +1324,7 @@ function drawChart(){
       var sz=256/(1<<up), sx=(x-((x>>up)<<up))*sz, sy=(y-((y>>up)<<up))*sz;
       gMap.drawImage(pt.im,sx,sy,sz,sz,dx,dy,dw,dh); break;
     }
+  }
   }
   gMap.fillStyle="rgba(8,10,14,"+(LOBBY?0.06+0.2*light.night:0.12+0.5*light.night)+")"; gMap.fillRect(0,0,W,H);
 }
@@ -1347,10 +1359,11 @@ function satTile(z,x,y,load){
   im.onerror=function(){ SATB.busy--; SATB.bad++; t.bad=true; setTimeout(function(){ delete SATB.c[k]; },60000); mapDirty=true; };
   im.src=SATB.url+k; return t;
 }
-function satTrim(){ var ks=Object.keys(SATB.c); if(ks.length<420) return; ks.sort(function(a,b){ return SATB.c[a].u-SATB.c[b].u; }); ks.slice(0,ks.length-320).forEach(function(k){ if(SATB.c[k].ok||SATB.c[k].bad) delete SATB.c[k]; }); }
+function satTrim(){ var ks=Object.keys(SATB.c); if(ks.length<560) return; ks.sort(function(a,b){ return SATB.c[a].u-SATB.c[b].u; }); ks.slice(0,ks.length-420).forEach(function(k){ if(SATB.c[k].ok||SATB.c[k].bad) delete SATB.c[k]; }); }
 function drawSat(S2){
   satFill(); SATB.n++;
-  var s=proj.scale()*T.k, zf=Math.log2(2*Math.PI*s/256)+Math.log2(Math.min(DPR,1.5)), z=Math.max(6,Math.min(16,Math.round(zf))), n=Math.pow(2,z);
+  // Tiles match the screen's own sharpness (on a 2x screen, one level finer); USGS imagery goes to level 16
+  var s=proj.scale()*T.k, zf=Math.log2(2*Math.PI*s/256)+Math.log2(Math.min(DPR,1.5)), z=Math.max(6,Math.min(16,Math.ceil(Math.log2(2*Math.PI*s/256)+Math.log2(Math.min(DPR,2))-0.25))), n;
   var day=light.day, zt=Math.max(0,Math.min(1,(zf-7)/5));     // 0 zoomed out on the state, 1 zoomed in on a field
   gMap.save(); gMap.setTransform(DPR,0,0,DPR,0,0); gMap.imageSmoothingEnabled=true; gMap.imageSmoothingQuality="high";
   // Whole-region picture first
@@ -1358,11 +1371,10 @@ function drawSat(S2){
     gMap.drawImage(SATB.fill,f0[0]*T.k+T.x,f0[1]*T.k+T.y,(f1[0]-f0[0])*T.k,(f1[1]-f0[1])*T.k); }
   // Sharp aerial tiles over the US, once zoomed in past the state view
   if(zf>5.4){
-    var nw=proj.invert([(0-T.x)/T.k,(0-T.y)/T.k]), se=proj.invert([(W-T.x)/T.k,(H-T.y)/T.k]);
-    var tx=function(lo){ return Math.floor((lo+180)/360*n); }, ty=function(la){ var r=la*Math.PI/180; return Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n); };
+    var vb=viewBox2(); vb.lo0=Math.max(vb.lo0,-97); vb.lo1=Math.min(vb.lo1,-73); vb.la1=Math.min(vb.la1,50); vb.la0=Math.max(vb.la0,38.5);
+    var R=tileRange(vb,z,6,300); z=R.z; n=R.n; var x0=R.x0, x1=R.x1, y0=R.y0, y1=R.y1;
     var lon=function(x){ return x/n*360-180; }, lat=function(y){ var v=Math.PI-2*Math.PI*y/n; return 180/Math.PI*Math.atan(0.5*(Math.exp(v)-Math.exp(-v))); };
-    var x0=tx(Math.max(nw[0],-97)), x1=tx(Math.min(se[0],-73)), y0=ty(Math.min(nw[1],50)), y1=ty(Math.max(se[1],38.5));
-    if((x1-x0+1)*(y1-y0+1)<=160){
+    if(vb.lo0<vb.lo1&&vb.la0<vb.la1&&(x1-x0+1)*(y1-y0+1)<=300){
       // load from the middle of the screen out
       var cx=(x0+x1)/2, cy=(y0+y1)/2, list=[];
       for(var x=x0;x<=x1;x++) for(var y=y0;y<=y1;y++) list.push([x,y]);

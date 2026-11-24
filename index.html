@@ -967,7 +967,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
     <div class="k">Where the data comes from</div>
     <h2>Public, Live and Volunteer-Built.</h2>
     <ul class="src">
-      <li><b>Traffic</b> from <a href="https://adsb.lol" target="_blank" rel="noopener">adsb.lol</a>, with <a href="https://airplanes.live" target="_blank" rel="noopener">airplanes.live</a> and <a href="https://adsb.fi" target="_blank" rel="noopener">adsb.fi</a> as backups: networks of volunteer ADS-B receivers.</li>
+      <li><b>Traffic</b> from <a href="https://adsb.lol" target="_blank" rel="noopener">adsb.lol</a>, with <a href="https://airplanes.live" target="_blank" rel="noopener">airplanes.live</a> as a backup: networks of volunteer ADS-B receivers.</li>
       <li><b>Weather reports and forecasts</b> from the <a href="https://aviationweather.gov" target="_blank" rel="noopener">NOAA Aviation Weather Center</a>.</li>
       <li><b>Clouds and radar</b> from NOAA satellite and NEXRAD imagery, served by the <a href="https://mesonet.agron.iastate.edu" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>.</li>
       <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Terrain from NOAA.</li>
@@ -1009,7 +1009,7 @@ body.v3d .vig,body.v3d .ticker,body.v3d .foot,body.v3d .topright,body.v3d .hud>*
   <button class="x" id="credits-x" aria-label="Close">×</button>
   <h3>Data &amp; Credits.</h3>
   <ul>
-    <li><b>Traffic</b> from <a href="https://adsb.lol" target="_blank" rel="noopener">adsb.lol</a>, a community network of volunteer receivers, with airplanes.live and adsb.fi as backups. Data under the <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener">Open Database License</a>.</li>
+    <li><b>Traffic</b> from <a href="https://adsb.lol" target="_blank" rel="noopener">adsb.lol</a>, a community network of volunteer receivers, with airplanes.live as a backup. Data under the <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener">Open Database License</a>.</li>
     <li><b>Weather</b> from the <a href="https://aviationweather.gov" target="_blank" rel="noopener">NOAA Aviation Weather Center</a>.</li>
     <li><b>Clouds and radar</b> from NOAA satellite and NEXRAD imagery, served by the <a href="https://mesonet.agron.iastate.edu" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>. Terrain from NOAA.</li>
     <li><b>Airline routes</b> from <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>, community route data that can be out of date. Small-plane departures are worked out from what upwind saw near each field.</li>
@@ -3751,7 +3751,7 @@ var V3=(function(){
   var on=false, vw=0, vh=0, dpr=1, dirty=true, lastDraw=0, anim=null, pick3=null, busy=0, lob3=false;
   var LAT0=43.2, LON0=-84.6, KX=60*Math.cos(LAT0*Math.PI/180), FT=1/6076, NEAR=0.6;
   function nm(lon,lat){ return [(lon-LON0)*KX,(lat-LAT0)*60]; }
-  var EXS=[3,6,12], exI=1, EX=6, showAsp=true;
+  var EXS=[3,6,12], exI=1, EX=6, showAsp=true, START=null;
   var cam={tx:0,ty:0,tz:0,bear:-24,pitch:42,dist:80};
   var HOMEV=(function(){ var dtw=nm(-83.3534,42.2124), arb=nm(-83.7456,42.2231); return {tx:dtw[0]*0.6+arb[0]*0.4,ty:dtw[1]*0.6+arb[1]*0.4-4,tz:0,bear:-24,pitch:42,dist:80}; })();
 
@@ -4041,7 +4041,7 @@ var V3=(function(){
   btn("v3-jets",function(){ layers.jets=!layers.jets; this.setAttribute("aria-pressed",layers.jets); var c=document.querySelector('[data-layer="jets"]'); if(c) c.setAttribute("aria-pressed",layers.jets); dirty=true; });
   btn("v3-ex",function(){ exI=(exI+1)%EXS.length; EX=EXS[exI]; this.textContent="Height ×"+EX; note(); dirty=true; });
   btn("v3-flatv",function(){ var top=cam.pitch>80; flyTo(look({pitch:top?42:90,bear:top?cam.bear:0}),1100); this.textContent=top?"Top Down":"Tilt"; });
-  btn("v3-reset",function(){ flyTo(HOMEV,1300); document.getElementById("v3-flatv").textContent="Top Down"; });
+  btn("v3-reset",function(){ flyTo(START||HOMEV,1300); document.getElementById("v3-flatv").textContent="Top Down"; });
   function note(){ document.getElementById("v3-note").textContent="Heights drawn ×"+EX+" so they read. Below 18,000 ft, altitudes are corrected with the nearest airport's altimeter setting."; }
 
   // ---- Lobby: a hands-off 3D segment around the field, faded in and out from the flat map
@@ -4100,8 +4100,10 @@ var V3=(function(){
   function enter(){ if(on||LOBBY) return; closeOthers(); if(RP.on) stopReplay(); if(follow) stopFollow();
     // over the home airport when one is set, otherwise over the middle of the flat map, about as far out as it was
     var c=home&&home.lat!=null?[home.lon,home.lat]:proj.invert([(W/2-T.x)/T.k,(H*0.55-T.y)/T.k]);
-    if(c){ var q=nm(c[0],c[1]); cam.tx=q[0]; cam.ty=q[1]; cam.dist=home?70:Math.max(20,Math.min(260,230/Math.pow(T.k,0.9))); } else Object.assign(cam,HOMEV);
+    if(!c) c=[-84.9,43.9];   // the middle of Michigan
+    var q=nm(c[0],c[1]); cam.tx=q[0]; cam.ty=q[1]; cam.dist=home?70:Math.max(20,Math.min(260,230/Math.pow(T.k,0.9)));
     cam.tz=0; cam.bear=-20; cam.pitch=42; pick3=null;
+    START={tx:cam.tx,ty:cam.ty,tz:0,bear:cam.bear,pitch:cam.pitch,dist:cam.dist};   // what Reset returns to
     on=true; document.body.classList.add("v3d"); document.getElementById("v3").hidden=false; size(); setToggle(); note();
     document.getElementById("v3-jets").setAttribute("aria-pressed",layers.jets);
     if(matchMedia("(pointer:coarse)").matches) hint.textContent="Drag to turn and tilt · Two fingers to move and zoom"; hint.classList.remove("gone"); clearTimeout(enter.t); enter.t=setTimeout(hideHint,7000);

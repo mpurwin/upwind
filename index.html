@@ -505,6 +505,9 @@ body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transp
 @media (max-width:760px){body.hud-min .vig{background:linear-gradient(to bottom,rgba(13,13,12,.9) 0,transparent 22%),linear-gradient(to top,rgba(13,13,12,.94) 10%,transparent 32%)}}
 
 /* Walkthrough */
+/* OpenStreetMap credit while close-up streets show: a tiny corner note, out of the bottom bar's flow */
+#osm-note{position:fixed;right:10px;bottom:calc(3px + env(safe-area-inset-bottom,0px));z-index:5;font-size:9px!important;opacity:.5;margin:0!important}
+#osm-note[hidden]{display:none}
 /* Tour: a caption bar over the live map (bottom left on computers, top on phones) with a progress strip */
 .tour2{position:fixed;left:32px;bottom:calc(104px + env(safe-area-inset-bottom,0px));width:min(440px,calc(100vw - 64px));z-index:62;background:rgba(22,21,19,.74);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);border:1px solid rgba(236,231,222,.14);border-radius:16px;padding:12px 12px 13px 16px;color:var(--bone);box-shadow:0 14px 44px rgba(0,0,0,.45);opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .4s,transform .4s cubic-bezier(.3,.6,.3,1)}
 .tour2.on{opacity:1;transform:none;pointer-events:auto}
@@ -921,6 +924,7 @@ body.v3d .wmrow .btag,body:has(.mcard.on .sky) .wmrow .btag,body.v3d-lobby .lb-m
     <span><i style="background:var(--s2)"></i>5,000 to 18,000</span>
     <span><i style="background:var(--s3)"></i>Above 18,000</span>
     <span class="fine">Connecting · Not for flight planning</span>
+    <a class="fine credits-btn" id="osm-note" hidden href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>
     <button class="fine credits-btn" id="credits-btn">Data &amp; Credits</button>
     <a class="fine credits-btn" id="about-link" href="about.html">About</a>
   </div>
@@ -1020,6 +1024,7 @@ body.v3d .wmrow .btag,body:has(.mcard.on .sky) .wmrow .btag,body.v3d-lobby .lb-m
       <li><b>Clouds and radar</b> from NOAA satellite and NEXRAD imagery, served by the <a href="https://mesonet.agron.iastate.edu" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>.</li>
       <li><b>Airports, airspace and the sectional chart</b> from the <a href="https://www.faa.gov/air_traffic/flight_info/aeronav" target="_blank" rel="noopener">FAA</a>. Terrain from NOAA. Runway positions in the 3D view from <a href="https://ourairports.com" target="_blank" rel="noopener">OurAirports</a> (public domain). Temporary flight restrictions from the <a href="https://tfr.faa.gov" target="_blank" rel="noopener">FAA</a>.</li>
     <li><b>Satellite map</b> from the <a href="https://www.usgs.gov/programs/national-geospatial-program/national-map" target="_blank" rel="noopener">USGS National Map</a> and NASA's <a href="https://earthobservatory.nasa.gov/features/BlueMarble" target="_blank" rel="noopener">Blue Marble</a>.</li>
+    <li><b>Close-up streets, towns and runways</b> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors, via <a href="https://protomaps.com" target="_blank" rel="noopener">Protomaps</a>.</li>
       <li><b>Airline routes</b> from <a href="https://www.adsbdb.com" target="_blank" rel="noopener">adsbdb</a>, community route data that can be out of date.</li>
     </ul>
   </section>
@@ -1065,7 +1070,7 @@ body.v3d .wmrow .btag,body:has(.mcard.on .sky) .wmrow .btag,body.v3d-lobby .lb-m
     <li><b>Fonts:</b> Calogen and Hanken Grotesk. QR codes by Kazuhiko Arase's qrcode-generator (MIT).</li>
   </ul>
   <p class="cnote">upwind is for fun and awareness only. It is not for navigation or flight planning; use current charts, NOTAMs and an official briefing.</p>
-  <p class="cnote" id="privacy-note">No cookies or tracking. Your home airport and settings stay in your browser.</p>
+  <p class="cnote" id="privacy-note">No cookies, and nothing that identifies you: only daily totals of which features get used. Your home airport and settings stay in your browser.</p>
   <p class="cnote" id="feedback-line" hidden>Ideas or bugs? <a id="feedback-link" href="#">Send Feedback</a>.</p>
 </div>
 <div class="mcard" id="mcard" aria-live="polite"></div>
@@ -1292,6 +1297,12 @@ function getTile(z,x,y){
   im.onerror=function(){ t.bad=true; tileBad++; if(tileBad===8&&!tileOK) toast("The FAA chart can't load in this preview. It will work once the site is on its own hosting.",6500); };
   im.src=TILE+k; return t;
 }
+// Terminal Area Charts (Detroit, Chicago): the same FAA service family at twice the sectional's scale. Drawn over the
+// sectional where they exist once zoomed in; elsewhere the service has no tile and the sectional shows.
+var TAC="https://tiles.arcgis.com/tiles/ssFJjBXIUyZDrSYZ/arcgis/rest/services/VFR_Terminal/MapServer/tile/", tacTiles={};
+function getTac(z,x,y){ var k=z+"/"+y+"/"+x, t=tacTiles[k]; if(t) return t;
+  var im=new Image(); im.crossOrigin="anonymous"; t=tacTiles[k]={im:im,ok:false};
+  im.onload=function(){ t.ok=true; mapDirty=true; }; im.onerror=function(){ t.bad=true; }; im.src=TAC+k; return t; }
 // The lon/lat box the screen covers. The map projection curves, so the corners alone miss the middle of the top
 // and bottom edges (that left an empty strip along the top); edge points are sampled too.
 function viewBox2(){ var lo0=1e9,lo1=-1e9,la0=1e9,la1=-1e9;
@@ -1325,9 +1336,105 @@ function drawChart(){
       gMap.drawImage(pt.im,sx,sy,sz,sz,dx,dy,dw,dh); break;
     }
   }
+  // Terminal chart on top, from level 10 in (its tiles start there)
+  if(z>=10) for(var x2=x0;x2<=x1;x2++) for(var y2=y0;y2<=y1;y2++){
+    var tt=getTac(z,x2,y2); if(!tt.ok) continue;
+    var a2=proj([lon(x2),lat(y2)]), b2=proj([lon(x2+1),lat(y2+1)]);
+    gMap.drawImage(tt.im,a2[0]*T.k+T.x,a2[1]*T.k+T.y,(b2[0]-a2[0])*T.k+0.6,(b2[1]-a2[1])*T.k+0.6); }
   }
   gMap.fillStyle="rgba(8,10,14,"+(LOBBY?0.06+0.2*light.night:0.12+0.5*light.night)+")"; gMap.fillRect(0,0,W,H);
 }
+/* Minimal Mapbox Vector Tile reader: layers, features, tags and geometry (tile coordinates, 0 to extent). */
+var MVT=(function(){
+  var TD=new TextDecoder();
+  function R(b){ this.b=b; this.p=0; }
+  R.prototype.v=function(){ var b=this.b, r=0, m=1, c; do{ c=b[this.p++]; r+=(c&127)*m; m*=128; }while(c&128); return r; };
+  R.prototype.skip=function(t){ if(t===0) this.v(); else if(t===1) this.p+=8; else if(t===2) this.p+=this.v(); else if(t===5) this.p+=4; };
+  function zz(n){ return n%2?-(n+1)/2:n/2; }
+  function packed(r){ var end=r.v()+r.p, out=[]; while(r.p<end) out.push(r.v()); return out; }
+  function value(r,end){ var v=null; while(r.p<end){ var k=r.v(), f=k>>3, t=k&7, dv;
+    if(f===1){ var l=r.v(); v=TD.decode(r.b.subarray(r.p,r.p+l)); r.p+=l; }
+    else if(f===2){ dv=new DataView(r.b.buffer,r.b.byteOffset+r.p,4); v=dv.getFloat32(0,true); r.p+=4; }
+    else if(f===3){ dv=new DataView(r.b.buffer,r.b.byteOffset+r.p,8); v=dv.getFloat64(0,true); r.p+=8; }
+    else if(f===4||f===5) v=r.v(); else if(f===6) v=zz(r.v()); else if(f===7) v=!!r.v(); else r.skip(t); } return v; }
+  function feature(r,end){ var f={type:0,tags:[],geom:[]}; while(r.p<end){ var k=r.v(), n=k>>3, t=k&7;
+    if(n===2) f.tags=packed(r); else if(n===3) f.type=r.v(); else if(n===4) f.geom=packed(r); else r.skip(t); } return f; }
+  function layer(r,end){ var L={name:"",extent:4096,keys:[],values:[],raw:[]}; while(r.p<end){ var k=r.v(), n=k>>3, t=k&7;
+    if(n===1){ var l=r.v(); L.name=TD.decode(r.b.subarray(r.p,r.p+l)); r.p+=l; }
+    else if(n===2){ var e=r.v()+r.p; L.raw.push(feature(r,e)); r.p=e; }
+    else if(n===3){ var l2=r.v(); L.keys.push(TD.decode(r.b.subarray(r.p,r.p+l2))); r.p+=l2; }
+    else if(n===4){ var e2=r.v()+r.p; L.values.push(value(r,e2)); r.p=e2; }
+    else if(n===5) L.extent=r.v(); else r.skip(t); }
+    L.features=L.raw.map(function(f){ var p={}; for(var i=0;i<f.tags.length;i+=2) p[L.keys[f.tags[i]]]=L.values[f.tags[i+1]]; return {type:f.type,props:p,geom:f.geom}; });
+    delete L.raw; return L; }
+  // geometry as rings/lines of [x,y] points
+  function rings(g){ var out=[], cur=null, x=0, y=0, i=0; while(i<g.length){ var c=g[i++], id=c&7, n=c>>3;
+      if(id===1||id===2){ for(var j=0;j<n;j++){ x+=zz(g[i++]); y+=zz(g[i++]); if(id===1){ cur=[[x,y]]; out.push(cur); } else cur.push([x,y]); } }
+      else if(id===7&&cur) cur.push(cur[0]); }
+    return out; }
+  function read(buf){ var r=new R(buf instanceof Uint8Array?buf:new Uint8Array(buf)), L={}; while(r.p<r.b.length){ var k=r.v(), n=k>>3, t=k&7;
+      if(n===3){ var e=r.v()+r.p, l=layer(r,e); L[l.name]=l; r.p=e; } else r.skip(t); } return L; }
+  return {read:read,rings:rings};
+})();
+
+/* ---------------- Close-up streets (dark map) ----------------
+   Roads, water, towns, runways and taxiways from OpenStreetMap (via a Protomaps file of Michigan that the relay
+   serves from upwind's own storage). Fades in once zoomed past county level; drawn quietly so traffic stays on top.
+   If the file isn't there, nothing shows and the map is as before. */
+var STR={url:RELAY?RELAY.replace(/\/$/,"")+"/pm/michigan.pmtiles":"", pm:null, lib:0, off:false, maxz:14, c:{}, busy:0, n:0};
+function strOn(){ return !chart&&!satOn()&&!STR.off&&!!STR.url&&T.k>=5; }
+function strLib(){ if(STR.lib) return; STR.lib=1; var sc=document.createElement("script"); sc.src="https://cdn.jsdelivr.net/npm/pmtiles@4.5.0/dist/pmtiles.js";
+  sc.onload=function(){ try{ STR.pm=new pmtiles.PMTiles(STR.url); STR.pm.getHeader().then(function(h){ STR.maxz=h.maxZoom||14; STR.lib=2; mapDirty=true; }).catch(function(){ STR.off=true; }); }catch(e){ STR.off=true; } };
+  sc.onerror=function(){ STR.off=true; }; document.head.appendChild(sc); }
+var ROADW={highway:[1.7,0.3],major_road:[1.05,0.2],minor_road:[0.6,0.1]};
+// One tile, decoded once into ready-to-draw shapes (tile units, 0 to 4096)
+function strBuild(L){ var o={water:new Path2D(),aero:new Path2D(),river:new Path2D(),rw:new Path2D(),tw:new Path2D(),roads:{highway:new Path2D(),major_road:new Path2D(),minor_road:new Path2D()},towns:[]};
+  function add(path,g){ MVT.rings(g).forEach(function(r){ r.forEach(function(p,i){ if(i) path.lineTo(p[0],p[1]); else path.moveTo(p[0],p[1]); }); }); }
+  if(L.water) L.water.features.forEach(function(f){ if(f.type===3) add(o.water,f.geom); else if(f.type===2&&(f.props.kind==="river")) add(o.river,f.geom); });
+  if(L.landuse) L.landuse.features.forEach(function(f){ if(f.type===3&&f.props.kind==="aerodrome") add(o.aero,f.geom); });
+  if(L.roads) L.roads.features.forEach(function(f){ if(f.type!==2) return; var k=f.props.kind, d=f.props.kind_detail;
+    if(k==="aeroway"){ if(d==="runway") add(o.rw,f.geom); else if(d==="taxiway") add(o.tw,f.geom); } else if(o.roads[k]) add(o.roads[k],f.geom); });
+  if(L.places) L.places.features.forEach(function(f){ var p=f.props; if(f.type!==1||!p.name||!/^(locality|neighbourhood)$/.test(p.kind)) return; var g=MVT.rings(f.geom)[0]; if(g) o.towns.push({x:g[0][0],y:g[0][1],t:p.name,big:p.kind==="locality",mz:p.min_zoom||0}); });
+  return o; }
+function strTile(z,x,y){ var k=z+"/"+x+"/"+y, t=STR.c[k]; if(t){ t.u=STR.n; return t; }
+  if(STR.busy>=6) return null; t=STR.c[k]={u:STR.n,ok:false}; STR.busy++;
+  STR.pm.getZxy(z,x,y).then(function(r){ STR.busy--; if(r&&r.data){ try{ t.d=strBuild(MVT.read(new Uint8Array(r.data))); }catch(e){} } t.ok=true; mapDirty=true; })
+    .catch(function(){ STR.busy--; t.ok=true; });
+  var ks=Object.keys(STR.c); if(ks.length>220){ ks.sort(function(a,b){ return STR.c[a].u-STR.c[b].u; }).slice(0,60).forEach(function(q){ if(STR.c[q].ok) delete STR.c[q]; }); }
+  return t; }
+function drawStreets(P){
+  if(!strOn()){ osmNote(false); return; }
+  strLib(); if(STR.lib!==2) return; STR.n++;
+  var a=Math.max(0,Math.min(1,(T.k-5)/4)); if(a<=0) return;
+  var zc=Math.log2(2*Math.PI*proj.scale()*T.k/256), z=Math.max(7,Math.min(STR.maxz,Math.floor(zc+0.4)));
+  var R=tileRange(viewBox2(),z,7,40), n=R.n, cl=0;
+  var mpp=156543*Math.cos(44*Math.PI/180)/Math.pow(2,zc);   // meters per screen pixel, for real-width runways
+  function corner(x,y){ var lon=x/n*360-180, v=Math.PI-2*Math.PI*y/n, lat=180/Math.PI*Math.atan(0.5*(Math.exp(v)-Math.exp(-v))), q=proj([lon,lat]); return [q[0]*T.k+T.x,q[1]*T.k+T.y]; }
+  var towns=[];
+  gMap.save(); gMap.lineJoin="round"; gMap.lineCap="round";
+  for(var x=R.x0;x<=R.x1;x++) for(var y=R.y0;y<=R.y1;y++){
+    var t=strTile(R.z,x,y); if(!t||!t.d) continue; var d=t.d;
+    var o=corner(x,y), e=corner(x+1,y), s2=corner(x,y+1), ux=(e[0]-o[0])/4096, uy=(e[1]-o[1])/4096, vx=(s2[0]-o[0])/4096, vy=(s2[1]-o[1])/4096, sc=Math.hypot(ux,uy);
+    gMap.setTransform(DPR*ux,DPR*uy,DPR*vx,DPR*vy,DPR*o[0],DPR*o[1]);
+    gMap.globalAlpha=a; gMap.fillStyle=P.lake; gMap.fill(d.water);
+    gMap.lineWidth=0.9/sc; gMap.strokeStyle=P.lake; gMap.stroke(d.river);
+    gMap.fillStyle="rgba(236,231,222,.035)"; gMap.fill(d.aero);
+    ["minor_road","major_road","highway"].forEach(function(k){ if(k==="minor_road"&&zc<11.5) return; var w=ROADW[k]; gMap.lineWidth=w[0]/sc; gMap.strokeStyle="rgba(236,231,222,"+w[1]+")"; gMap.stroke(d.roads[k]); });
+    if(zc>=10.5){ gMap.lineCap="butt"; gMap.lineWidth=Math.max(1,14/mpp)/sc; gMap.strokeStyle="rgba(236,231,222,.16)"; gMap.stroke(d.tw);
+      gMap.lineWidth=Math.max(1.6,40/mpp)/sc; gMap.strokeStyle="rgba(236,231,222,.42)"; gMap.stroke(d.rw); gMap.lineCap="round"; }
+    d.towns.forEach(function(w){ if(w.mz>zc+0.5||(!w.big&&zc<12)) return; towns.push([o[0]+ux*w.x+vx*w.y,o[1]+uy*w.x+vy*w.y,w]); });
+  }
+  // Town names, quiet and small, never stacked on each other
+  gMap.setTransform(DPR,0,0,DPR,0,0); gMap.globalAlpha=a; gMap.textAlign="center"; var taken=[];
+  towns.sort(function(p,q){ return (q[2].big?1:0)-(p[2].big?1:0); }).forEach(function(w){ if(w[0]<0||w[1]<0||w[0]>W||w[1]>H) return;
+    var big=w[2].big; gMap.font=(big?"500 11px":"400 10px")+" Hanken Grotesk, sans-serif"; var tw=gMap.measureText(w[2].t).width+8, bx=[w[0]-tw/2,w[1]-10,tw,14];
+    if(taken.some(function(b){ return !(bx[0]>b[0]+b[2]||bx[0]+bx[2]<b[0]||bx[1]>b[1]+b[3]||bx[1]+bx[3]<b[1]); })) return; taken.push(bx);
+    gMap.fillStyle="rgba(236,231,222,"+(big?0.34:0.24)+")"; gMap.fillText(w[2].t,w[0],w[1]); });
+  gMap.restore(); osmNote(true);
+}
+// OpenStreetMap's license asks for visible credit wherever its data shows
+var osmEl=null; function osmNote(on){ if(!osmEl) osmEl=document.getElementById("osm-note"); if(osmEl&&osmEl.hidden===on) osmEl.hidden=!on; }
+
 /* ---------------- Satellite base map ---------------- */
 // Aerial imagery from the USGS National Map (public domain, US only) over a NASA Blue Marble picture of the
 // whole region (public domain) for Canada and the far lakes. Darkened and muted so planes, airports and airspace
@@ -1425,7 +1532,7 @@ function setSat(v){ satBase=v; try{ localStorage.setItem("upwind-sat",v?"1":"0")
 document.getElementById("base-dark").addEventListener("click",function(e){ setSat(false); if(chart) document.getElementById("chart-btn").click(); else { baseUI(); mapDirty=true; } });
 document.getElementById("sat-btn").addEventListener("click",function(e){ setSat(true); if(chart) document.getElementById("chart-btn").click(); else { baseUI(); mapDirty=true; } });
 baseUI();
-document.getElementById("chart-btn").addEventListener("click",function(){ chart=!chart; baseUI(); document.body.classList.toggle("chart",chart); mapDirty=true; clearWind(); if(chart) toast("FAA VFR sectional chart. Not for navigation; use current charts.",3600); });
+document.getElementById("chart-btn").addEventListener("click",function(){ chart=!chart; baseUI(); if(typeof zoom!=="undefined"){ zoom.scaleExtent([0.8,chart?ZMAX_CHART:ZMAX]); if(chart&&T.k>ZMAX_CHART) d3.select(cTop).transition().duration(700).call(zoom.scaleTo,ZMAX_CHART); } document.body.classList.toggle("chart",chart); mapDirty=true; clearWind(); if(chart) toast("FAA VFR sectional chart. Not for navigation; use current charts.",3600); });
 
 /* ---------------- Map ---------------- */
 var mapDirty=true, lastLightKey="";
@@ -1579,7 +1686,7 @@ function drawMap(){
   // Terrain and lake depth from NOAA elevation data, laid over the flat colors
   var SATM=satOn(); if(SATM) drawSat(S2);
   if(RELIEF.ok){ var r0=proj([RELIEF.b[0],RELIEF.b[3]]), r1=proj([RELIEF.b[2],RELIEF.b[1]]);
-    gMap.globalCompositeOperation="soft-light"; gMap.globalAlpha=SATM?Math.max(0,Math.min(0.4,(5-T.k)/6)):Math.max(0.55,Math.min(1,(6-T.k)/3)); gMap.drawImage(RELIEF.img,r0[0],r0[1],r1[0]-r0[0],r1[1]-r0[1]);
+    gMap.globalCompositeOperation="soft-light"; gMap.globalAlpha=SATM?Math.max(0,Math.min(0.4,(5-T.k)/6)):Math.max(0.55,Math.min(1,(6-T.k)/3))*Math.max(0,Math.min(1,(32-T.k)/18)); gMap.drawImage(RELIEF.img,r0[0],r0[1],r1[0]-r0[0],r1[1]-r0[1]);
     var rs=SATM?0:Math.max(0,Math.min(1,(4.5-T.k)/2.5)); if(rs>0){ gMap.globalAlpha=0.55*rs; gMap.drawImage(RELIEF.img,r0[0],r0[1],r1[0]-r0[0],r1[1]-r0[1]); }
     gMap.globalCompositeOperation="source-over"; gMap.globalAlpha=1; }
   gMap.lineWidth=0.8/T.k; gMap.strokeStyle=P.lakeEdge; gMap.stroke(S2.lakes);
@@ -1588,6 +1695,8 @@ function drawMap(){
   gMap.lineWidth=0.8/T.k; gMap.strokeStyle=P.border; gMap.setLineDash([3/T.k,4/T.k]); gMap.stroke(S2.borders); gMap.setLineDash([]);
   // Michigan shoreline
   gMap.lineWidth=1/T.k; gMap.strokeStyle=P.shore; gMap.stroke(S2.mi);
+  // Close-up streets, towns and runways (dark map only)
+  drawStreets(P);
   // Weather from above: radar, then satellite clouds with their shadows
   drawRadarSat(); drawLowCloud(); drawPathsLayer();
   drawHeat();
@@ -2203,7 +2312,8 @@ function blurCopy(){
 
 /* ---------------- Zoom and interaction ---------------- */
 var zoomAt=0;
-var zoom=d3.zoom().scaleExtent([0.8,14]).on("zoom",function(e){ T=e.transform; zoomAt=performance.now(); mapDirty=true; clearWind(); if(e.sourceEvent&&follow) stopFollow(); }).on("start",function(e){ if(e.sourceEvent&&e.sourceEvent.type==="mousedown") cTop.classList.add("drag"); }).on("end",function(){ cTop.classList.remove("drag"); });
+var ZMAX=64, ZMAX_CHART=28;   // closest zoom: about one airport's traffic pattern (the sectional has no finer detail, so it stops sooner)
+var zoom=d3.zoom().scaleExtent([0.8,chart?ZMAX_CHART:ZMAX]).on("zoom",function(e){ T=e.transform; zoomAt=performance.now(); mapDirty=true; clearWind(); if(e.sourceEvent&&follow) stopFollow(); }).on("start",function(e){ if(e.sourceEvent&&e.sourceEvent.type==="mousedown") cTop.classList.add("drag"); }).on("end",function(){ cTop.classList.remove("drag"); });
 var sel_=d3.select(cTop).call(zoom).on("dblclick.zoom",null);
 var homeEdge=null;
 function drawHome(t){
@@ -2291,16 +2401,22 @@ function getPaths(step,cb){
 }
 function drawPathsLayer(){
   if(!layers.paths||chart) return;
-  getPaths(5,function(){ PATHS.key=""; mapDirty=true; });
-  var d=PATHS.d; if(!d) return;
-  var key=projKey()+"|"+d.now;
+  // zoomed in, use the finer record (a point every 2 minutes instead of 5)
+  var fine=T.k>=5; getPaths(fine?2:5,function(){ PATHS.key=""; mapDirty=true; });
+  var d=(fine&&RPD.d)||PATHS.d; if(!d) return;
+  var key=projKey()+"|"+d.now+"|"+d.step;
   if(PATHS.key!==key){ var p2=new Path2D();
-    Object.keys(d.p).forEach(function(h){ var a=d.p[h], prev=null;
-      a.forEach(function(x){ var q=proj([x[2]/1000,x[1]/1000]); if(!q) return;
-        if(!prev||x[0]-prev[0]>d.step*3) p2.moveTo(q[0],q[1]); else p2.lineTo(q[0],q[1]); prev=x; }); });
+    // each flight is drawn as a smooth curve through its points (midpoint curves), so turns don't look like corners
+    Object.keys(d.p).forEach(function(h){ var a=d.p[h], run=[];
+      function flush(){ if(run.length>1){ p2.moveTo(run[0][0],run[0][1]);
+          for(var j=1;j<run.length-1;j++){ p2.quadraticCurveTo(run[j][0],run[j][1],(run[j][0]+run[j+1][0])/2,(run[j][1]+run[j+1][1])/2); }
+          p2.lineTo(run[run.length-1][0],run[run.length-1][1]); } run=[]; }
+      var prev=null; a.forEach(function(x){ var q=proj([x[2]/1000,x[1]/1000]); if(!q) return;
+        if(prev&&x[0]-prev[0]>d.step*3) flush(); run.push(q); prev=x; }); flush(); });
     PATHS.p2=p2; PATHS.key=key; }
+  var up=Math.max(0,Math.min(1,(T.k-3)/12));   // 0 on the state view, 1 zoomed in close
   gMap.save(); gMap.globalCompositeOperation="lighter"; gMap.lineJoin="round"; gMap.lineCap="round";
-  gMap.strokeStyle="rgba(242,163,58,"+(light.day>0.4?0.16:0.2)+")"; gMap.lineWidth=1.1/T.k; gMap.stroke(PATHS.p2);
+  gMap.strokeStyle="rgba(242,163,58,"+((light.day>0.4?0.16:0.2)+0.2*up).toFixed(3)+")"; gMap.lineWidth=(1.1+1.1*up)/T.k; gMap.stroke(PATHS.p2);
   gMap.restore();
 }
 // Replay

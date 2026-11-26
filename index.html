@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>upwind · Michigan's Sky, Live · Flight Tracker and Airport Weather</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJjIj48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjKSI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjMGQwZDBjIi8+PHJlY3QgeT0iMzciIHdpZHRoPSI2NCIgaGVpZ2h0PSI5IiBmaWxsPSIjZTg2OTJjIi8+PHJlY3QgeT0iNDYiIHdpZHRoPSI2NCIgaGVpZ2h0PSI5IiBmaWxsPSIjZjJhMzNhIi8+PHJlY3QgeT0iNTUiIHdpZHRoPSI2NCIgaGVpZ2h0PSI5IiBmaWxsPSIjZjRlMmM2Ii8+PC9nPjwvc3ZnPgo=">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -505,6 +505,14 @@ body.hud-min .vig{background:linear-gradient(to right,rgba(13,13,12,.7) 0,transp
 @media (max-width:760px){body.hud-min .vig{background:linear-gradient(to bottom,rgba(13,13,12,.9) 0,transparent 22%),linear-gradient(to top,rgba(13,13,12,.94) 10%,transparent 32%)}}
 
 /* Walkthrough */
+/* Press-and-hold ring for What's Overhead */
+.hold-ring{position:fixed;left:0;top:0;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;border:1.5px solid rgba(236,231,222,.75);z-index:4;pointer-events:none;opacity:0;transform:scale(.3)}
+.hold-ring:after{content:"";position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:var(--bone)}
+.hold-ring.grow{animation:holdGrow .55s .08s cubic-bezier(.3,.6,.3,1) forwards}
+.hold-ring.done{animation:holdDone .65s ease-out forwards;border-color:var(--s2)}
+@keyframes holdGrow{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+@keyframes holdDone{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.6)}}
+@media (prefers-reduced-motion:reduce){.hold-ring.grow,.hold-ring.done{animation:none;opacity:0}}
 /* OpenStreetMap credit while close-up streets show: a tiny corner note, out of the bottom bar's flow */
 #osm-note{position:fixed;right:10px;bottom:calc(3px + env(safe-area-inset-bottom,0px));z-index:5;font-size:9px!important;opacity:.5;margin:0!important}
 #osm-note[hidden]{display:none}
@@ -586,19 +594,25 @@ body.touring .ticker,body.touring .a2hs,body.touring .v3-key{opacity:0!important
 .splash.gone{display:none}
 .splash .bg{position:absolute;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center}
 .splash .wm2{font-family:"Calogen Exp","Hanken Grotesk",sans-serif;font-style:italic;font-weight:700;font-size:1.7rem;letter-spacing:.01em;color:var(--bone);display:flex}
-.splash .wm2 span{display:inline-block;opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i)*60ms + 120ms)}
-.splash.on .wm2 span{opacity:1;transform:none}
-.splash.on .wm2{animation:wmDrift 3.4s ease-out both}
+.splash .wm2 span{display:inline-block}
+.splash .wm2{opacity:0;transition:opacity .7s ease .1s}.splash.on .wm2{opacity:1}
+
+/* The intro opens on the full lockup: the mark beside the wordmark. Its three bars then bend and fly a short way up
+   and to the left, one after another, fading out, and the stripes come across the screen right after. The wordmark stays put. */
+.splash .wm2{align-items:center}
+.splash .wm2 .mk2{position:static;inset:auto;height:1.02em;width:1.08em;margin-right:.14em;flex:none;overflow:visible}
+.splash .wm2 .mk2.go rect{opacity:0;transition:none}
 /* Lobby: the featured airport's identifier hangs under the stripes and drops in, the mirror of the wordmark rising */
 .splash .apt2{position:absolute;left:0;right:0;display:flex;justify-content:center;font:700 1.05rem "Hanken Grotesk",sans-serif;letter-spacing:.32em;text-indent:.32em;color:var(--s3)}
 .splash .apt2 span{display:inline-block;opacity:0;transform:translateY(-12px);transition:opacity .5s ease,transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i)*70ms + 900ms)}
 .splash.on .apt2 span{opacity:1;transform:none}
-@keyframes wmDrift{from{transform:scale(.95);letter-spacing:.06em}to{transform:scale(1.04);letter-spacing:.01em}}
+
 .splash svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .splash polyline{fill:none;stroke-linejoin:round;stroke-linecap:butt}
 .splash .pl{fill:var(--bone)}
 .splash.split > .bg,.splash.split > svg{visibility:hidden}
 .splash .half{position:absolute;inset:0;transition:transform .9s cubic-bezier(.7,0,.25,1);will-change:transform}
+.splash.lr .half{transition-duration:.55s}
 
 @media (max-width:760px){
   .hud{left:20px;top:20px}
@@ -632,7 +646,7 @@ body.touring .ticker,body.touring .a2hs,body.touring .v3-key{opacity:0!important
   .card:not(.float){max-height:calc(100vh - 150px)}
   .follow{top:64px;bottom:auto;max-width:calc(100vw - 32px)}
 }
-@media (prefers-reduced-motion:reduce){.splash .wm2 span,.splash .apt2 span{transition:none}.splash.on .wm2{animation:none}}
+@media (prefers-reduced-motion:reduce){.splash .wm2,.splash .apt2 span{transition:none}}
 
 /* ---------- Lobby mode (?lobby=KARB): a hands-off wall display ---------- */
 body.lobby{cursor:none}
@@ -1095,7 +1109,7 @@ body.v3d .wmrow .btag,body:has(.mcard.on .sky) .wmrow .btag,body.v3d-lobby .lb-m
   <button class="chip" id="lb-gear"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 3h12M1 7h12M1 11h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> Display</button>
 </div>
 <div class="splash" id="splash" role="img" aria-label="upwind">
-  <div class="bg"><div class="wm2" aria-hidden="true"><span style="--i:0">u</span><span style="--i:1">p</span><span style="--i:2">w</span><span style="--i:3">i</span><span style="--i:4">n</span><span style="--i:5">d</span></div></div>
+  <div class="bg"><div class="wm2" aria-hidden="true"><svg class="mk2" viewBox="13 18 68 64" aria-hidden="true"><g transform="translate(10.63 0) skewX(-12)"><rect x="22" y="20" width="18" height="60" rx="5.5" fill="#e8692c"/><rect x="45" y="28" width="14" height="44" rx="4.5" fill="#f2a33a"/><rect x="64" y="35" width="10" height="30" rx="3.5" fill="#f4e2c6"/></g></svg><span style="--i:0">u</span><span style="--i:1">p</span><span style="--i:2">w</span><span style="--i:3">i</span><span style="--i:4">n</span><span style="--i:5">d</span></div></div>
   <svg id="splash-svg" aria-hidden="true"></svg>
 </div>
 
@@ -1290,11 +1304,22 @@ var ICE_FULL=["Lake Saint Clair","Lake Winnebago","Petenwell Lake","Long Lake","
 /* ---------------- FAA sectional chart ---------------- */
 var chart=false, TILE="https://tiles.arcgis.com/tiles/ssFJjBXIUyZDrSYZ/arcgis/rest/services/VFR_Sectional/MapServer/tile/", tiles={}, tileOK=0, tileBad=0, toastT;
 function toast(msg,ms){ var t=document.getElementById("toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(function(){t.classList.remove("on");},ms||4200); }
+/* Smooth tiles: each new map tile fades in over a moment instead of popping, and while one loads its square is filled
+   from the level above or below (stretched, or four smaller tiles), so zooming either way never leaves holes. */
+var tileFadeUntil=0, TFADE=280, tilePend=0;
+function fadeA(t){ if(!t||!t.at) return 1; var a=(performance.now()-t.at)/TFADE; if(a<1){ tileFadeUntil=performance.now()+60; return Math.max(0,a); } return 1; }
+function tileFill(getUp,peek,img,z,x,y,zmin,zmax,dx,dy,dw,dh){
+  for(var up=1;up<=4&&z-up>=zmin;up++){ var pt=getUp(z-up,x>>up,y>>up); if(!pt||!pt.ok) continue; var im=img(pt); if(!im) return true;
+    var sz=256/(1<<up), sx=(x-((x>>up)<<up))*sz, sy=(y-((y>>up)<<up))*sz; gMap.drawImage(im,sx,sy,sz,sz,dx,dy,dw,dh); return true; }
+  if(z+1<=zmax){ var cs=[[0,0],[1,0],[0,1],[1,1]], ch=cs.map(function(c){ return peek(z+1,2*x+c[0],2*y+c[1]); });
+    if(ch.every(function(c){ return c&&c.ok; })){ ch.forEach(function(c,i){ var im=img(c); if(im) gMap.drawImage(im,dx+cs[i][0]*dw/2,dy+cs[i][1]*dh/2,dw/2+0.5,dh/2+0.5); }); return true; } }
+  return false; }
+function chartPeek(z,x,y){ return tiles[z+"/"+y+"/"+x]; }
 function getTile(z,x,y){
   var k=z+"/"+y+"/"+x, t=tiles[k]; if(t) return t;
-  var im=new Image(); im.crossOrigin="anonymous"; t=tiles[k]={im:im,ok:false};
-  im.onload=function(){ t.ok=true; tileOK++; mapDirty=true; };
-  im.onerror=function(){ t.bad=true; tileBad++; if(tileBad===8&&!tileOK) toast("The FAA chart can't load in this preview. It will work once the site is on its own hosting.",6500); };
+  var im=new Image(); im.crossOrigin="anonymous"; t=tiles[k]={im:im,ok:false}; tilePend++;
+  im.onload=function(){ tilePend--; t.ok=true; t.at=performance.now(); tileOK++; mapDirty=true; };
+  im.onerror=function(){ tilePend--; t.bad=true; tileBad++; if(tileBad===8&&!tileOK) toast("The FAA chart can't load in this preview. It will work once the site is on its own hosting.",6500); };
   im.src=TILE+k; return t;
 }
 // Terminal Area Charts (Detroit, Chicago): the same FAA service family at twice the sectional's scale. Drawn over the
@@ -1302,7 +1327,7 @@ function getTile(z,x,y){
 var TAC="https://tiles.arcgis.com/tiles/ssFJjBXIUyZDrSYZ/arcgis/rest/services/VFR_Terminal/MapServer/tile/", tacTiles={};
 function getTac(z,x,y){ var k=z+"/"+y+"/"+x, t=tacTiles[k]; if(t) return t;
   var im=new Image(); im.crossOrigin="anonymous"; t=tacTiles[k]={im:im,ok:false};
-  im.onload=function(){ t.ok=true; mapDirty=true; }; im.onerror=function(){ t.bad=true; }; im.src=TAC+k; return t; }
+  im.onload=function(){ t.ok=true; t.at=performance.now(); mapDirty=true; }; im.onerror=function(){ t.bad=true; }; im.src=TAC+k; return t; }
 // The lon/lat box the screen covers. The map projection curves, so the corners alone miss the middle of the top
 // and bottom edges (that left an empty strip along the top); edge points are sampled too.
 function viewBox2(){ var lo0=1e9,lo1=-1e9,la0=1e9,la1=-1e9;
@@ -1327,20 +1352,18 @@ function drawChart(){
   for(var x=x0;x<=x1;x++) for(var y=y0;y<=y1;y++){
     var a=proj([lon(x),lat(y)]), b=proj([lon(x+1),lat(y+1)]);
     var dx=a[0]*T.k+T.x, dy=a[1]*T.k+T.y, dw=(b[0]-a[0])*T.k+0.6, dh=(b[1]-a[1])*T.k+0.6;
-    var t=getTile(z,x,y);
-    if(t.ok){ gMap.drawImage(t.im,dx,dy,dw,dh); continue; }
-    // While a tile loads (or if the chart has no tile at this zoom), stretch the matching piece of a lower-zoom tile so there are no holes
-    for(var up=1;up<=3&&z-up>=8;up++){
-      var pt=getTile(z-up,x>>up,y>>up); if(!pt.ok) continue;
-      var sz=256/(1<<up), sx=(x-((x>>up)<<up))*sz, sy=(y-((y>>up)<<up))*sz;
-      gMap.drawImage(pt.im,sx,sy,sz,sz,dx,dy,dw,dh); break;
-    }
+    var t=getTile(z,x,y), fa=t.ok?fadeA(t):0;
+    // while it loads (or if the chart has no tile at this zoom), fill from the level above or below so there are no holes
+    if(fa<1) tileFill(function(a,b,c){ return a>=8?getTile(a,b,c):null; },chartPeek,function(q){ return q.im; },z,x,y,8,12,dx,dy,dw,dh);
+    if(t.ok){ gMap.globalAlpha=fa; gMap.drawImage(t.im,dx,dy,dw,dh); gMap.globalAlpha=1; }
   }
+  // Idle: start on the next level for the middle of the screen, so zooming in lands on a sharp chart
+  if(!tilePend&&z<12){ var mx=Math.floor((x0+x1)/2), my=Math.floor((y0+y1)/2); for(var px=mx;px<=mx+1;px++) for(var py=my;py<=my+1;py++) for(var c2=0;c2<4;c2++) getTile(z+1,2*px+(c2&1),2*py+(c2>>1)); }
   // Terminal chart on top, from level 10 in (its tiles start there)
   if(z>=10) for(var x2=x0;x2<=x1;x2++) for(var y2=y0;y2<=y1;y2++){
     var tt=getTac(z,x2,y2); if(!tt.ok) continue;
     var a2=proj([lon(x2),lat(y2)]), b2=proj([lon(x2+1),lat(y2+1)]);
-    gMap.drawImage(tt.im,a2[0]*T.k+T.x,a2[1]*T.k+T.y,(b2[0]-a2[0])*T.k+0.6,(b2[1]-a2[1])*T.k+0.6); }
+    gMap.globalAlpha=fadeA(tt); gMap.drawImage(tt.im,a2[0]*T.k+T.x,a2[1]*T.k+T.y,(b2[0]-a2[0])*T.k+0.6,(b2[1]-a2[1])*T.k+0.6); gMap.globalAlpha=1; }
   }
   gMap.fillStyle="rgba(8,10,14,"+(LOBBY?0.06+0.2*light.night:0.12+0.5*light.night)+")"; gMap.fillRect(0,0,W,H);
 }
@@ -1398,7 +1421,7 @@ function strBuild(L){ var o={water:new Path2D(),aero:new Path2D(),river:new Path
   return o; }
 function strTile(z,x,y){ var k=z+"/"+x+"/"+y, t=STR.c[k]; if(t){ t.u=STR.n; return t; }
   if(STR.busy>=6) return null; t=STR.c[k]={u:STR.n,ok:false}; STR.busy++;
-  STR.pm.getZxy(z,x,y).then(function(r){ STR.busy--; if(r&&r.data){ try{ t.d=strBuild(MVT.read(new Uint8Array(r.data))); }catch(e){} } t.ok=true; mapDirty=true; })
+  STR.pm.getZxy(z,x,y).then(function(r){ STR.busy--; if(r&&r.data){ try{ t.d=strBuild(MVT.read(new Uint8Array(r.data))); }catch(e){} } t.ok=true; t.at=performance.now(); mapDirty=true; })
     .catch(function(){ STR.busy--; t.ok=true; });
   var ks=Object.keys(STR.c); if(ks.length>220){ ks.sort(function(a,b){ return STR.c[a].u-STR.c[b].u; }).slice(0,60).forEach(function(q){ if(STR.c[q].ok) delete STR.c[q]; }); }
   return t; }
@@ -1413,16 +1436,21 @@ function drawStreets(P){
   var towns=[];
   gMap.save(); gMap.lineJoin="round"; gMap.lineCap="round";
   for(var x=R.x0;x<=R.x1;x++) for(var y=R.y0;y<=R.y1;y++){
-    var t=strTile(R.z,x,y); if(!t||!t.d) continue; var d=t.d;
-    var o=corner(x,y), e=corner(x+1,y), s2=corner(x,y+1), ux=(e[0]-o[0])/4096, uy=(e[1]-o[1])/4096, vx=(s2[0]-o[0])/4096, vy=(s2[1]-o[1])/4096, sc=Math.hypot(ux,uy);
+    var t=strTile(R.z,x,y), tz=R.z, tx=x, ty=y, clip=null;
+    // a new level still loading: draw the larger tile it sits in, trimmed to this square, so streets don't blink out
+    if(!t||!t.d){ var pt=STR.c[(R.z-1)+"/"+(x>>1)+"/"+(y>>1)]; if(!pt||!pt.d) continue; clip=[corner(x,y),corner(x+1,y),corner(x+1,y+1),corner(x,y+1)]; t=pt; tz=R.z-1; tx=x>>1; ty=y>>1; }
+    var d=t.d, nn=Math.pow(2,tz), cr=function(xx,yy){ return corner(xx*n/nn,yy*n/nn); };
+    var o=cr(tx,ty), e=cr(tx+1,ty), s2=cr(tx,ty+1), ux=(e[0]-o[0])/4096, uy=(e[1]-o[1])/4096, vx=(s2[0]-o[0])/4096, vy=(s2[1]-o[1])/4096, sc=Math.hypot(ux,uy);
+    gMap.save(); if(clip){ gMap.setTransform(DPR,0,0,DPR,0,0); gMap.beginPath(); clip.forEach(function(c,i){ if(i) gMap.lineTo(c[0],c[1]); else gMap.moveTo(c[0],c[1]); }); gMap.closePath(); gMap.clip(); }
     gMap.setTransform(DPR*ux,DPR*uy,DPR*vx,DPR*vy,DPR*o[0],DPR*o[1]);
-    gMap.globalAlpha=a; gMap.fillStyle=P.lake; gMap.fill(d.water);
+    gMap.globalAlpha=a*(clip?1:fadeA(t)); gMap.fillStyle=P.lake; gMap.fill(d.water);
     gMap.lineWidth=0.9/sc; gMap.strokeStyle=P.lake; gMap.stroke(d.river);
     gMap.fillStyle="rgba(236,231,222,.035)"; gMap.fill(d.aero);
     ["minor_road","major_road","highway"].forEach(function(k){ if(k==="minor_road"&&zc<11.5) return; var w=ROADW[k]; gMap.lineWidth=w[0]/sc; gMap.strokeStyle="rgba(236,231,222,"+w[1]+")"; gMap.stroke(d.roads[k]); });
     if(zc>=10.5){ gMap.lineCap="butt"; gMap.lineWidth=Math.max(1,14/mpp)/sc; gMap.strokeStyle="rgba(236,231,222,.16)"; gMap.stroke(d.tw);
       gMap.lineWidth=Math.max(1.6,40/mpp)/sc; gMap.strokeStyle="rgba(236,231,222,.42)"; gMap.stroke(d.rw); gMap.lineCap="round"; }
-    d.towns.forEach(function(w){ if(w.mz>zc+0.5||(!w.big&&zc<12)) return; towns.push([o[0]+ux*w.x+vx*w.y,o[1]+uy*w.x+vy*w.y,w]); });
+    if(!clip) d.towns.forEach(function(w){ if(w.mz>zc+0.5||(!w.big&&zc<12)) return; towns.push([o[0]+ux*w.x+vx*w.y,o[1]+uy*w.x+vy*w.y,w]); });
+    gMap.restore();
   }
   // Town names, quiet and small, never stacked on each other
   gMap.setTransform(DPR,0,0,DPR,0,0); gMap.globalAlpha=a; gMap.textAlign="center"; var taken=[];
@@ -1462,7 +1490,7 @@ function satTile(z,x,y,load){
   if(!load||SATB.busy>=10||(SATB.bad>24&&!SATB.ok)) return null;
   t=SATB.c[k]={ok:false,u:SATB.n}; SATB.busy++;
   var im=new Image(); im.crossOrigin="anonymous";
-  im.onload=function(){ SATB.busy--; SATB.ok++; var r=satKey(im); t.cv=r.cv; t.empty=r.empty; t.ok=true; mapDirty=true; };
+  im.onload=function(){ SATB.busy--; SATB.ok++; var r=satKey(im); t.cv=r.cv; t.empty=r.empty; t.ok=true; t.at=performance.now(); mapDirty=true; };
   im.onerror=function(){ SATB.busy--; SATB.bad++; t.bad=true; setTimeout(function(){ delete SATB.c[k]; },60000); mapDirty=true; };
   im.src=SATB.url+k; return t;
 }
@@ -1489,15 +1517,13 @@ function drawSat(S2){
       list.forEach(function(q){ var x=q[0], y=q[1];
         var a=proj([lon(x),lat(y)]), b=proj([lon(x+1),lat(y+1)]);
         var dx=a[0]*T.k+T.x, dy=a[1]*T.k+T.y, dw=(b[0]-a[0])*T.k+0.5, dh=(b[1]-a[1])*T.k+0.5;
-        var t=satTile(z,x,y,true);
-        if(t&&t.ok){ if(t.cv) gMap.drawImage(t.cv,dx,dy,dw,dh); return; }
-        // still loading: stretch the matching piece of a lower-zoom tile so there are no holes
-        for(var up=1;up<=4&&z-up>=7;up++){
-          var pt=satTile(z-up,x>>up,y>>up,false); if(!pt||!pt.ok) continue; if(!pt.cv) return;
-          var sz=256/(1<<up), sx=(x-((x>>up)<<up))*sz, sy=(y-((y>>up)<<up))*sz;
-          gMap.drawImage(pt.cv,sx,sy,sz,sz,dx,dy,dw,dh); return;
-        }
+        var t=satTile(z,x,y,true), fa=t&&t.ok?fadeA(t):0;
+        // still loading (or fading in): fill from the level above or below so there are no holes
+        if(fa<1) tileFill(function(a,b,c){ return satTile(a,b,c,false); },function(a,b,c){ return satTile(a,b,c,false); },function(q){ return q.cv; },z,x,y,7,16,dx,dy,dw,dh);
+        if(t&&t.ok&&t.cv){ gMap.globalAlpha=fa; gMap.drawImage(t.cv,dx,dy,dw,dh); gMap.globalAlpha=1; }
       });
+      // Idle: start on the next level for the middle of the screen, so zooming in lands on sharp imagery
+      if(!SATB.busy&&z<16){ var mx=Math.floor(cx), my=Math.floor(cy); for(var px=mx;px<=mx+1;px++) for(var py=my;py<=my+1;py++) for(var c2=0;c2<4;c2++) satTile(z+1,2*px+(c2&1),2*py+(c2>>1),true); }
       satTrim();
     }
   }
@@ -1532,7 +1558,7 @@ function setSat(v){ satBase=v; try{ localStorage.setItem("upwind-sat",v?"1":"0")
 document.getElementById("base-dark").addEventListener("click",function(e){ setSat(false); if(chart) document.getElementById("chart-btn").click(); else { baseUI(); mapDirty=true; } });
 document.getElementById("sat-btn").addEventListener("click",function(e){ setSat(true); if(chart) document.getElementById("chart-btn").click(); else { baseUI(); mapDirty=true; } });
 baseUI();
-document.getElementById("chart-btn").addEventListener("click",function(){ chart=!chart; baseUI(); if(typeof zoom!=="undefined"){ zoom.scaleExtent([0.8,chart?ZMAX_CHART:ZMAX]); if(chart&&T.k>ZMAX_CHART) d3.select(cTop).transition().duration(700).call(zoom.scaleTo,ZMAX_CHART); } document.body.classList.toggle("chart",chart); mapDirty=true; clearWind(); if(chart) toast("FAA VFR sectional chart. Not for navigation; use current charts.",3600); });
+document.getElementById("chart-btn").addEventListener("click",function(){ chart=!chart; baseUI(); if(typeof zoom!=="undefined"){ zoom.scaleExtent([0.8,chart?ZMAX_CHART:ZMAX]); if(chart&&T.k>ZMAX_CHART) d3.select(cTop).transition().duration(700).call(zoom.scaleTo,ZMAX_CHART); } document.body.classList.toggle("chart",chart); mapDirty=true; clearWind(); if(chart) toast("FAA VFR sectional chart. Not for navigation; use current charts.",3600); saveViewSoon(); });
 
 /* ---------------- Map ---------------- */
 var mapDirty=true, lastLightKey="";
@@ -2276,6 +2302,7 @@ function frame(now){
   // 3D Sky: planes and data keep updating, the flat map pauses
   if(V3&&V3.on){ try{ V3.frame(now); }catch(e){ if(!V3.err){ V3.err=1; console.error(e); } } if(!V3.blending){ requestAnimationFrame(frame); return; } }
   if(follow) followStep(dt);
+  if(tileFadeUntil>performance.now()) mapDirty=true;
   if(mapDirty) drawMap();
   stepWind(dt);
   g.setTransform(DPR,0,0,DPR,0,0); g.clearRect(0,0,W,H);
@@ -2312,8 +2339,16 @@ function blurCopy(){
 
 /* ---------------- Zoom and interaction ---------------- */
 var zoomAt=0;
+/* Open where you left off: the map's center, zoom, sectional and 3D are kept on this device (for two weeks) and
+   used the next time upwind opens. Not on a first visit, a shared link, the lobby, or during the tour or a replay. */
+var VIEW_KEY="upwind-view", viewT=null, restore3d=false;   // restore3d: go into 3D once the opening animation ends
+function saveViewSoon(){ clearTimeout(viewT); viewT=setTimeout(saveView,700); }
+function saveView(){ if(LOBBY||(typeof TOURING!=="undefined"&&TOURING)||(typeof RP!=="undefined"&&RP.on)||!W) return;
+  var c=proj.invert([(W/2-T.x)/T.k,(H/2-T.y)/T.k]); if(!c) return;
+  try{ localStorage.setItem(VIEW_KEY,JSON.stringify({lat:+c[1].toFixed(5),lon:+c[0].toFixed(5),k:+T.k.toFixed(3),chart:!!chart,v3:!!(typeof V3!=="undefined"&&V3&&V3.on),t:Date.now()})); }catch(e){} }
+function savedView(){ try{ var v=JSON.parse(localStorage.getItem(VIEW_KEY)||"null"); if(v&&typeof v.lat==="number"&&typeof v.k==="number"&&Date.now()-v.t<14*864e5) return v; }catch(e){} return null; }
 var ZMAX=64, ZMAX_CHART=28;   // closest zoom: about one airport's traffic pattern (the sectional has no finer detail, so it stops sooner)
-var zoom=d3.zoom().scaleExtent([0.8,chart?ZMAX_CHART:ZMAX]).on("zoom",function(e){ T=e.transform; zoomAt=performance.now(); mapDirty=true; clearWind(); if(e.sourceEvent&&follow) stopFollow(); }).on("start",function(e){ if(e.sourceEvent&&e.sourceEvent.type==="mousedown") cTop.classList.add("drag"); }).on("end",function(){ cTop.classList.remove("drag"); });
+var zoom=d3.zoom().scaleExtent([0.8,chart?ZMAX_CHART:ZMAX]).on("zoom",function(e){ T=e.transform; zoomAt=performance.now(); mapDirty=true; clearWind(); if(e.sourceEvent&&follow) stopFollow(); }).on("start",function(e){ if(e.sourceEvent&&e.sourceEvent.type==="mousedown") cTop.classList.add("drag"); }).on("end",function(){ cTop.classList.remove("drag"); saveViewSoon(); });
 var sel_=d3.select(cTop).call(zoom).on("dblclick.zoom",null);
 var homeEdge=null;
 function drawHome(t){
@@ -2348,14 +2383,25 @@ cTop.addEventListener("click",function(e){
     if(!lookPos){ var ll=proj.invert([(e.clientX-T.x)/T.k,(e.clientY-T.y)/T.k]); if(ll){ myPos={lat:ll[1],lon:ll[0],src:"tap"}; setLook(ll[1],ll[0]); } }
     return; }
   var h=hit(e.clientX,e.clientY); if(!h){ var tf=tfrAt(e.clientX,e.clientY); if(tf){ closeCard(); openTfr(tf); return; } closeCard(); closeTfr(); return; } if(h.home) flyToLL(home.lat,home.lon,Math.max(T.k,2.4)); else if(h.p) openPlane(h.p); else if(h.spot) openSpot(h.spot); else if(h.st) openStation(h.st); else openAirport(h.a); });
-// What's Overhead: look from somewhere else on purpose, with press-and-hold (phones) or double-click (computers)
-var lookHeld=false, holdT=null, holdXY=null;
-function lookFromScreen(x,y){ var ll=proj.invert([(x-T.x)/T.k,(y-T.y)/T.k]); if(ll){ setLook(ll[1],ll[0]); if(navigator.vibrate) try{ navigator.vibrate(12); }catch(e){} } }
-cTop.addEventListener("pointerdown",function(e){ if(mode!=="look"||e.pointerType==="mouse") return; holdXY=[e.clientX,e.clientY]; clearTimeout(holdT); holdT=setTimeout(function(){ lookHeld=true; lookFromScreen(holdXY[0],holdXY[1]); setTimeout(function(){ lookHeld=false; },700); },550); });
-cTop.addEventListener("pointermove",function(e){ if(holdXY&&Math.hypot(e.clientX-holdXY[0],e.clientY-holdXY[1])>9){ clearTimeout(holdT); holdXY=null; } });
-["pointerup","pointercancel"].forEach(function(n){ cTop.addEventListener(n,function(){ clearTimeout(holdT); holdXY=null; }); });
+// What's Overhead from any spot, straight from the map: press and hold (phones), or right-click or double-click
+// (computers; double-click only once What's Overhead is open, since it otherwise zooms). A ring grows under the
+// finger while holding, so it's clear something is about to happen.
+var lookHeld=false, holdT=null, holdXY=null, holdN=0, TOUCHY=!!(window.matchMedia&&matchMedia("(pointer:coarse)").matches);
+var holdRing=document.createElement("div"); holdRing.className="hold-ring"; holdRing.setAttribute("aria-hidden","true"); document.body.appendChild(holdRing);
+function holdOK(){ return (mode==="look"||mode==="sky")&&!LOBBY&&!(typeof TOURING!=="undefined"&&TOURING)&&!RP.on; }
+function ringAt(x,y,cls){ holdRing.style.left=x+"px"; holdRing.style.top=y+"px"; holdRing.className="hold-ring"; void holdRing.offsetWidth; holdRing.className="hold-ring "+cls; }
+function ringOff(){ if(!/done/.test(holdRing.className)) holdRing.className="hold-ring"; }
+function lookFromScreen(x,y){ var ll=proj.invert([(x-T.x)/T.k,(y-T.y)/T.k]); if(!ll) return;
+  ringAt(x,y,"done"); setTimeout(function(){ holdRing.className="hold-ring"; },700);
+  if(mode==="look") setLook(ll[1],ll[0]); else setMode("look",{lat:ll[1],lon:ll[0]});
+  if(navigator.vibrate) try{ navigator.vibrate(12); }catch(e){} }
+cTop.addEventListener("pointerdown",function(e){ holdN++; if(holdN>1||!holdOK()||e.pointerType==="mouse"){ clearTimeout(holdT); holdXY=null; ringOff(); return; }
+  holdXY=[e.clientX,e.clientY]; clearTimeout(holdT); ringAt(e.clientX,e.clientY,"grow");
+  holdT=setTimeout(function(){ if(!holdXY) return; lookHeld=true; lookFromScreen(holdXY[0],holdXY[1]); holdXY=null; setTimeout(function(){ lookHeld=false; },700); },550); });
+cTop.addEventListener("pointermove",function(e){ if(holdXY&&Math.hypot(e.clientX-holdXY[0],e.clientY-holdXY[1])>9){ clearTimeout(holdT); holdXY=null; ringOff(); } });
+["pointerup","pointercancel","pointerleave"].forEach(function(n){ cTop.addEventListener(n,function(){ holdN=Math.max(0,holdN-1); clearTimeout(holdT); holdXY=null; ringOff(); }); });
 cTop.addEventListener("dblclick",function(e){ if(mode==="look") lookFromScreen(e.clientX,e.clientY); });
-cTop.addEventListener("contextmenu",function(e){ if(mode==="look") e.preventDefault(); });
+cTop.addEventListener("contextmenu",function(e){ if(!holdOK()) return; e.preventDefault(); if(!TOUCHY||e.button===2) lookFromScreen(e.clientX,e.clientY); });
 cTop.addEventListener("mousemove",function(e){ var h=hit(e.clientX,e.clientY); hoverP=h&&h.p?h.p:null; if(h&&h.home){ cTop.classList.add("hover"); return; } cTop.classList.toggle("hover",!!h); });
 
 /* ---------------- Cards ---------------- */
@@ -3148,7 +3194,7 @@ document.getElementById("snd").addEventListener("click",function(){ var v=!sound
 
 /* ---------------- Modes: Sky, Plan a trip, Look up ---------------- */
 var mode="sky", mcard=document.getElementById("mcard"), cruise=110, trip=null, lookPos=null, lookT=0, myPos=null;
-function setMode(m,at){ if(m==="look") used("overhead");
+function setMode(m,at){ if(m==="look"){ used("overhead"); if(!at&&typeof tip==="function") tip("hold",TOUCHY?"Tip: press and hold any spot on the map to see what's about to fly over it.":"Tip: right-click any spot on the map to see what's about to fly over it."); }
   if(m==="plan"&&!home){ toast("Set your home airport first, then plan from there."); openHomeForm(); return; }
   mode=m; document.body.classList.remove("mode-sky","mode-plan","mode-look"); document.body.classList.add("mode-"+m);
   var lb=document.getElementById("look-btn"); if(lb) lb.setAttribute("aria-pressed",m==="look");
@@ -3257,12 +3303,14 @@ function lookFromLine(){
   var n=nearestApts(lookPos.lat,lookPos.lon,1)[0], near=n&&n.nm<15?" near "+code(n.a):"";
   return lookPos.auto?"From your home airport, "+esc(code(home))+".":"Viewing from a spot"+near+".";
 }
-function setLook(lat,lon,auto){ lookPos={lat:lat,lon:lon,auto:!!auto}; flyToLL(lat,lon,7,null,true); renderLook(); }
+function setLook(lat,lon,auto){ lookPos={lat:lat,lon:lon,auto:!!auto}; flyToLL(lat,lon,Math.min(12,Math.max(7,T.k)),null,true); renderLook(); }
 function predict(p){
   var dx=(p.lon-lookPos.lon)*60*Math.cos(lookPos.lat*Math.PI/180), dy=(p.lat-lookPos.lat)*60, r=p.trk*Math.PI/180, vx=Math.sin(r)*p.gs/60, vy=Math.cos(r)*p.gs/60;
   var vv=vx*vx+vy*vy, tm=vv?-(dx*vx+dy*vy)/vv:0, cx=dx+vx*tm, cy=dy+vy*tm;
   return {now:Math.hypot(dx,dy),t:tm,dmin:Math.hypot(cx,cy),bx:cx,by:cy,from:cardinal((p.trk+180)%360),side:cardinal((Math.atan2(cx,cy)*180/Math.PI+360)%360)};
 }
+// Is the spot being looked from the viewer's own location (GPS or a spot they tapped as theirs) or their home field?
+function lookIsYou(){ if(!lookPos) return false; var mine=myPos&&Math.abs(myPos.lat-lookPos.lat)<1e-6&&Math.abs(myPos.lon-lookPos.lon)<1e-6; return !!(mine||lookPos.auto); }
 function renderLook(){
   if(!lookPos) return;
   var cand=[], nearest=null;
@@ -3274,14 +3322,15 @@ function renderLook(){
   mcard.classList.add("on");
   function when(t){ return t<1?"&lt;1 min":Math.round(t)+" min"; }
   // The header and sky view stay put; only the list below is refreshed each second (rebuilding the whole card made it flicker)
-  var body=mcard.querySelector(".look-body");
-  if(!body){ mcard.innerHTML='<span class="k">What\'s Overhead</span><h3>Above You.</h3>'+(SKY&&SKY.on?'<div class="sky-slot"></div>':'')+'<div class="look-body"></div>'; body=mcard.querySelector(".look-body"); }
+  var body=mcard.querySelector(".look-body"), self=lookIsYou(), ttl=self?"Above You.":(lookPos.auto&&home?"Above "+code(home)+".":"Above This Spot.");
+  if(!body){ mcard.innerHTML='<span class="k">What\'s Overhead</span><h3>'+ttl+'</h3>'+(SKY&&SKY.on?'<div class="sky-slot"></div>':'')+'<div class="look-body"></div>'; body=mcard.querySelector(".look-body"); }
+  else { var h3=mcard.querySelector("h3"); if(h3&&h3.textContent!==ttl) h3.textContent=ttl; }
   body.innerHTML=''+
     (over?'<div class="now">Overhead now: '+esc(an(over.name))+' at '+fmtAlt(over.alt)+'. Look up!</div>':'')+
-    (lookList.length?'<ul>'+lookList.map(function(p,i){ var pr=p._pr; return '<li data-pi="'+i+'"><span class="t">'+when(pr.t)+'</span><div><b>'+esc(p.name)+'</b><br><span>'+fmtAlt(p.alt)+', coming from the '+pr.from+(pr.dmin<0.8?", right overhead":", passing "+pr.dmin.toFixed(1)+" nm to your "+pr.side)+'</span></div></li>'; }).join("")+'</ul>'
-      :'<p>Nothing headed right over you in the next 12 minutes.'+(nearest?' The closest is '+esc(an(nearest.name).replace(/^A/,'a'))+', '+nearest._pr.now.toFixed(0)+' nm '+cardinal((Math.atan2((nearest.lon-lookPos.lon)*Math.cos(lookPos.lat*Math.PI/180),nearest.lat-lookPos.lat)*180/Math.PI+360)%360)+' at '+fmtAlt(nearest.alt)+'.':'')+'</p>')+
+    (lookList.length?'<ul>'+lookList.map(function(p,i){ var pr=p._pr; return '<li data-pi="'+i+'"><span class="t">'+when(pr.t)+'</span><div><b>'+esc(p.name)+'</b><br><span>'+fmtAlt(p.alt)+', coming from the '+pr.from+(pr.dmin<0.8?", right overhead":", passing "+pr.dmin.toFixed(1)+" nm to "+(self?"your ":"the ")+pr.side)+'</span></div></li>'; }).join("")+'</ul>'
+      :'<p>Nothing headed right over '+(self?'you':'this spot')+' in the next 12 minutes.'+(nearest?' The closest is '+esc(an(nearest.name).replace(/^A/,'a'))+', '+nearest._pr.now.toFixed(0)+' nm '+cardinal((Math.atan2((nearest.lon-lookPos.lon)*Math.cos(lookPos.lat*Math.PI/180),nearest.lat-lookPos.lat)*180/Math.PI+360)%360)+' at '+fmtAlt(nearest.alt)+'.':'')+'</p>')+
     '<div class="acts"><button class="btn ghost" data-act="look-here">Back to My Location</button></div>'+
-    '<p class="fine2">'+lookFromLine()+' Real time, based on each plane\'s current track. '+(W<=760?'Press and hold':'Double-click')+' the map to look from somewhere else.</p>';
+    '<p class="fine2">'+lookFromLine()+' Real time, based on each plane\'s current track. '+(TOUCHY?'Press and hold':'Right-click')+' any spot on the map to look from there.</p>';
 }
 function drawLook(t){
   if(mode!=="look"||!lookPos) return;
@@ -3292,9 +3341,9 @@ function drawLook(t){
   g.fillStyle="#f4e2c6"; g.beginPath(); g.arc(q[0],q[1],5,0,7); g.fill(); g.strokeStyle="#0d0d0c"; g.lineWidth=2; g.stroke();
   g.font="600 11px Hanken Grotesk, sans-serif"; g.fillStyle="#f4e2c6"; g.shadowColor="rgba(0,0,0,.9)"; g.shadowBlur=5;
   // "You" goes wherever it won't sit on an airport or tail label
-  var yw=g.measureText("You").width, ys=[[10,4],[-10-yw,4],[-yw/2,20],[-yw/2,-12]], yp=ys[2];
+  var yl=lookIsYou()?"You":"Here", yw=g.measureText(yl).width, ys=[[10,4],[-10-yw,4],[-yw/2,20],[-yw/2,-12]], yp=ys[2];
   for(var yi=0;yi<ys.length;yi++){ if(lblFree(q[0]+ys[yi][0]-2,q[1]+ys[yi][1]-11,yw+4,14)){ yp=ys[yi]; break; } }
-  g.fillText("You",q[0]+yp[0],q[1]+yp[1]); g.shadowBlur=0;
+  g.fillText(yl,q[0]+yp[0],q[1]+yp[1]); g.shadowBlur=0;
   lookList.forEach(function(p){ var a=scr(p.lon,p.lat), pr=p._pr, cl=scr(p.lon+(Math.sin(p.trk*Math.PI/180)*p.gs/60*pr.t)/(60*Math.cos(p.lat*Math.PI/180)),p.lat+(Math.cos(p.trk*Math.PI/180)*p.gs/60*pr.t)/60);
     g.save(); g.setLineDash([4,4]); g.lineDashOffset=-t*10; g.strokeStyle="rgba(242,163,58,.7)"; g.lineWidth=1.3; g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(cl[0],cl[1]); g.stroke(); g.restore(); });
 }
@@ -3760,7 +3809,7 @@ var tour=(function(){
     }
     S.push({k:"apt",h:function(){ return code(AP)+" · "+AP.t; },p:"Every airport has a window like this: weather, runways, frequencies and the traffic nearby.",d:7500,run:function(){ var was=V&&V.on; clean(); later2(function(){ openAptW(AP); },was?700:0); }});
     if(quiet&&can3) S.push({k:"3d",h:"3D.",p:"The same live sky, with height. Drag to turn and tilt.",d:8000,run:function(){ clean(); if(!V.on) V.enter(); later2(function(){ V.goTo(AP.lat,AP.lon); },900); later2(function(){ if(V.orbit) V.orbit(true); },2200); }});
-    S.push({k:"look",h:"What's Overhead.",p:"What's about to fly over a spot"+(home?", here "+code(home):"")+". Tap it anytime, then tap where you are.",d:7500,run:function(){ var was=V&&V.on; clean(); later2(function(){ setMode("look",{lat:ll.lat,lon:ll.lon,home:ll===home}); },was?700:0); }});
+    S.push({k:"look",h:"What's Overhead.",p:"What's about to fly over a spot"+(home?", here "+code(home):"")+". Tap it anytime, or "+(TOUCHY?"press and hold":"right-click")+" any spot on the map.",d:7500,run:function(){ var was=V&&V.on; clean(); later2(function(){ setMode("look",{lat:ll.lat,lon:ll.lon,home:ll===home}); },was?700:0); }});
     S.push({end:true,h:"Your turn.",p:"The tour is under the upwind logo anytime.",run:function(){ clean(); if(T0) d3.select(cTop).transition().duration(RM?1:1400).ease(d3.easeCubicInOut).call(zoom.transform,T0); }});
     return S; }
   function render(){
@@ -4488,7 +4537,7 @@ var V3=(function(){
   function size(){ var r=cv.getBoundingClientRect(); vw=Math.round(r.width)||innerWidth; vh=Math.round(r.height)||innerHeight; dpr=lob3?1:Math.min(2,devicePixelRatio||1); cv.width=vw*dpr; cv.height=vh*dpr; dirty=true; }   // lobby screens draw at 1x: TVs and streaming sticks
   addEventListener("resize",function(){ if(on) size(); });
   function setToggle(){ var f=document.getElementById("view-flat"), t=document.getElementById("view-3d"); if(f) f.setAttribute("aria-pressed",!on); if(t) t.setAttribute("aria-pressed",on); }
-  function enter(){ if(on||LOBBY) return; used("3d"); closeOthers(); if(RP.on) stopReplay(); var rf=follow; if(follow) stopFollow();
+  function enter(){ if(on||LOBBY) return; used("3d"); setTimeout(saveView,50); closeOthers(); if(RP.on) stopReplay(); var rf=follow; if(follow) stopFollow();
     // over the home airport when one is set, otherwise over the middle of the flat map, about as far out as it was
     var c=home&&home.lat!=null?[home.lon,home.lat]:proj.invert([(W/2-T.x)/T.k,(H*0.55-T.y)/T.k]);
     if(!c) c=[-84.9,43.9];   // the middle of Michigan
@@ -4500,7 +4549,7 @@ var V3=(function(){
     if(matchMedia("(pointer:coarse)").matches) hint.textContent="Drag to turn and tilt · Two fingers to move and zoom"; hint.classList.remove("gone"); clearTimeout(enter.t); enter.t=setTimeout(hideHint,7000);
     try{ var u=new URL(location.href); u.searchParams.set("view","3d"); history.replaceState(null,"",u); }catch(e){}
     if(rf&&!rf.gone) rideStart(rf); }
-  function exit(){ if(!on) return; var rp=ride; ride=null; on=false; document.body.classList.remove("v3d"); document.getElementById("v3").hidden=true; card3.classList.remove("on"); pick3=null; setToggle(); mapDirty=true;
+  function exit(){ if(!on) return; var rp=ride; ride=null; on=false; setTimeout(saveView,50); document.body.classList.remove("v3d"); document.getElementById("v3").hidden=true; card3.classList.remove("on"); pick3=null; setToggle(); mapDirty=true;
     try{ var u=new URL(location.href); u.searchParams.delete("view"); history.replaceState(null,"",u); }catch(e){}
     if(rp&&!rp.gone&&typeof startFollow==="function") startFollow(rp); }
   function frame(now){ if(!on) return; if(!(vw>0&&vh>0)){ size(); if(!(vw>0&&vh>0)) return; } todTick(now); if(LB) lobbyStep(now); else if(anim){ anim(now); dirty=true; } else if(ride) rideStep();
@@ -4565,12 +4614,13 @@ if(innerWidth<=760&&!LOBBY){ document.body.classList.add("tick-wait"); setTimeou
   how.textContent=ios?"Tap the Share button, then Add to Home Screen.":"Open your browser menu, then Add to Home screen.";
   setTimeout(function(){ if(document.querySelector(".card.on,.pop.on,.panel.on,.tour2.on")) return; el.classList.add("on"); document.body.classList.add("a2hs-on"); setTimeout(hide,20000); },22000);
 })();
-function endSplash(){ if(document.body.classList.contains("tick-wait")) setTimeout(function(){ document.body.classList.remove("tick-wait"); },10000); clearTimeout(spT); cancelAnimationFrame(spRaf); if(!splash.classList.contains("gone")){ if(LOBBY) setTimeout(lobbyNext,600); else if(deep.apt||deep.plane) setTimeout(runDeep,400); else if(!tour.seen()) tour.auto(); } splash.classList.add("gone"); splash.classList.remove("on","split"); splash.querySelectorAll(".half").forEach(function(h){h.remove();}); }
+function endSplash(){ if(document.body.classList.contains("tick-wait")) setTimeout(function(){ document.body.classList.remove("tick-wait"); },10000); clearTimeout(spT); cancelAnimationFrame(spRaf); if(!splash.classList.contains("gone")){ if(LOBBY) setTimeout(lobbyNext,600); else if(deep.apt||deep.plane) setTimeout(runDeep,400); else if(!tour.seen()) tour.auto(); else if(restore3d){ restore3d=false; setTimeout(function(){ if(typeof V3!=="undefined"&&V3&&!V3.on) V3.enter(); },500); } } splash.classList.add("gone"); splash.classList.remove("on","split"); splash.querySelectorAll(".half").forEach(function(h){h.remove();}); }
 function playSplash(){
   clearTimeout(spT); cancelAnimationFrame(spRaf);
   var still=matchMedia("(prefers-reduced-motion:reduce)").matches;
   splash.querySelectorAll(".half").forEach(function(h){h.remove();});
-  splash.classList.remove("gone","on","split"); void splash.offsetWidth; splash.classList.add("on");
+  var mk=splash.querySelector(".mk2"); if(mk) mk.classList.remove("go");
+  splash.classList.remove("gone","on","split","lr"); void splash.offsetWidth; splash.classList.add("on");
   var Wd=innerWidth, Hd=innerHeight, band=3;
   var wmR=splash.querySelector(".wm2").getBoundingClientRect(), yU=Math.round(wmR.bottom+22)+0.5;
   // Lobby: the airport identifier sits under the stripes, inside .bg so it travels with the lower half on the split
@@ -4587,12 +4637,11 @@ function playSplash(){
   var letters=[].slice.call(splash.querySelectorAll(".wm2 span")), lift=letters.map(function(){return 0;}), lc=letters.map(function(sp){ var r=sp.getBoundingClientRect(); return r.left+r.width/2; });
   // The identifier's letters dip as the plane passes over them, the opposite of the wordmark's lift
   var dl=a2?[].slice.call(a2.querySelectorAll("span")):[], dip=dl.map(function(){return 0;}), dc=dl.map(function(sp){ var r=sp.getBoundingClientRect(); return r.left+r.width/2; });
+  var xS=x0, tails=null;
   function draw(p){
-    var x=x0+L*p;
-    // Letters lift a little as the plane passes underneath, like a wake
-    letters.forEach(function(sp,j){ var d=(x-lc[j])/70, bump=Math.exp(-d*d); lift[j]+=(bump-lift[j])*0.1; sp.style.translate="0 "+(-8*lift[j]).toFixed(2)+"px"; sp.style.rotate=(-1.5*lift[j]).toFixed(2)+"deg"; });
+    var x=xS+(x1-xS)*p;
     dl.forEach(function(sp,j){ var d=(x-dc[j])/70, bump=Math.exp(-d*d); dip[j]+=(bump-dip[j])*0.1; sp.style.translate="0 "+(6*dip[j]).toFixed(2)+"px"; });
-    lines.forEach(function(ln,k){ var y=yU+(k-1)*band; ln.attr("points",x0+","+y+" "+x.toFixed(1)+","+y); });
+    lines.forEach(function(ln,k){ var y=yU+(k-1)*band; ln.attr("points",(tails&&tails[k]?tails[k]:x0+","+y)+" "+x.toFixed(1)+","+y); });
     plane.attr("transform","translate("+x.toFixed(1)+","+yU+") rotate(90)");
   }
   function finish(){
@@ -4600,24 +4649,57 @@ function playSplash(){
     spT=setTimeout(function(){
       plane.style("display","none");
       var bgEl=splash.querySelector(".bg"), svgN=document.getElementById("splash-svg");
-      var halves=[["0 0 "+(Hd-yU)+"px 0",-(yU+band*2)],[yU+"px 0 0 0",(Hd-yU)+band*2]].map(function(c){
-        var h=document.createElement("div"); h.className="half"; h.style.clipPath="inset("+c[0]+")";
+      var cuts=SPL?[["polygon(0 0,"+SPL.xt+"px 0,"+SPL.xb+"px 100%,0 100%)",-(Math.max(SPL.xt,SPL.xb)+60)],["polygon("+SPL.xt+"px 0,100% 0,100% 100%,"+SPL.xb+"px 100%)",Wd-Math.min(SPL.xt,SPL.xb)+60]]
+        :[["inset(0 0 "+(Hd-yU)+"px 0)",-(yU+band*2)],["inset("+yU+"px 0 0 0)",(Hd-yU)+band*2]];
+      var halves=cuts.map(function(c){
+        var h=document.createElement("div"); h.className="half"; h.style.clipPath=c[0];
         var b2=bgEl.cloneNode(true), s2=svgN.cloneNode(true); s2.removeAttribute("id");
         h.appendChild(b2); h.appendChild(s2); splash.appendChild(h); h.dataset.to=c[1]; return h;
       });
-      splash.classList.add("split"); void splash.offsetWidth;
-      halves.forEach(function(h){ h.style.transform="translateY("+h.dataset.to+"px)"; });
-      d3.select(cTop).call(zoom.transform,d3.zoomIdentity.translate(Wd*0.03,Hd*0.02).scale(0.95));
+      splash.classList.add("split"); if(SPL) splash.classList.add("lr"); void splash.offsetWidth;
+      halves.forEach(function(h){ h.style.transform=(SPL?"translateX(":"translateY(")+h.dataset.to+"px)"; });
       var tgt=d3.zoomIdentity; if(home){ var hb=proj([home.lon,home.lat]), hk=1.9; tgt=d3.zoomIdentity.translate((mobile?W/2:W*0.62)-hb[0]*hk,(mobile?H*0.56:H/2)-hb[1]*hk).scale(hk); }
-      d3.select(cTop).transition().duration(2400).ease(d3.easeCubicOut).call(zoom.transform,tgt);
-      spT=setTimeout(endSplash,950);
-    },320);
+      var sv=(!LOBBY&&!deep.apt&&!deep.plane&&tour.seen())?savedView():null;
+      if(sv){ var sk2=Math.max(0.8,Math.min(sv.chart?ZMAX_CHART:ZMAX,sv.k)), sb=proj([sv.lon,sv.lat]); tgt=d3.zoomIdentity.translate(W/2-sb[0]*sk2,H/2-sb[1]*sk2).scale(sk2);
+        if(sv.chart&&!chart) document.getElementById("chart-btn").click();
+        var u3=null; try{ u3=new URLSearchParams(location.search).get("view"); }catch(e){}
+        if(sv.v3&&!u3) restore3d=true; }
+      // a slight, soft zoom into wherever the map lands: start a touch further out (around the screen's centre) and ease in
+      var z0=0.94; d3.select(cTop).call(zoom.transform,d3.zoomIdentity.translate(W/2+(tgt.x-W/2)*z0,H/2+(tgt.y-H/2)*z0).scale(tgt.k*z0));
+      d3.select(cTop).transition().duration(2200).ease(d3.easeCubicOut).call(zoom.transform,tgt);
+      spT=setTimeout(endSplash,SPL?600:950);
+    },SPL?40:320);
   }
   if(still){ draw(1); spT=setTimeout(finish,1000); return; }
-  var dur=2700, t0=performance.now()+450;
-  (function step(now){ var t=Math.max(0,Math.min(1,(now-t0)/dur)), p=0.5-0.5*Math.cos(Math.PI*t); draw(p);
-    if(t<1) spRaf=requestAnimationFrame(step); else { draw(1); settle(); finish(); } })(performance.now());
-  function settle(){ var any=false; dl.forEach(function(sp,j){ dip[j]*=0.93; if(dip[j]>0.01) any=true; else dip[j]=0; sp.style.translate="0 "+(6*dip[j]).toFixed(2)+"px"; }); letters.forEach(function(sp,j){ lift[j]*=0.93; if(lift[j]>0.01) any=true; else lift[j]=0; sp.style.translate="0 "+(-8*lift[j]).toFixed(2)+"px"; sp.style.rotate=(-1.5*lift[j]).toFixed(2)+"deg"; }); if(any) requestAnimationFrame(settle); }
+  // The windsock: the lockup holds, the mark's bars sway in a gentle breeze (the ripple runs from the orange mouth out
+  // to the cream tip), then the bars extend in place along their own slant to the top and bottom of the screen, and the
+  // screen splits left and right between the amber and cream bars. No plane in this intro.
+  var tB=performance.now()+200, DB=1100, tE=tB+DB, DE=480, SPL=null;
+  plane.style("display","none");
+  var R=mk?[].slice.call(mk.querySelectorAll("rect")):[], R0=[[22,20,18,60],[45,28,14,44],[64,35,10,30]];
+  function windsock(now){
+    if(!mk){ finish(); return; }
+    if(now<tB){ spRaf=requestAnimationFrame(windsock); return; }
+    var mr=mk.getBoundingClientRect(), sc=mr.height/64;
+    if(now<tE){                                              // breeze: a soft sway, stronger toward the tip
+      var tn=(now-tB)/DB, env=(1-Math.cos(2*Math.PI*tn))/2;   // eases in from stillness and back out
+      R.forEach(function(r,k){ var ph=2*Math.PI*1.5*tn-k*0.9, dx=(0.9+k*0.9)*Math.sin(ph)*env, rot=(0.7+k*0.8)*Math.sin(ph-0.4)*env, b=R0[k];
+        r.setAttribute("transform","translate("+dx.toFixed(2)+" 0) rotate("+rot.toFixed(2)+" "+(b[0]+b[2]/2)+" "+(b[1]+b[3])+")"); });
+      spRaf=requestAnimationFrame(windsock); return; }
+    // extend in place: each bar grows up and down along its slant until it runs off the top and bottom of the screen
+    var cY=mr.top+mr.height/2, ext=(Math.max(cY,Hd-cY)+60)/sc, done=true;
+    R.forEach(function(r,k){ var u=Math.max(0,Math.min(1,(now-tE-k*50)/DE)), e=u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2, b=R0[k];
+      if(u<1) done=false; r.removeAttribute("transform"); r.setAttribute("y",(b[1]-ext*e).toFixed(2)); r.setAttribute("height",(b[3]+2*ext*e).toFixed(2)); });
+    if(!done){ spRaf=requestAnimationFrame(windsock); return; }
+    // the cut runs through the gap between the amber and cream bars, leaning 12 degrees like the mark, so orange and
+    // amber leave whole with the left half, and cream leaves with the wordmark on the right
+    var T12=Math.tan(12*Math.PI/180), am=[61.5,50], vx=am[0]-T12*am[1]+10.63, X=mr.left+(vx-13)*sc, Y=mr.top+(am[1]-18)*sc;
+    SPL={xt:Math.round(X+Y*T12), xb:Math.round(X-(Hd-Y)*T12)};
+    finish();
+  }
+  if(mk) R.forEach(function(r,k){ var b=R0[k]; r.removeAttribute("transform"); r.setAttribute("y",b[1]); r.setAttribute("height",b[3]); });
+  spRaf=requestAnimationFrame(windsock);
+  function settle(){ var any=false; dl.forEach(function(sp,j){ dip[j]*=0.93; if(dip[j]>0.01) any=true; else dip[j]=0; sp.style.translate="0 "+(6*dip[j]).toFixed(2)+"px"; }); letters.forEach(function(sp,j){ lift[j]*=0.93; if(lift[j]>0.01) any=true; else lift[j]=0; sp.style.translate="0 "+(-4*lift[j]).toFixed(2)+"px"; sp.style.rotate=(-0.6*lift[j]).toFixed(2)+"deg"; }); if(any) requestAnimationFrame(settle); }
 }
 splash.addEventListener("click",endSplash);
 document.querySelectorAll("[data-ptab]").forEach(function(b){ b.addEventListener("click",function(e){ e.stopPropagation(); document.querySelectorAll("[data-ptab]").forEach(function(x){ x.setAttribute("aria-selected",x===b); }); document.querySelectorAll(".ppane").forEach(function(p){ p.hidden=p.dataset.pane!==b.dataset.ptab; }); }); });
